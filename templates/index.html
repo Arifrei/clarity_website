@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Clarity Solutions – Make Your Business Run Smarter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="Clarity Solutions helps business owners turn scattered, ad-hoc operations into a clear, simple workflow – whether you’re using too many tools or none at all."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- external CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <a href="#top" class="brand">
+        <div class="brand-mark">C</div>
+        <div>
+          <div class="brand-text-main">Clarity Solutions</div>
+          <div class="brand-text-sub">Operations & Software Consulting</div>
+        </div>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#process">How it works</a></li>
+          <li><a href="#testimonials">Clients</a></li>
+        </ul>
+      </nav>
+      <div class="nav-cta">
+        <button class="btn-primary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+          Book a call <span class="arrow">↗</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="shell">
+
+      <!-- HERO -->
+      <section class="hero fade-in">
+        <div>
+          <div class="hero-kicker">
+            <div class="hero-kicker-dot"></div>
+            <span>For owners whose business runs on “a bit of everything”</span>
+          </div>
+          <h1 class="hero-title">
+            Turn scattered, ad-hoc operations into a
+            <span class="highlight">clear, simple system.</span>
+          </h1>
+          <p class="hero-sub">
+            Clarity Solutions helps business owners who feel everything is “in my head”, in notebooks,
+            in WhatsApp, or split across too many tools. We turn that into a streamlined workflow your
+            team can follow — whether you use no software at all, or ten different apps.
+          </p>
+
+          <ul class="hero-list">
+            <li>
+              <div class="hero-list-bullet">✓</div>
+              <span>Good for you if you’re mostly on paper, spreadsheets, or your phone — and want something more organized.</span>
+            </li>
+            <li>
+              <div class="hero-list-bullet">✓</div>
+              <span>Good for you if you already use tools, but they don’t talk to each other and nothing feels “connected”.</span>
+            </li>
+            <li>
+              <div class="hero-list-bullet">✓</div>
+              <span>Good for you if you’re ready for light custom tools once the basics are finally under control.</span>
+            </li>
+          </ul>
+
+          <div class="hero-actions">
+            <button class="btn-primary" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+              Schedule a 30-min consult <span class="arrow">→</span>
+            </button>
+            <button class="btn-secondary" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">
+              View services
+            </button>
+          </div>
+
+          <div class="hero-caption">
+            You don’t have to become a “software person”. <span>You explain your business; Clarity translates that into a working system.</span>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-hidden="true">
+          <div class="hero-card-header">
+            <div>
+              <div class="hero-card-title">What “before” often looks like</div>
+              <div style="font-size:0.78rem; color:var(--text-soft);">Common patterns we see with new clients</div>
+            </div>
+            <div class="hero-card-tag">Any stage of business</div>
+          </div>
+
+          <div class="hero-card-row">
+            <span class="hero-card-label">Where information lives</span>
+            <span class="hero-card-value">Owner’s head · WhatsApp · paper · apps</span>
+          </div>
+          <div class="hero-card-row">
+            <span class="hero-card-label">How work is tracked</span>
+            <span class="hero-card-value">“I’ll remember” · scattered lists</span>
+          </div>
+          <div class="hero-card-row">
+            <span class="hero-card-label">Owner’s role day-to-day</span>
+            <span class="hero-card-value">Chief reminder & firefighter</span>
+          </div>
+
+          <div class="hero-card-note">
+            After working with Clarity, there’s one simple place to see what’s going on, what’s next,
+            and who’s responsible — whether the system is built from brand-new tools or the ones you already have.
+          </div>
+        </aside>
+      </section>
+
+      <!-- SERVICES -->
+      <section id="services" class="fade-in delay-1">
+        <div class="section-header">
+          <div class="section-kicker">Services</div>
+          <h2 class="section-title">From “everything is messy” to “we know how things flow”</h2>
+          <p class="section-sub">
+            These services are designed for both ends of the spectrum: businesses with no real system yet,
+            and businesses drowning in too many tools. The goal is the same — one clear, practical way of working.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <article class="card">
+            <div class="card-label">01 · Understand</div>
+            <h3>Operations & workflow audit</h3>
+            <p>
+              We sit with you and walk through real jobs, customers, or projects: how they start, who’s involved,
+              what gets written where, and where things fall through the cracks — with or without software.
+            </p>
+            <div class="card-meta">
+              <span>Deliverable: a clear picture of “how it really works today”.</span>
+              <span class="card-tag">1–2 weeks</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-label">02 · Design</div>
+            <h3>Simple system & tool plan</h3>
+            <p>
+              Based on how you actually work, we design a simple system: what should be on paper, what should go
+              into software, which tools (if any) you need, and how information moves from step to step.
+            </p>
+            <div class="card-meta">
+              <span>Deliverable: a practical “this is how we’ll run things” plan.</span>
+              <span class="card-tag">3–5 weeks</span>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card-label">03 · Build</div>
+            <h3>Setup, automation & custom tools</h3>
+            <p>
+              We set everything up with you: configure chosen tools, create views and checklists, connect pieces
+              together, and when needed, build small custom apps to handle the parts no off-the-shelf tool can.
+            </p>
+            <div class="card-meta">
+              <span>Deliverable: a working system your team can follow.</span>
+              <span class="card-tag">Ongoing</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- PROCESS -->
+      <section id="process" class="fade-in delay-2">
+        <div class="section-header">
+          <div class="section-kicker">How it works</div>
+          <h2 class="section-title">A simple three-step path — no matter where you’re starting</h2>
+          <p class="section-sub">
+            Whether you’re mostly on paper or already deep into software, the process is the same:
+            understand, design, then build something that fits the way you want the business to run.
+          </p>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-badge">1</div>
+            <div>
+              <h3>Discovery call</h3>
+              <p>
+                A short conversation about your business, how work happens today, what stresses you out,
+                and what “better” would look like — in your words, not technical language.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-badge">2</div>
+            <div>
+              <h3>Clarity blueprint</h3>
+              <p>
+                You get a written, plain-English blueprint: where information should live, what tools
+                (if any) to use, and the simple steps each job or customer should follow.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-badge">3</div>
+            <div>
+              <h3>Implementation & iteration</h3>
+              <p>
+                We help you put it in place, train your team if needed, and adjust after a few weeks of real use
+                — so it stays practical and doesn’t turn into another “system no one uses”.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TESTIMONIALS -->
+      <section id="testimonials" class="fade-in delay-3">
+        <div class="section-header">
+          <div class="section-kicker">Client stories</div>
+          <h2 class="section-title">“It’s the first time the business feels under control.”</h2>
+          <p class="section-sub">
+            These anonymized stories come from both sides: owners who had no system at all,
+            and owners buried under a pile of tools. The common thread — more clarity, less chaos.
+          </p>
+        </div>
+
+        <div class="testimonials-grid">
+          <article class="testimonial-card">
+            <div class="testimonial-body">
+              “Before Clarity, everything lived in my head, my notebook, and my phone. Staff kept asking
+              what was next and what was already done. Now we have one simple place where jobs move from step
+              to step, and I don’t have to remember everything for everyone.”
+            </div>
+            <div class="testimonial-footer">
+              <div class="testimonial-meta">
+                <span class="avatar">S</span>
+                <div>
+                  <strong>Owner, service business</strong>
+                  <span>Small team · High volume work</span>
+                </div>
+              </div>
+              <span class="testimonial-pill">From “in my head” to trackable</span>
+            </div>
+          </article>
+
+          <article class="testimonial-card">
+            <div class="testimonial-body">
+              “We were paying for so many apps and still running half the business from spreadsheets.
+              Clarity cut the noise, kept what actually helped, and gave us a simple flow everyone follows.
+              It finally feels like one business, not ten different systems.”
+            </div>
+            <div class="testimonial-footer">
+              <div class="testimonial-meta">
+                <span class="avatar">L</span>
+                <div>
+                  <strong>Owner, multi-location retail</strong>
+                  <span>3 locations · 8 staff</span>
+                </div>
+              </div>
+              <span class="testimonial-pill">Fewer tools, more clarity</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- CTA / CONTACT -->
+      <section id="contact" class="cta fade-in delay-3">
+        <div>
+          <h2>Let’s see where your operations are stuck.</h2>
+          <p>
+            On a short call we’ll walk through how things work today — tools or no tools — and highlight
+            a handful of practical changes that would make your life easier, with or without a full project.
+          </p>
+        </div>
+        <div class="cta-actions">
+          <button class="btn-primary">
+            Email: info@claritysolutionsco.com
+          </button>
+          <button class="btn-secondary">
+            Request a sample “Clarity blueprint”
+          </button>
+          <div class="cta-note">
+            Straightforward, low-pressure conversation. No heavy sales pitch, no jargon.
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer>
+        <div class="footer-inner">
+          <div>© <span id="year"></span> Clarity Solutions. All rights reserved.</div>
+          <div class="footer-links">
+            <a href="#services">Services</a>
+            <a href="#process">How it works</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <!-- external JS -->
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

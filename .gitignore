@@ -1,0 +1,62 @@
+# =========================
+# Python / Flask
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+*.db
+
+
+# =========================
+# Virtual Environments
+# =========================
+venv/
+.env
+.env.*
+pip-wheel-metadata/
+*.egg-info/
+
+
+# =========================
+# Flask / Production
+# =========================
+instance/
+flask_session/
+*.pid
+
+
+# =========================
+# Node (if added later)
+# =========================
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+*.code-workspace
+
+
+# =========================
+# Deployment Junk
+# =========================
+*.swp
+*.tmp
+*.bak
+*.old
