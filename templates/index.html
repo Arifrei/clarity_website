@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- HERO (Pinned scene + scroll-scrub text + chaos→order driven in JS) -->
+<section id="home" class="scene hero pinned">
+  <div class="heroInner">
+    <div class="grid">
+      <div class="heroLeft drift">
+        <div class="kicker">Clarity Solutions</div>
+        <h1 class="mega">
+          Make your business
+          <span class="grad">feel simple</span>.
+        </h1>
+        <p class="oneLine">Chaos → system. Fast.</p>
+
+        <div class="heroActions">
+          <button class="btn primary" data-target="contact">Start</button>
+          <button class="btn ghost" data-target="services">See services</button>
+        </div>
+
+        <div class="scrollHint" aria-hidden="true">
+          <span class="mouse"></span>
+          <span>Scroll</span>
+        </div>
+      </div>
+
+      <div class="heroRight drift">
+        <div class="glassCard">
+          <div class="tiny">You’re juggling</div>
+
+          <!-- chaos cloud resolves continuously by scroll via JS -->
+          <div class="cloudWrap" id="cloudWrap">
+            <div class="cloud" id="cloud">
+              <span class="tag">WhatsApp</span>
+              <span class="tag">Spreadsheets</span>
+              <span class="tag">Approvals</span>
+              <span class="tag">Projects</span>
+              <span class="tag">Invoices</span>
+              <span class="tag">Deadlines</span>
+              <span class="tag">Receipts</span>
+              <span class="tag">Follow-ups</span>
+              <span class="tag">“in my head”</span>
+              <span class="tag">Tool #7</span>
+              <span class="tag">Missed handoff</span>
+              <span class="tag">No visibility</span>
+            </div>
+          </div>
+
+          <div class="miniLine">Scroll → it snaps into order.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- depth layers -->
+    <div class="bgOrbs" aria-hidden="true">
+      <div class="orb a"></div>
+      <div class="orb b"></div>
+      <div class="orb c"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Spacer = pacing / breathing room (important for premium scroll rhythm) -->
+<section class="scene spacer"></section>
+
+<!-- ABOUT (minimal copy) -->
+<section id="about" class="scene about">
+  <div class="container">
+    <h2 class="sectionTitle drift">Order. Not overload.</h2>
+    <p class="sectionSub drift">
+      We design a workflow your team can follow — then pick tools that fit.
+    </p>
+
+    <div class="pillRow">
+      <div class="pill drift">One source of truth</div>
+      <div class="pill drift">Clear ownership</div>
+      <div class="pill drift">Real reporting</div>
+      <div class="pill drift">Less chasing</div>
+    </div>
+  </div>
+</section>
+
+<section class="scene spacer"></section>
+
+<!-- SERVICES (sticky chapter stepper) -->
+<section id="services" class="scene services">
+  <div class="container">
+    <div class="servicesGrid">
+      <div class="stickyStepper drift">
+        <div class="stepTop">
+          <div class="stepCount" id="stepCount">1/5</div>
+          <div class="stepTitle" id="stepTitle">Stop the scramble</div>
+        </div>
+        <div class="stepDots" id="stepDots" aria-hidden="true"></div>
+
+        <div class="stepNav">
+          <button class="miniBtn" id="prevStep">Prev</button>
+          <button class="miniBtn" id="nextStep">Next</button>
+        </div>
+      </div>
+
+      <div class="stepPanels" id="stepPanels">
+        <article class="stepPanel">
+          <div class="stepKicker">01</div>
+          <h3 class="cardTitle">Map the mess</h3>
+          <p class="cardSub">What actually happens. Not what it “should” be.</p>
+          <div class="cardVisual gradientFrame"></div>
+        </article>
+
+        <article class="stepPanel">
+          <div class="stepKicker">02</div>
+          <h3 class="cardTitle">Design the flow</h3>
+          <p class="cardSub">Owners. Steps. Hand-offs. Done.</p>
+          <div class="cardVisual gridFrame"></div>
+        </article>
+
+        <article class="stepPanel">
+          <div class="stepKicker">03</div>
+          <h3 class="cardTitle">Choose tools</h3>
+          <p class="cardSub">Simple stack. No Franken-systems.</p>
+          <div class="cardVisual chipsFrame"></div>
+        </article>
+
+        <article class="stepPanel">
+          <div class="stepKicker">04</div>
+          <h3 class="cardTitle">Integrate</h3>
+          <p class="cardSub">Make it feel like one system.</p>
+          <div class="cardVisual linkFrame"></div>
+        </article>
+
+        <article class="stepPanel">
+          <div class="stepKicker">05</div>
+          <h3 class="cardTitle">Automate</h3>
+          <p class="cardSub">Cut repeat work. Reduce mistakes.</p>
+          <div class="cardVisual pulseFrame"></div>
+        </article>
+      </div>
+    </div>
+
+    <div class="workBlock">
+      <div class="workTop">
+        <div>
+          <h2 class="sectionTitle drift">Work, in motion.</h2>
+          <p class="sectionSub drift">A few examples of what “clarity” looks like.</p>
+        </div>
+      </div>
+
+      <div class="workGrid">
+        <div class="workCard tilt drift">
+          <div class="workLabel">Dashboards</div>
+          <div class="workImg w1"></div>
+        </div>
+        <div class="workCard tilt drift">
+          <div class="workLabel">Automation</div>
+          <div class="workImg w2"></div>
+        </div>
+        <div class="workCard tilt drift">
+          <div class="workLabel">Templates</div>
+          <div class="workImg w3"></div>
+        </div>
+        <div class="workCard tilt drift">
+          <div class="workLabel">Reporting</div>
+          <div class="workImg w4"></div>
+        </div>
+      </div>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="track">
+          <span>clarity</span><span>systems</span><span>workflow</span><span>automation</span><span>visibility</span><span>reporting</span>
+          <span class="spacerSpan"></span>
+          <span>clarity</span><span>systems</span><span>workflow</span><span>automation</span><span>visibility</span><span>reporting</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quoteBlock">
+      <div class="quoteCard drift">
+        <div class="quoteText" id="quoteText">“Everything stopped living in ten places.”</div>
+        <div class="quoteWho" id="quoteWho">Owner, SMB</div>
+      </div>
+      <div class="quoteBtns">
+        <button class="iconBtn" id="qPrev" aria-label="Previous">←</button>
+        <button class="iconBtn" id="qNext" aria-label="Next">→</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="scene spacer"></section>
+
+<!-- CONTACT -->
+<section id="contact" class="scene contact">
+  <div class="container">
+    <h2 class="sectionTitle drift">Let’s simplify it.</h2>
+    <p class="sectionSub drift">Short message. We’ll reply with a plan.</p>
+
+    <form class="form" id="contactForm">
+      <div class="field drift">
+        <input name="name" required placeholder="Name" />
+      </div>
+      <div class="field drift">
+        <input name="email" type="email" required placeholder="Email" />
+      </div>
+      <div class="field drift">
+        <textarea name="msg" rows="4" required placeholder="What’s messy?"></textarea>
+      </div>
+
+      <div class="formRow">
+        <button class="btn primary" type="submit">Send</button>
+        <div class="formNote" id="formNote">Wire to email/CRM later.</div>
+      </div>
+    </form>
+
+    <div class="footerMini">
+      <span>© <span id="year"></span> Clarity Solutions</span>
+      <span class="dotSep">•</span>
+      <span>Calm operations.</span>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

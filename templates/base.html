@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Clarity Solutions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Turn scattered operations into a clear, simple system." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="topProgress" id="topProgress"></div>
+
+  <header class="navWrap" id="navWrap">
+    <div class="nav">
+      <a class="brand" data-target="home" href="#home" aria-label="Clarity Solutions Home">
+        <span class="mark" aria-hidden="true"></span>
+        <span class="brandText">Clarity</span>
+      </a>
+
+      <div class="navLinks" aria-label="Primary navigation">
+        <button class="navBtn active" data-target="home">Home</button>
+        <button class="navBtn" data-target="about">About</button>
+        <button class="navBtn" data-target="services">Services</button>
+        <button class="navBtn" data-target="contact">Contact</button>
+      </div>
+
+      <button class="cta magnetic" id="ctaBtn" data-target="contact">
+        <span class="ctaDot" aria-hidden="true"></span>
+        <span>Let’s talk</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
