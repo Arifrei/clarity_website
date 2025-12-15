@@ -2376,3 +2376,334 @@ main{ padding-top: var(--navH); }
     bottom: 14px;
   }
 }
+
+/* -------- SCROLL EFFECTS -------- */
+
+/* Base states for scroll-triggered elements */
+.scroll-fade-up{
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.scroll-fade-down{
+  opacity: 0;
+  transform: translateY(-60px);
+  transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.scroll-fade-left{
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.scroll-fade-right{
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.scroll-scale{
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.scroll-rotate{
+  opacity: 0;
+  transform: rotate(-8deg) scale(0.9);
+  transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.scroll-flip{
+  opacity: 0;
+  transform: perspective(1000px) rotateY(20deg);
+  transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.scroll-blur{
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(.2,.8,.2,1), filter 0.8s cubic-bezier(.2,.8,.2,1), transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+/* Active states when element is in view */
+.scroll-fade-up.in-view,
+.scroll-fade-down.in-view,
+.scroll-fade-left.in-view,
+.scroll-fade-right.in-view{
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.scroll-scale.in-view{
+  opacity: 1;
+  transform: scale(1);
+}
+
+.scroll-rotate.in-view{
+  opacity: 1;
+  transform: rotate(0) scale(1);
+}
+
+.scroll-flip.in-view{
+  opacity: 1;
+  transform: perspective(1000px) rotateY(0);
+}
+
+.scroll-blur.in-view{
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* Stagger delays for sequential animations */
+.scroll-delay-1{ transition-delay: 0.1s; }
+.scroll-delay-2{ transition-delay: 0.2s; }
+.scroll-delay-3{ transition-delay: 0.3s; }
+.scroll-delay-4{ transition-delay: 0.4s; }
+.scroll-delay-5{ transition-delay: 0.5s; }
+.scroll-delay-6{ transition-delay: 0.6s; }
+.scroll-delay-7{ transition-delay: 0.7s; }
+.scroll-delay-8{ transition-delay: 0.8s; }
+
+/* Parallax effect containers */
+.parallax-slow{
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
+
+.parallax-medium{
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
+
+.parallax-fast{
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
+
+/* Reveal animations (for text/headings) */
+.reveal-text{
+  overflow: hidden;
+  display: inline-block;
+}
+
+.reveal-text > *{
+  display: inline-block;
+  transform: translateY(110%);
+  transition: transform 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.reveal-text.in-view > *{
+  transform: translateY(0);
+}
+
+/* Progressive reveal for lists */
+.progressive-reveal > *{
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s cubic-bezier(.2,.8,.2,1), transform 0.6s cubic-bezier(.2,.8,.2,1);
+}
+
+.progressive-reveal.in-view > *:nth-child(1){ opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+.progressive-reveal.in-view > *:nth-child(2){ opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+.progressive-reveal.in-view > *:nth-child(3){ opacity: 1; transform: translateY(0); transition-delay: 0.3s; }
+.progressive-reveal.in-view > *:nth-child(4){ opacity: 1; transform: translateY(0); transition-delay: 0.4s; }
+.progressive-reveal.in-view > *:nth-child(5){ opacity: 1; transform: translateY(0); transition-delay: 0.5s; }
+.progressive-reveal.in-view > *:nth-child(6){ opacity: 1; transform: translateY(0); transition-delay: 0.6s; }
+.progressive-reveal.in-view > *:nth-child(7){ opacity: 1; transform: translateY(0); transition-delay: 0.7s; }
+.progressive-reveal.in-view > *:nth-child(8){ opacity: 1; transform: translateY(0); transition-delay: 0.8s; }
+
+/* Zoom-in reveal for cards */
+.zoom-reveal{
+  opacity: 0;
+  transform: scale(0.7) translateY(40px);
+  transition: opacity 0.9s cubic-bezier(.2,.8,.2,1), transform 0.9s cubic-bezier(.2,.8,.2,1);
+}
+
+.zoom-reveal.in-view{
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Slide-in from edges */
+.slide-edge-left{
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 0.9s cubic-bezier(.2,.8,.2,1), transform 0.9s cubic-bezier(.2,.8,.2,1);
+}
+
+.slide-edge-right{
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.9s cubic-bezier(.2,.8,.2,1), transform 0.9s cubic-bezier(.2,.8,.2,1);
+}
+
+.slide-edge-left.in-view,
+.slide-edge-right.in-view{
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Glow reveal effect */
+.glow-reveal{
+  opacity: 0;
+  transform: scale(0.9);
+  box-shadow: 0 0 0 rgba(61,220,255,0);
+  transition: all 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.glow-reveal.in-view{
+  opacity: 1;
+  transform: scale(1);
+  box-shadow: 0 0 60px rgba(61,220,255,0.3);
+}
+
+/* Counter animation */
+.counter-animate{
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 0.6s cubic-bezier(.2,.8,.2,1), transform 0.6s cubic-bezier(.2,.8,.2,1);
+}
+
+.counter-animate.in-view{
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Ripple effect */
+@keyframes ripple{
+  0%{
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100%{
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.ripple-trigger::before{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(61,220,255,0.6);
+  opacity: 0;
+}
+
+.ripple-trigger.in-view::before{
+  animation: ripple 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* 3D card flip on scroll */
+.card-flip-3d{
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(15deg);
+  opacity: 0;
+  transition: all 0.9s cubic-bezier(.2,.8,.2,1);
+}
+
+.card-flip-3d.in-view{
+  transform: perspective(1000px) rotateX(0);
+  opacity: 1;
+}
+
+/* Text shimmer reveal */
+@keyframes shimmer{
+  0%{
+    background-position: -200% center;
+  }
+  100%{
+    background-position: 200% center;
+  }
+}
+
+.text-shimmer{
+  background: linear-gradient(90deg,
+    rgba(234,240,255,0.3) 0%,
+    rgba(61,220,255,1) 50%,
+    rgba(234,240,255,0.3) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Expanding border effect */
+.border-expand{
+  position: relative;
+  overflow: hidden;
+}
+
+.border-expand::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(61,220,255,0.8);
+  border-radius: inherit;
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.8s cubic-bezier(.2,.8,.2,1), opacity 0.8s cubic-bezier(.2,.8,.2,1);
+}
+
+.border-expand.in-view::after{
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* Bounce-in effect */
+@keyframes bounceIn{
+  0%{
+    opacity: 0;
+    transform: scale(0.3) translateY(50px);
+  }
+  50%{
+    transform: scale(1.05);
+  }
+  70%{
+    transform: scale(0.97);
+  }
+  100%{
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.bounce-in{
+  opacity: 0;
+}
+
+.bounce-in.in-view{
+  animation: bounceIn 0.8s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+/* Typewriter reveal */
+@keyframes typewriter{
+  from{
+    width: 0;
+  }
+  to{
+    width: 100%;
+  }
+}
+
+.typewriter{
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+}
+
+.typewriter.in-view{
+  animation: typewriter 2s steps(40) forwards;
+}
+
+/* Scroll-based opacity fade */
+.scroll-opacity{
+  will-change: opacity;
+  transition: opacity 0.3s ease-out;
+}

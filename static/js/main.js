@@ -228,3 +228,348 @@ if (pillsCloud && pillsCloudWrap) {
   window.addEventListener('resize', drivePillsOrder);
   drivePillsOrder();
 }
+
+/* -------- COMPREHENSIVE SCROLL EFFECTS SYSTEM -------- */
+
+// Intersection Observer for all scroll-triggered animations
+const scrollObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in-view');
+
+      // For one-time animations, unobserve after triggering
+      if (!entry.target.classList.contains('repeat-animation')) {
+        scrollObserver.unobserve(entry.target);
+      }
+    } else {
+      // Remove class if you want repeating animations
+      if (entry.target.classList.contains('repeat-animation')) {
+        entry.target.classList.remove('in-view');
+      }
+    }
+  });
+}, {
+  threshold: 0.15,
+  rootMargin: '0px 0px -50px 0px'
+});
+
+// Observe all elements with scroll animation classes
+const scrollAnimateClasses = [
+  '.scroll-fade-up',
+  '.scroll-fade-down',
+  '.scroll-fade-left',
+  '.scroll-fade-right',
+  '.scroll-scale',
+  '.scroll-rotate',
+  '.scroll-flip',
+  '.scroll-blur',
+  '.reveal-text',
+  '.progressive-reveal',
+  '.zoom-reveal',
+  '.slide-edge-left',
+  '.slide-edge-right',
+  '.glow-reveal',
+  '.counter-animate',
+  '.ripple-trigger',
+  '.card-flip-3d',
+  '.bounce-in',
+  '.border-expand',
+  '.typewriter'
+];
+
+scrollAnimateClasses.forEach(className => {
+  $$(className).forEach(el => scrollObserver.observe(el));
+});
+
+/* -------- PARALLAX EFFECTS -------- */
+const parallaxElements = {
+  slow: $$('.parallax-slow'),
+  medium: $$('.parallax-medium'),
+  fast: $$('.parallax-fast')
+};
+
+function updateParallax() {
+  const scrolled = window.scrollY;
+
+  // Slow parallax (moves 0.3x scroll speed)
+  parallaxElements.slow.forEach(el => {
+    const offset = (scrolled - el.offsetTop) * 0.3;
+    el.style.transform = `translateY(${offset}px)`;
+  });
+
+  // Medium parallax (moves 0.5x scroll speed)
+  parallaxElements.medium.forEach(el => {
+    const offset = (scrolled - el.offsetTop) * 0.5;
+    el.style.transform = `translateY(${offset}px)`;
+  });
+
+  // Fast parallax (moves 0.8x scroll speed)
+  parallaxElements.fast.forEach(el => {
+    const offset = (scrolled - el.offsetTop) * 0.8;
+    el.style.transform = `translateY(${offset}px)`;
+  });
+}
+
+/* -------- SCROLL-BASED OPACITY -------- */
+function updateScrollOpacity() {
+  const vh = window.innerHeight;
+
+  $$('.scroll-opacity').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const elementCenter = rect.top + rect.height / 2;
+    const viewportCenter = vh / 2;
+
+    // Calculate distance from viewport center (0 = center, 1 = edge)
+    const distance = Math.abs(elementCenter - viewportCenter) / viewportCenter;
+
+    // Fade out as element moves away from center
+    const opacity = Math.max(0.3, 1 - (distance * 0.7));
+    el.style.opacity = opacity;
+  });
+}
+
+/* -------- 3D TILT ON SCROLL -------- */
+function update3DTilt() {
+  $$('.scroll-3d-tilt').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const vh = window.innerHeight;
+
+    // Calculate element position in viewport (0 = top, 1 = bottom)
+    const position = (rect.top + rect.height / 2) / vh;
+
+    // Create tilt based on position
+    const rotateX = (position - 0.5) * 15;
+    el.style.transform = `perspective(1000px) rotateX(${rotateX}deg)`;
+  });
+}
+
+/* -------- SMOOTH SCALE ON SCROLL -------- */
+function updateScrollScale() {
+  $$('.scroll-scale-dynamic').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const vh = window.innerHeight;
+
+    // Element is in view
+    if (rect.top < vh && rect.bottom > 0) {
+      // Calculate how centered the element is
+      const center = rect.top + rect.height / 2;
+      const viewportCenter = vh / 2;
+      const distance = Math.abs(center - viewportCenter);
+      const maxDistance = vh / 2;
+
+      // Scale from 0.85 to 1 based on proximity to center
+      const scale = 0.85 + (1 - Math.min(distance / maxDistance, 1)) * 0.15;
+      el.style.transform = `scale(${scale})`;
+    }
+  });
+}
+
+/* -------- BACKGROUND ORB PARALLAX -------- */
+function updateOrbParallax() {
+  const scrolled = window.scrollY;
+
+  // Hero orbs
+  const heroOrbs = $$('.bgOrbs .orb');
+  heroOrbs.forEach((orb, index) => {
+    const speed = 0.2 + (index * 0.15);
+    const offset = scrolled * speed;
+    orb.style.transform = `translateY(${offset}px)`;
+  });
+
+  // Pills section orbs
+  const pillsOrbs = $$('.pillsOrb');
+  pillsOrbs.forEach((orb, index) => {
+    const speed = 0.15 + (index * 0.1);
+    const offset = scrolled * speed;
+    const currentTransform = orb.style.transform || '';
+    // Preserve existing animations while adding parallax
+    if (!currentTransform.includes('translate')) {
+      orb.style.transform = `translateY(${offset}px)`;
+    }
+  });
+}
+
+/* -------- PROGRESSIVE NUMBER COUNT -------- */
+function animateCounter(el) {
+  const target = parseFloat(el.getAttribute('data-count') || el.textContent);
+  const duration = 2000;
+  const start = 0;
+  const startTime = performance.now();
+
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    // Easing function
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const current = start + (target - start) * easeOut;
+
+    // Format number
+    if (el.textContent.includes('$')) {
+      el.textContent = '$' + Math.floor(current).toLocaleString();
+    } else if (el.textContent.includes('%')) {
+      el.textContent = Math.floor(current) + '%';
+    } else {
+      el.textContent = Math.floor(current).toLocaleString();
+    }
+
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    }
+  }
+
+  requestAnimationFrame(update);
+}
+
+// Trigger counters when they come into view
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+      entry.target.classList.add('counted');
+      animateCounter(entry.target);
+      counterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+$$('.counter-animate').forEach(el => {
+  const countEl = el.querySelector('[data-count]');
+  if (countEl) {
+    counterObserver.observe(countEl);
+  }
+});
+
+/* -------- SCROLL VELOCITY EFFECTS -------- */
+let lastScrollY = window.scrollY;
+let scrollVelocity = 0;
+
+function updateScrollVelocity() {
+  const currentScrollY = window.scrollY;
+  scrollVelocity = currentScrollY - lastScrollY;
+  lastScrollY = currentScrollY;
+
+  // Apply velocity-based effects
+  $$('.velocity-scale').forEach(el => {
+    const scale = 1 + Math.abs(scrollVelocity) * 0.001;
+    el.style.transform = `scale(${Math.min(scale, 1.05)})`;
+  });
+}
+
+/* -------- STAGGER ANIMATIONS FOR GRIDS -------- */
+const gridObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const items = Array.from(entry.target.children);
+      items.forEach((item, index) => {
+        setTimeout(() => {
+          item.classList.add('in-view');
+        }, index * 100); // 100ms delay between each item
+      });
+      gridObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.2 });
+
+$$('.stagger-grid').forEach(grid => gridObserver.observe(grid));
+
+/* -------- SCROLL DIRECTION DETECTION -------- */
+let lastScrollTop = 0;
+let scrollDirection = 'down';
+
+function detectScrollDirection() {
+  const st = window.scrollY || document.documentElement.scrollTop;
+
+  if (st > lastScrollTop) {
+    scrollDirection = 'down';
+    document.body.classList.add('scrolling-down');
+    document.body.classList.remove('scrolling-up');
+  } else if (st < lastScrollTop) {
+    scrollDirection = 'up';
+    document.body.classList.add('scrolling-up');
+    document.body.classList.remove('scrolling-down');
+  }
+
+  lastScrollTop = st <= 0 ? 0 : st;
+}
+
+/* -------- SMOOTH SCALE ON SECTION ENTRY -------- */
+function updateSectionScale() {
+  $$('.scene').forEach(section => {
+    const rect = section.getBoundingClientRect();
+    const vh = window.innerHeight;
+
+    if (rect.top < vh && rect.bottom > 0) {
+      // Calculate visibility percentage
+      const visibleHeight = Math.min(rect.bottom, vh) - Math.max(rect.top, 0);
+      const percentage = visibleHeight / vh;
+
+      // Apply subtle scale based on visibility
+      const scale = 0.98 + (percentage * 0.02);
+
+      // Only apply to sections with the class
+      if (section.classList.contains('scale-on-view')) {
+        section.style.transform = `scale(${scale})`;
+      }
+    }
+  });
+}
+
+/* -------- MAGNETIC SCROLL EFFECT FOR CARDS -------- */
+$$('.magnetic-scroll').forEach(card => {
+  let isHovering = false;
+
+  card.addEventListener('mouseenter', () => isHovering = true);
+  card.addEventListener('mouseleave', () => {
+    isHovering = false;
+    card.style.transform = '';
+  });
+
+  window.addEventListener('scroll', () => {
+    if (isHovering) {
+      const rect = card.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const cardCenter = rect.top + rect.height / 2;
+      const viewportCenter = vh / 2;
+      const offset = (viewportCenter - cardCenter) * 0.1;
+
+      card.style.transform = `translateY(${offset}px)`;
+    }
+  }, { passive: true });
+});
+
+/* -------- ENHANCED SCROLL ENGINE -------- */
+let rafId = null;
+
+function scrollEffects() {
+  updateParallax();
+  updateScrollOpacity();
+  update3DTilt();
+  updateScrollScale();
+  updateOrbParallax();
+  updateScrollVelocity();
+  detectScrollDirection();
+  updateSectionScale();
+}
+
+// Throttled scroll listener
+window.addEventListener('scroll', () => {
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+  }
+
+  rafId = requestAnimationFrame(() => {
+    scrollEffects();
+  });
+}, { passive: true });
+
+// Initial call
+scrollEffects();
+
+// Resize handler
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    scrollEffects();
+  }, 100);
+});
