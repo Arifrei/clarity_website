@@ -66,44 +66,7 @@ cta.addEventListener('mousemove', (e) => {
 });
 cta.addEventListener('mouseleave', () => cta.style.transform = 'none');
 
-/* -------- Chaos cloud: random offsets that resolve on scroll -------- */
-const cloud = $('#cloud');
-const cloudWrap = $('#cloudWrap');
-
-function seedChaos(){
-  $$('.tag', cloud).forEach(t => {
-    const tx = (Math.random() - .5) * 70;
-    const ty = (Math.random() - .5) * 52;
-    const tr = (Math.random() - .5) * 18;
-    t.style.setProperty('--tx', tx.toFixed(1) + 'px');
-    t.style.setProperty('--ty', ty.toFixed(1) + 'px');
-    t.style.setProperty('--tr', tr.toFixed(1) + 'deg');
-  });
-}
-seedChaos();
-
 function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
-
-function driveCloud(){
-  if(!cloudWrap) return;
-  const r = cloudWrap.getBoundingClientRect();
-  const vh = window.innerHeight || 800;
-
-  // p = 0 far away, p = 1 when centered
-  const center = r.top + r.height/2;
-  const p = 1 - clamp(Math.abs(center - vh*0.5) / (vh*0.55), 0, 1);
-
-  // progressively reduce transforms toward 0
-  $$('.tag', cloud).forEach(t => {
-    const tx = parseFloat(t.style.getPropertyValue('--tx')) || 0;
-    const ty = parseFloat(t.style.getPropertyValue('--ty')) || 0;
-    const tr = parseFloat(t.style.getPropertyValue('--tr')) || 0;
-    t.style.transform = `translate(${tx*(1-p)}px, ${ty*(1-p)}px) rotate(${tr*(1-p)}deg)`;
-  });
-}
-window.addEventListener('scroll', driveCloud, { passive:true });
-window.addEventListener('resize', driveCloud);
-driveCloud();
 
 /* -------- Services stepper (1/5..5/5 + prev/next) -------- */
 const panels = $$('.stepPanel');
@@ -205,3 +168,63 @@ window.addEventListener('scroll', onScroll, { passive: true });
 
 /* Year */
 $('#year').textContent = new Date().getFullYear();
+
+/* -------- Pills cloud: chaos → order on scroll -------- */
+const pillsCloud = $('#pillsCloud');
+const pillsCloudWrap = $('#pillsCloudWrap');
+
+if (pillsCloud && pillsCloudWrap) {
+  let hasSnapped = false;
+
+  // Seed initial chaos positions
+  function seedPillsChaos(){
+    $$('.platformPill', pillsCloud).forEach(pill => {
+      const tx = (Math.random() - .5) * 100;
+      const ty = (Math.random() - .5) * 80;
+      const tr = (Math.random() - .5) * 25;
+      pill.style.setProperty('--tx', tx.toFixed(1) + 'px');
+      pill.style.setProperty('--ty', ty.toFixed(1) + 'px');
+      pill.style.setProperty('--tr', tr.toFixed(1) + 'deg');
+
+      // Start in chaotic state
+      pill.style.transform = `translate(${tx}px, ${ty}px) rotate(${tr}deg)`;
+      pill.style.transition = 'transform 0.8s cubic-bezier(.2,.8,.2,1)';
+    });
+  }
+
+  seedPillsChaos();
+
+  // Drive the chaos-to-order effect based on scroll
+  function drivePillsOrder(){
+    if(!pillsCloudWrap || hasSnapped) return;
+
+    const r = pillsCloudWrap.getBoundingClientRect();
+    const vh = window.innerHeight || 800;
+
+    // Calculate progress: 0 = far away, 1 = centered/visible
+    // Using a wider range (vh*0.9) so it takes more scrolling to reach full visibility
+    const center = r.top + r.height/2;
+    const p = 1 - clamp(Math.abs(center - vh*0.4) / (vh*0.9), 0, 1);
+
+    // If we've scrolled enough, snap to order permanently
+    // Lower threshold (0.85) means you need to scroll further before it snaps
+    if (p > 0.85) {
+      hasSnapped = true;
+      $$('.platformPill', pillsCloud).forEach(pill => {
+        pill.style.transform = 'translate(0, 0) rotate(0)';
+      });
+    } else {
+      // Progressively reduce chaos based on scroll position
+      $$('.platformPill', pillsCloud).forEach(pill => {
+        const tx = parseFloat(pill.style.getPropertyValue('--tx')) || 0;
+        const ty = parseFloat(pill.style.getPropertyValue('--ty')) || 0;
+        const tr = parseFloat(pill.style.getPropertyValue('--tr')) || 0;
+        pill.style.transform = `translate(${tx*(1-p)}px, ${ty*(1-p)}px) rotate(${tr*(1-p)}deg)`;
+      });
+    }
+  }
+
+  window.addEventListener('scroll', drivePillsOrder, { passive:true });
+  window.addEventListener('resize', drivePillsOrder);
+  drivePillsOrder();
+}

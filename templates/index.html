@@ -11,7 +11,7 @@
           Make your business
           <span class="grad">feel simple</span>.
         </h1>
-        <p class="oneLine">Chaos → system. Fast.</p>
+        <p class="oneLine">Chaos. System. Clarity.</p>
 
         <div class="heroActions">
           <button class="btn primary" data-target="contact">Start</button>
@@ -25,29 +25,7 @@
       </div>
 
       <div class="heroRight drift">
-        <div class="glassCard">
-          <div class="tiny">You’re juggling</div>
-
-          <!-- chaos cloud resolves continuously by scroll via JS -->
-          <div class="cloudWrap" id="cloudWrap">
-            <div class="cloud" id="cloud">
-              <span class="tag">WhatsApp</span>
-              <span class="tag">Spreadsheets</span>
-              <span class="tag">Approvals</span>
-              <span class="tag">Projects</span>
-              <span class="tag">Invoices</span>
-              <span class="tag">Deadlines</span>
-              <span class="tag">Receipts</span>
-              <span class="tag">Follow-ups</span>
-              <span class="tag">“in my head”</span>
-              <span class="tag">Tool #7</span>
-              <span class="tag">Missed handoff</span>
-              <span class="tag">No visibility</span>
-            </div>
-          </div>
-
-          <div class="miniLine">Scroll → it snaps into order.</div>
-        </div>
+        <!-- Pills section moved to top - placeholder for balance -->
       </div>
     </div>
 
@@ -63,6 +41,58 @@
 <!-- Spacer = pacing / breathing room (important for premium scroll rhythm) -->
 <section class="scene spacer"></section>
 
+<!-- PILLS SECTION (Full screen showcase) -->
+<section id="pills" class="scene pillsSection">
+  <div class="pillsContainer">
+    <div class="pillsGlassCard">
+      <div class="pillsHeader">
+        <div class="tiny">You're juggling</div>
+      </div>
+
+      <div class="pillsCloudWrap" id="pillsCloudWrap">
+        <div class="pillsCloud" id="pillsCloud">
+          <span class="platformPill whatsapp">WhatsApp</span>
+          <span class="platformPill email">Email</span>
+          <span class="platformPill spreadsheets">Spreadsheets</span>
+          <span class="platformPill approvals">Approvals</span>
+          <span class="platformPill projects">Projects</span>
+          <span class="platformPill invoices">Invoices</span>
+          <span class="platformPill deadlines">Deadlines</span>
+          <span class="platformPill receipts">Receipts</span>
+          <span class="platformPill followups">Follow-ups</span>
+          <span class="platformPill mental">"in my head"</span>
+          <span class="platformPill tool">Tool #7</span>
+          <span class="platformPill handoff">Missed handoff</span>
+          <span class="platformPill visibility">No visibility</span>
+          <span class="platformPill slack">Slack</span>
+          <span class="platformPill meetings">Meetings</span>
+          <span class="platformPill calendar">Calendar</span>
+          <span class="platformPill quotes">Quotes</span>
+          <span class="platformPill clients">Client requests</span>
+          <span class="platformPill todos">To-do lists</span>
+          <span class="platformPill files">Files everywhere</span>
+          <span class="platformPill updates">Status updates</span>
+          <span class="platformPill payments">Payments</span>
+          <span class="platformPill contracts">Contracts</span>
+          <span class="platformPill notes">Notes</span>
+          <span class="platformPill reminders">Reminders</span>
+        </div>
+      </div>
+
+      <div class="miniLine">Scroll → it snaps into order.</div>
+    </div>
+  </div>
+
+  <!-- Background visual effects -->
+  <div class="pillsBgOrbs" aria-hidden="true">
+    <div class="pillsOrb orb1"></div>
+    <div class="pillsOrb orb2"></div>
+    <div class="pillsOrb orb3"></div>
+  </div>
+</section>
+
+<section class="scene spacer"></section>
+
 <!-- ABOUT (minimal copy) -->
 <section id="about" class="scene about">
   <div class="container">
@@ -70,6 +100,411 @@
     <p class="sectionSub drift">
       We design a workflow your team can follow — then pick tools that fit.
     </p>
+
+    <!-- Animated Business Dashboard -->
+    <div class="businessVisual">
+      <div class="dashboardFrame">
+        <!-- Sidebar Navigation -->
+        <div class="dashSidebar">
+          <div class="sidebarLogo"></div>
+          <div class="sidebarNav">
+            <div class="navItem active"></div>
+            <div class="navItem"></div>
+            <div class="navItem"></div>
+            <div class="navItem"></div>
+            <div class="navItem"></div>
+          </div>
+        </div>
+
+        <!-- Main Dashboard Content -->
+        <div class="dashMain">
+          <!-- Top Bar -->
+          <div class="dashboardHeader">
+            <div class="dashTitle">Overview</div>
+            <div class="dashTopRight">
+              <div class="dashSearch"></div>
+              <div class="dashNotif">3</div>
+              <div class="dashAvatar"></div>
+            </div>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="dashboardStats">
+            <div class="statCard">
+              <div class="statTop">
+                <div class="statLabel">Total Revenue</div>
+                <div class="statTrend up">↑ 12%</div>
+              </div>
+              <div class="statValue">$127,450</div>
+              <div class="statMiniChart">
+                <div class="chartBar" style="height: 40%; animation-delay: 0.1s;"></div>
+                <div class="chartBar" style="height: 55%; animation-delay: 0.2s;"></div>
+                <div class="chartBar" style="height: 45%; animation-delay: 0.3s;"></div>
+                <div class="chartBar" style="height: 70%; animation-delay: 0.4s;"></div>
+                <div class="chartBar" style="height: 85%; animation-delay: 0.5s;"></div>
+                <div class="chartBar" style="height: 100%; animation-delay: 0.6s;"></div>
+              </div>
+            </div>
+
+            <div class="statCard">
+              <div class="statTop">
+                <div class="statLabel">Active Projects</div>
+                <div class="statTrend up">↑ 8%</div>
+              </div>
+              <div class="statValue">23</div>
+              <div class="statProgress">
+                <div class="progressBar" style="width: 75%; animation-delay: 0.3s;"></div>
+              </div>
+              <div class="statSubtext">18 completed this month</div>
+            </div>
+
+            <div class="statCard">
+              <div class="statTop">
+                <div class="statLabel">Team Performance</div>
+                <div class="statTrend up">↑ 15%</div>
+              </div>
+              <div class="statValue">94%</div>
+              <div class="statCircle">
+                <svg viewBox="0 0 36 36" class="circularChart">
+                  <path class="circleBg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="circle" stroke-dasharray="94, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="statCard">
+              <div class="statTop">
+                <div class="statLabel">Client Growth</div>
+                <div class="statTrend up">↑ 24%</div>
+              </div>
+              <div class="statValue">+18</div>
+              <div class="statSparkline">
+                <svg viewBox="0 0 100 30" class="sparkline">
+                  <polyline points="0,25 20,20 40,15 60,18 80,10 100,5" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Section -->
+          <div class="dashboardCharts">
+            <div class="chartCard large">
+              <div class="chartHeader">
+                <div class="chartTitle">Revenue Trend</div>
+                <div class="chartPeriod">Last 7 days</div>
+              </div>
+              <div class="lineChart">
+                <div class="chartLine"></div>
+                <div class="chartBars">
+                  <div class="barGroup" style="animation-delay: 0.2s;">
+                    <div class="bar" style="height: 45%;"></div>
+                    <div class="barLabel">Mon</div>
+                  </div>
+                  <div class="barGroup" style="animation-delay: 0.3s;">
+                    <div class="bar" style="height: 60%;"></div>
+                    <div class="barLabel">Tue</div>
+                  </div>
+                  <div class="barGroup" style="animation-delay: 0.4s;">
+                    <div class="bar" style="height: 55%;"></div>
+                    <div class="barLabel">Wed</div>
+                  </div>
+                  <div class="barGroup" style="animation-delay: 0.5s;">
+                    <div class="bar" style="height: 75%;"></div>
+                    <div class="barLabel">Thu</div>
+                  </div>
+                  <div class="barGroup" style="animation-delay: 0.6s;">
+                    <div class="bar" style="height: 85%;"></div>
+                    <div class="barLabel">Fri</div>
+                  </div>
+                  <div class="barGroup" style="animation-delay: 0.7s;">
+                    <div class="bar" style="height: 70%;"></div>
+                    <div class="barLabel">Sat</div>
+                  </div>
+                  <div class="barGroup" style="animation-delay: 0.8s;">
+                    <div class="bar" style="height: 90%;"></div>
+                    <div class="barLabel">Sun</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="chartCard">
+              <div class="chartHeader">
+                <div class="chartTitle">Recent Activity</div>
+              </div>
+              <div class="activityFeed">
+                <div class="activityItem" style="animation-delay: 0.5s;">
+                  <div class="activityDot green"></div>
+                  <div class="activityText">Deal closed</div>
+                  <div class="activityTime">2m</div>
+                </div>
+                <div class="activityItem" style="animation-delay: 0.7s;">
+                  <div class="activityDot blue"></div>
+                  <div class="activityText">New client</div>
+                  <div class="activityTime">8m</div>
+                </div>
+                <div class="activityItem" style="animation-delay: 0.9s;">
+                  <div class="activityDot gold"></div>
+                  <div class="activityText">Payment received</div>
+                  <div class="activityTime">15m</div>
+                </div>
+                <div class="activityItem" style="animation-delay: 1.1s;">
+                  <div class="activityDot purple"></div>
+                  <div class="activityText">Milestone hit</div>
+                  <div class="activityTime">1h</div>
+                </div>
+                <div class="activityItem" style="animation-delay: 1.3s;">
+                  <div class="activityDot cyan"></div>
+                  <div class="activityText">Project complete</div>
+                  <div class="activityTime">2h</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Popup Accomplishments -->
+        <div class="popupContainer">
+          <div class="popup success" style="animation-delay: 0s;">
+            <div class="popupIcon">✓</div>
+            <div class="popupContent">
+              <div class="popupTitle">Deal Closed</div>
+              <div class="popupText">TechCorp - $12,500</div>
+            </div>
+          </div>
+
+          <div class="popup payment" style="animation-delay: 1s;">
+            <div class="popupIcon">$</div>
+            <div class="popupContent">
+              <div class="popupTitle">Payment Received</div>
+              <div class="popupText">Invoice #4821 - $8,400</div>
+            </div>
+          </div>
+
+          <div class="popup client" style="animation-delay: 2s;">
+            <div class="popupIcon">👤</div>
+            <div class="popupContent">
+              <div class="popupTitle">New Client</div>
+              <div class="popupText">StartupX onboarded</div>
+            </div>
+          </div>
+
+          <div class="popup milestone" style="animation-delay: 3s;">
+            <div class="popupIcon">🎯</div>
+            <div class="popupContent">
+              <div class="popupTitle">Milestone Achieved</div>
+              <div class="popupText">Q4 revenue target hit</div>
+            </div>
+          </div>
+
+          <div class="popup task" style="animation-delay: 4s;">
+            <div class="popupIcon">✓</div>
+            <div class="popupContent">
+              <div class="popupTitle">Project Delivered</div>
+              <div class="popupText">Website redesign complete</div>
+            </div>
+          </div>
+
+          <div class="popup success" style="animation-delay: 5s;">
+            <div class="popupIcon">✓</div>
+            <div class="popupContent">
+              <div class="popupTitle">Contract Signed</div>
+              <div class="popupText">BuildCo - 12 month agreement</div>
+            </div>
+          </div>
+
+          <div class="popup payment" style="animation-delay: 6s;">
+            <div class="popupIcon">$</div>
+            <div class="popupContent">
+              <div class="popupTitle">Recurring Payment</div>
+              <div class="popupText">AgencyPro - $3,200/mo</div>
+            </div>
+          </div>
+
+          <div class="popup client" style="animation-delay: 7s;">
+            <div class="popupIcon">👤</div>
+            <div class="popupContent">
+              <div class="popupTitle">Client Onboarded</div>
+              <div class="popupText">DesignHub - Enterprise plan</div>
+            </div>
+          </div>
+
+          <div class="popup milestone" style="animation-delay: 8s;">
+            <div class="popupIcon">🎯</div>
+            <div class="popupContent">
+              <div class="popupTitle">Team Goal Met</div>
+              <div class="popupText">100% task completion rate</div>
+            </div>
+          </div>
+
+          <div class="popup task" style="animation-delay: 9s;">
+            <div class="popupIcon">✓</div>
+            <div class="popupContent">
+              <div class="popupTitle">Approval Received</div>
+              <div class="popupText">Brand guidelines approved</div>
+            </div>
+          </div>
+
+          <div class="popup payment" style="animation-delay: 10s;">
+            <div class="popupIcon">$</div>
+            <div class="popupContent">
+              <div class="popupTitle">Invoice Paid</div>
+              <div class="popupText">RetailCo - $15,800</div>
+            </div>
+          </div>
+
+          <div class="popup success" style="animation-delay: 11s;">
+            <div class="popupIcon">✓</div>
+            <div class="popupContent">
+              <div class="popupTitle">Feature Shipped</div>
+              <div class="popupText">Dashboard analytics v2.0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="automationStage">
+      <div class="automationText drift">
+        <div class="tiny">Under the dashboard</div>
+        <h3 class="cardTitle">Ops brain on overdrive</h3>
+        <p class="cardSub">The gears think, beams route, and every task finds the exact bin it belongs to.</p>
+        <div class="microPills">
+          <span class="microPill">Cortex gears</span>
+          <span class="microPill">Signal beams</span>
+          <span class="microPill">Bins locking in</span>
+          <span class="microPill">Dual conveyors</span>
+        </div>
+      </div>
+
+      <div class="machineCanvas drift" aria-hidden="true">
+        <div class="machineBackdrop"></div>
+
+        <div class="gearGrid">
+          <svg viewBox="0 0 120 120" class="gearPiece gearA">
+            <g class="gearTeeth">
+              <rect x="56" y="4" width="8" height="18" rx="3" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(30 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(60 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(90 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(120 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(150 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(180 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(210 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(240 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(270 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(300 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(330 60 60)" />
+            </g>
+            <circle class="gearRim" cx="60" cy="60" r="42" />
+            <circle class="gearCore" cx="60" cy="60" r="26" />
+            <circle class="gearHole" cx="60" cy="60" r="10" />
+          </svg>
+
+          <svg viewBox="0 0 120 120" class="gearPiece gearB">
+            <g class="gearTeeth">
+              <rect x="56" y="4" width="8" height="18" rx="3" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(30 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(60 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(90 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(120 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(150 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(180 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(210 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(240 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(270 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(300 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(330 60 60)" />
+            </g>
+            <circle class="gearRim" cx="60" cy="60" r="36" />
+            <circle class="gearCore" cx="60" cy="60" r="20" />
+            <circle class="gearHole" cx="60" cy="60" r="9" />
+          </svg>
+
+          <svg viewBox="0 0 120 120" class="gearPiece gearC">
+            <g class="gearTeeth">
+              <rect x="56" y="4" width="8" height="18" rx="3" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(30 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(60 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(90 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(120 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(150 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(180 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(210 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(240 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(270 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(300 60 60)" />
+              <rect x="56" y="4" width="8" height="18" rx="3" transform="rotate(330 60 60)" />
+            </g>
+            <circle class="gearRim" cx="60" cy="60" r="30" />
+            <circle class="gearCore" cx="60" cy="60" r="16" />
+            <circle class="gearHole" cx="60" cy="60" r="8" />
+          </svg>
+        </div>
+
+        <div class="brainCore">
+          <div class="coreGlow"></div>
+          <div class="corePulse"></div>
+          <div class="coreRing outer"></div>
+          <div class="coreRing inner"></div>
+          <div class="coreGear big"></div>
+          <div class="coreGear small"></div>
+          <div class="coreSpark s1"></div>
+          <div class="coreSpark s2"></div>
+          <div class="coreSpark s3"></div>
+          <div class="coreSpark s4"></div>
+        </div>
+
+        <div class="logicLanes">
+          <div class="logicLane lane1"><span class="logicDot"></span></div>
+          <div class="logicLane lane2"><span class="logicDot"></span></div>
+          <div class="logicLane lane3"><span class="logicDot"></span></div>
+          <div class="logicLane lane4"><span class="logicDot"></span></div>
+        </div>
+
+        <div class="intakeBelt beltTop">
+          <div class="beltTrack"></div>
+          <div class="beltChip c1">Requests</div>
+          <div class="beltChip c2">Bugs</div>
+          <div class="beltChip c3">Invoices</div>
+          <div class="beltChip c4">Approvals</div>
+          <div class="beltChip c5">Notes</div>
+        </div>
+
+        <div class="sortTower">
+          <div class="sortHeader">Sorted</div>
+          <div class="sortSlots">
+            <div class="sortSlot">Triage</div>
+            <div class="sortSlot">Finance</div>
+            <div class="sortSlot">Delivery</div>
+            <div class="sortSlot">Clients</div>
+            <div class="sortSlot">Archives</div>
+          </div>
+          <div class="sortChip d1">OK</div>
+          <div class="sortChip d2">Paid</div>
+          <div class="sortChip d3">Ship</div>
+          <div class="sortChip d4">Done</div>
+          <div class="sortChip d5">Store</div>
+        </div>
+
+        <div class="outputBelt">
+          <div class="beltTrack"></div>
+          <div class="outputBox b1">Clean handoff</div>
+          <div class="outputBox b2">Ready to bill</div>
+          <div class="outputBox b3">Launch prep</div>
+          <div class="outputBox b4">Stakeholder ping</div>
+        </div>
+
+        <div class="tinyLights">
+          <span class="light l1"></span>
+          <span class="light l2"></span>
+          <span class="light l3"></span>
+          <span class="light l4"></span>
+          <span class="light l5"></span>
+          <span class="light l6"></span>
+        </div>
+      </div>
+    </div>
 
     <div class="pillRow">
       <div class="pill drift">One source of truth</div>
