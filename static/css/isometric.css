@@ -1,0 +1,646 @@
+/* ============================================ */
+/* 3D ISOMETRIC OPS BRAIN - EXACT RECREATION */
+/* ============================================ */
+
+.automationStage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  margin: 80px 0;
+}
+
+.opsVisual {
+  width: 100%;
+  min-height: 650px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.opsScene {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 650px;
+  background:
+    radial-gradient(ellipse 600px 400px at 50% 50%, rgba(160, 210, 240, 0.3), transparent 70%),
+    linear-gradient(180deg, #a8d5e2, #c8e6f0);
+  border-radius: var(--radius2);
+  overflow: visible;
+  transform-style: preserve-3d;
+  transform: rotateX(5deg);
+}
+
+/* ===== ISOMETRIC HELPER ===== */
+.iso3d {
+  transform-style: preserve-3d;
+  transform:
+    rotateX(54.736deg)
+    rotateZ(45deg);
+}
+
+/* ===== FLOATING DISCS (Background) ===== */
+.isoDisc {
+  position: absolute;
+  transform-style: preserve-3d;
+  animation: gentleFloat 4s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+.isoDisc.small {
+  width: 50px;
+  height: 50px;
+}
+
+.isoDisc.tiny {
+  width: 30px;
+  height: 30px;
+}
+
+.discTop {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: translateZ(12px);
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  filter: drop-shadow(0 25px 30px rgba(0, 0, 0, 0.4));
+}
+
+.discSide {
+  position: absolute;
+  width: 100%;
+  height: 24px;
+  background: linear-gradient(180deg, currentColor, rgba(0, 0, 0, 0.3));
+  clip-path: ellipse(50% 50%);
+  transform: translateZ(-12px) translateY(12px);
+}
+
+.discTop.blue {
+  background: linear-gradient(135deg, #64E6FF 0%, #3DDCFF 50%, #2AB4DC 100%);
+  box-shadow:
+    inset -5px -5px 20px rgba(0, 0, 0, 0.2),
+    inset 5px 5px 15px rgba(255, 255, 255, 0.6);
+  color: #2AB4DC;
+}
+
+.discTop.orange {
+  background: linear-gradient(135deg, #FFA050 0%, #FF8C3C 50%, #E67028 100%);
+  box-shadow:
+    inset -5px -5px 20px rgba(0, 0, 0, 0.2),
+    inset 5px 5px 15px rgba(255, 255, 255, 0.6);
+  color: #E67028;
+}
+
+.discTop.purple {
+  background: linear-gradient(135deg, #B48CFF 0%, #9B7BFF 50%, #7D5FE6 100%);
+  box-shadow:
+    inset -5px -5px 20px rgba(0, 0, 0, 0.2),
+    inset 5px 5px 15px rgba(255, 255, 255, 0.6);
+  color: #7D5FE6;
+}
+
+.discTop.green {
+  background: linear-gradient(135deg, #78DC8C 0%, #50C878 50%, #3AA05E 100%);
+  box-shadow:
+    inset -5px -5px 20px rgba(0, 0, 0, 0.2),
+    inset 5px 5px 15px rgba(255, 255, 255, 0.6);
+  color: #3AA05E;
+}
+
+/* ===== ISOMETRIC PILLS ===== */
+.isoPill {
+  position: absolute;
+  width: 40px;
+  height: 70px;
+  transform-style: preserve-3d;
+  animation: gentleFloat 3.5s ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+.pillFace {
+  position: absolute;
+  border-radius: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.4));
+}
+
+.pillFace.top {
+  width: 40px;
+  height: 40px;
+  transform: rotateX(90deg) translateZ(35px);
+}
+
+.pillFace.front {
+  width: 40px;
+  height: 70px;
+  transform: translateZ(20px);
+}
+
+.pillFace.orange {
+  background: linear-gradient(135deg, #FFA050 0%, #FF8C3C 50%, #E67028 100%);
+  box-shadow:
+    inset -8px -8px 25px rgba(0, 0, 0, 0.25),
+    inset 8px 8px 20px rgba(255, 255, 255, 0.6);
+}
+
+.pillFace.cyan {
+  background: linear-gradient(135deg, #00E6E6 0%, #00C8C8 50%, #00A0A0 100%);
+  box-shadow:
+    inset -8px -8px 25px rgba(0, 0, 0, 0.25),
+    inset 8px 8px 20px rgba(255, 255, 255, 0.6);
+}
+
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-25px) translateX(8px); }
+}
+
+/* ===== CLOUD (Isometric 3D) ===== */
+.isoCloud {
+  position: absolute;
+  width: 180px;
+  height: 100px;
+  transform-style: preserve-3d;
+  animation: cloudBob 7s ease-in-out infinite;
+  filter: drop-shadow(0 35px 50px rgba(0, 0, 0, 0.3));
+}
+
+.cloudBlob {
+  position: absolute;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(255, 255, 255, 1) 0%, rgba(240, 248, 255, 0.95) 50%, rgba(220, 235, 245, 0.9) 100%);
+  border: 4px solid rgba(255, 255, 255, 1);
+  box-shadow:
+    inset 8px 8px 20px rgba(255, 255, 255, 1),
+    inset -8px -8px 25px rgba(180, 200, 220, 0.4);
+}
+
+.cloudBlob.blob1 { width: 90px; height: 70px; left: 45px; top: 20px; transform: translateZ(15px); }
+.cloudBlob.blob2 { width: 70px; height: 60px; left: 0; top: 25px; transform: translateZ(8px); }
+.cloudBlob.blob3 { width: 70px; height: 60px; right: 0; top: 25px; transform: translateZ(12px); }
+.cloudBlob.blob4 { width: 60px; height: 50px; left: 60px; top: 0; transform: translateZ(20px); }
+
+@keyframes cloudBob {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(20px) translateY(-15px); }
+}
+
+/* ===== DATABASE CYLINDERS (Chunky 3D) ===== */
+.isoDatabase {
+  position: absolute;
+  width: 110px;
+  height: 140px;
+  transform-style: preserve-3d;
+  animation: dbBob 5s ease-in-out infinite;
+  filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.5));
+}
+
+.dbTop, .dbBottom {
+  position: absolute;
+  width: 110px;
+  height: 35px;
+  border-radius: 50%;
+  border: 5px solid;
+}
+
+.dbTop {
+  top: 0;
+  transform: translateZ(25px);
+}
+
+.dbBottom {
+  bottom: 0;
+  transform: translateZ(-25px);
+}
+
+.dbBody {
+  position: absolute;
+  width: 110px;
+  height: 140px;
+  top: 0;
+  background: linear-gradient(90deg, transparent 0%, currentColor 10%, currentColor 90%, transparent 100%);
+  border-left: 5px solid;
+  border-right: 5px solid;
+  transform: translateZ(0);
+}
+
+.isoDatabase.blue .dbTop,
+.isoDatabase.blue .dbBottom {
+  background: linear-gradient(135deg, #64E6FF 0%, #3DDCFF 50%, #2AB4DC 100%);
+  border-color: #64E6FF;
+  box-shadow:
+    inset -8px -8px 25px rgba(0, 0, 0, 0.3),
+    inset 8px 8px 20px rgba(255, 255, 255, 0.6),
+    0 15px 50px rgba(61, 220, 255, 0.4);
+}
+
+.isoDatabase.blue .dbBody {
+  color: #3DDCFF;
+  border-color: #2AB4DC;
+}
+
+.isoDatabase.green .dbTop,
+.isoDatabase.green .dbBottom {
+  background: linear-gradient(135deg, #78DC8C 0%, #50C878 50%, #3AA05E 100%);
+  border-color: #78DC8C;
+  box-shadow:
+    inset -8px -8px 25px rgba(0, 0, 0, 0.3),
+    inset 8px 8px 20px rgba(255, 255, 255, 0.6),
+    0 15px 50px rgba(80, 200, 120, 0.4);
+}
+
+.isoDatabase.green .dbBody {
+  color: #50C878;
+  border-color: #3AA05E;
+}
+
+.dbTop::after {
+  content: '';
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes dbBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+/* ===== PLATFORM BASE ===== */
+.isoPlatform {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 50px 80px rgba(0, 0, 0, 0.4));
+}
+
+.platformTop {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(220, 235, 245, 0.1) 100%);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  transform: translateZ(30px);
+  box-shadow:
+    inset -15px -15px 40px rgba(0, 0, 0, 0.1),
+    inset 10px 10px 30px rgba(255, 255, 255, 0.2);
+}
+
+.platformLeft {
+  position: absolute;
+  width: 300px;
+  height: 30px;
+  background: linear-gradient(90deg, rgba(180, 200, 220, 0.3), rgba(160, 180, 200, 0.2));
+  border: 3px solid rgba(200, 220, 235, 0.4);
+  transform: rotateX(-90deg) translateY(15px);
+  transform-origin: bottom;
+}
+
+.platformRight {
+  position: absolute;
+  width: 30px;
+  height: 300px;
+  background: linear-gradient(180deg, rgba(160, 180, 200, 0.35), rgba(140, 160, 180, 0.25));
+  border: 3px solid rgba(180, 200, 215, 0.4);
+  transform: rotateY(90deg) translateX(165px);
+  transform-origin: right;
+}
+
+/* ===== 3D ISOMETRIC GEARS (Chunky & Thick) ===== */
+.isoGear {
+  position: absolute;
+  transform-style: preserve-3d;
+  animation: rotateGearIso var(--rotation-speed, 8s) linear infinite;
+  filter: drop-shadow(0 35px 60px rgba(0, 0, 0, 0.6));
+}
+
+.isoGear:not(.large) {
+  width: 120px;
+  height: 120px;
+}
+
+.isoGear.large {
+  width: 160px;
+  height: 160px;
+}
+
+.gearFront {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: translateZ(30px);
+  border: 6px solid;
+  position: relative;
+}
+
+.gearSide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: translateZ(15px);
+}
+
+.gearDepth {
+  position: absolute;
+  width: 100%;
+  height: 60px;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.7;
+}
+
+.gearCenter {
+  position: absolute;
+  width: 35%;
+  height: 35%;
+  border-radius: 50%;
+  top: 32.5%;
+  left: 32.5%;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.9));
+  box-shadow:
+    inset 0 8px 20px rgba(0, 0, 0, 1),
+    0 2px 8px rgba(255, 255, 255, 0.2);
+  border: 3px solid rgba(0, 0, 0, 0.8);
+}
+
+.tooth {
+  position: absolute;
+  width: 24px;
+  height: 42px;
+  background: inherit;
+  border: inherit;
+  border-radius: 6px;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotate(var(--tooth-angle)) translateY(calc(-50% - 20px));
+  box-shadow: inset -3px -3px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* GREEN GEAR */
+.isoGear.green .gearFront {
+  background: linear-gradient(135deg, #78DC8C 0%, #50C878 50%, #3AA05E 100%);
+  border-color: #78DC8C;
+  box-shadow:
+    inset -12px -12px 30px rgba(0, 0, 0, 0.35),
+    inset 12px 12px 25px rgba(255, 255, 255, 0.6),
+    0 0 40px rgba(80, 200, 120, 0.5);
+}
+
+.isoGear.green .gearSide {
+  background: linear-gradient(135deg, #50C878, #3AA05E);
+}
+
+.isoGear.green .gearDepth {
+  background: linear-gradient(180deg, #3AA05E, rgba(58, 160, 94, 0.6));
+}
+
+/* ORANGE GEAR */
+.isoGear.orange .gearFront {
+  background: linear-gradient(135deg, #FFA050 0%, #FF8C3C 50%, #E67028 100%);
+  border-color: #FFA050;
+  box-shadow:
+    inset -12px -12px 30px rgba(0, 0, 0, 0.35),
+    inset 12px 12px 25px rgba(255, 255, 255, 0.6),
+    0 0 40px rgba(255, 140, 60, 0.5);
+}
+
+.isoGear.orange .gearSide {
+  background: linear-gradient(135deg, #FF8C3C, #E67028);
+}
+
+.isoGear.orange .gearDepth {
+  background: linear-gradient(180deg, #E67028, rgba(230, 112, 40, 0.6));
+}
+
+/* BLUE GEAR */
+.isoGear.blue .gearFront {
+  background: linear-gradient(135deg, #64E6FF 0%, #3DDCFF 50%, #2AB4DC 100%);
+  border-color: #64E6FF;
+  box-shadow:
+    inset -12px -12px 30px rgba(0, 0, 0, 0.35),
+    inset 12px 12px 25px rgba(255, 255, 255, 0.6),
+    0 0 40px rgba(61, 220, 255, 0.5);
+}
+
+.isoGear.blue .gearSide {
+  background: linear-gradient(135deg, #3DDCFF, #2AB4DC);
+}
+
+.isoGear.blue .gearDepth {
+  background: linear-gradient(180deg, #2AB4DC, rgba(42, 180, 220, 0.6));
+}
+
+/* PURPLE GEAR */
+.isoGear.purple .gearFront {
+  background: linear-gradient(135deg, #B48CFF 0%, #9B7BFF 50%, #7D5FE6 100%);
+  border-color: #B48CFF;
+  box-shadow:
+    inset -12px -12px 30px rgba(0, 0, 0, 0.35),
+    inset 12px 12px 25px rgba(255, 255, 255, 0.6),
+    0 0 40px rgba(155, 123, 255, 0.5);
+}
+
+.isoGear.purple .gearSide {
+  background: linear-gradient(135deg, #9B7BFF, #7D5FE6);
+}
+
+.isoGear.purple .gearDepth {
+  background: linear-gradient(180deg, #7D5FE6, rgba(125, 95, 230, 0.6));
+}
+
+@keyframes rotateGearIso {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ===== SERVER STACK (3D Boxes) ===== */
+.isoServerStack {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transform-style: preserve-3d;
+}
+
+.isoServer {
+  position: relative;
+  width: 120px;
+  height: 45px;
+  transform-style: preserve-3d;
+  animation: serverPulseIso 2.5s ease-in-out infinite;
+  animation-delay: var(--server-delay, 0s);
+  filter: drop-shadow(0 30px 50px rgba(0, 0, 0, 0.5));
+}
+
+.serverTop {
+  position: absolute;
+  width: 120px;
+  height: 50px;
+  transform: rotateX(90deg) translateZ(22.5px);
+  transform-origin: center;
+  border: 5px solid;
+  border-radius: 5px;
+}
+
+.serverFront {
+  position: absolute;
+  width: 120px;
+  height: 45px;
+  transform: translateZ(25px);
+  border: 5px solid;
+  border-radius: 5px;
+}
+
+.serverRight {
+  position: absolute;
+  width: 50px;
+  height: 45px;
+  transform: rotateY(90deg) translateZ(95px);
+  transform-origin: right;
+  border: 5px solid;
+  border-radius: 5px;
+}
+
+.isoServer.cyan .serverTop {
+  background: linear-gradient(135deg, #00E6E6, #00C8C8);
+  border-color: #00E6E6;
+  box-shadow: inset -6px -6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.isoServer.cyan .serverFront {
+  background: linear-gradient(180deg, #00C8C8, #00A0A0);
+  border-color: #00C8C8;
+  box-shadow:
+    inset -10px -10px 25px rgba(0, 0, 0, 0.3),
+    inset 8px 8px 20px rgba(255, 255, 255, 0.4),
+    0 15px 50px rgba(0, 200, 200, 0.4);
+}
+
+.isoServer.cyan .serverRight {
+  background: linear-gradient(135deg, #00A0A0, rgba(0, 140, 140, 0.9));
+  border-color: #00A0A0;
+  box-shadow: inset -6px -6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.serverLights {
+  position: absolute;
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  z-index: 10;
+  transform: translateZ(26px);
+}
+
+.serverLights::before,
+.serverLights::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 255, 255, 1), rgba(0, 255, 255, 0.7));
+  box-shadow:
+    0 0 15px rgba(0, 255, 255, 1),
+    inset 0 2px 5px rgba(255, 255, 255, 0.8);
+  animation: blinkLightIso 2s ease-in-out infinite;
+}
+
+.serverLights::after {
+  animation-delay: 1s;
+}
+
+@keyframes serverPulseIso {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes blinkLightIso {
+  0%, 100% { opacity: 1; box-shadow: 0 0 15px rgba(0, 255, 255, 1); }
+  50% { opacity: 0.3; box-shadow: 0 0 5px rgba(0, 255, 255, 0.3); }
+}
+
+/* ===== CONNECTING BEAMS ===== */
+.isoBeams {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.isoBeams .beam {
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: beamPulseIso 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
+}
+
+.isoBeams .beam:nth-child(2) { animation-delay: 1.3s; }
+.isoBeams .beam:nth-child(3) { animation-delay: 2.6s; }
+
+@keyframes beamPulseIso {
+  0% { stroke-dashoffset: 300; opacity: 0.2; }
+  50% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: -300; opacity: 0.2; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 968px) {
+  .automationStage {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .opsScene {
+    height: 500px;
+  }
+
+  .isoGear:not(.large) {
+    width: 80px;
+    height: 80px;
+  }
+
+  .isoGear.large {
+    width: 110px;
+    height: 110px;
+  }
+
+  .isoDatabase {
+    width: 80px;
+    height: 100px;
+  }
+
+  .isoServer {
+    width: 90px;
+    height: 35px;
+  }
+
+  .isoCloud {
+    transform: scale(0.75);
+  }
+
+  .isoPlatform {
+    width: 220px;
+    height: 220px;
+  }
+}

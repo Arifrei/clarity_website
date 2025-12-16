@@ -77,11 +77,15 @@ a{ color:inherit; text-decoration:none; }
   font-weight:900;
   letter-spacing:-.04em;
 }
-.mark{
-  width:14px; height:14px;
-  border-radius:4px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  box-shadow: 0 0 0 7px rgba(61,220,255,.10);
+.brandLogo{
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(61,220,255,.3));
+  transition: transform .2s ease;
+}
+.brand:hover .brandLogo{
+  transform: scale(1.1);
 }
 .brandText{ opacity:.96; }
 
@@ -1532,61 +1536,6 @@ main{ padding-top: var(--navH); }
   opacity:.8;
 }
 
-.gearGrid{
-  position:absolute;
-  left: 6%;
-  top: 12%;
-  width: 260px;
-  height: 260px;
-}
-
-.gearPiece{
-  position:absolute;
-  filter: drop-shadow(0 10px 24px rgba(0,0,0,.35));
-}
-
-.gearTeeth rect{
-  fill: rgba(61,220,255,.32);
-  stroke: rgba(61,220,255,.5);
-  stroke-width: 1.4;
-}
-
-.gearRim{
-  fill: rgba(61,220,255,.12);
-  stroke: rgba(61,220,255,.55);
-  stroke-width: 3;
-}
-
-.gearCore{
-  fill: rgba(155,123,255,.22);
-  stroke: rgba(155,123,255,.55);
-  stroke-width: 2;
-}
-
-.gearHole{
-  fill: rgba(0,0,0,.7);
-  stroke: rgba(255,255,255,.2);
-  stroke-width: 2;
-}
-
-.gearA{
-  width: 150px; height:150px;
-  left: 0; top: 10px;
-  animation: spinSlow 11s linear infinite;
-}
-
-.gearB{
-  width: 120px; height:120px;
-  left: 115px; top: 88px;
-  animation: spinFast 8s linear infinite reverse;
-}
-
-.gearC{
-  width: 94px; height:94px;
-  left: 70px; top: 178px;
-  animation: spinSlow 6s linear infinite;
-}
-
 .brainCore{
   position:absolute;
   left: 18%;
@@ -1860,6 +1809,7 @@ main{ padding-top: var(--navH); }
 @keyframes spinFast{
   to{ transform: rotate(-360deg); }
 }
+
 @keyframes beltMove{
   to{ background-position: 80px 0; }
 }
@@ -2707,3 +2657,4 @@ main{ padding-top: var(--navH); }
   will-change: opacity;
   transition: opacity 0.3s ease-out;
 }
+

@@ -11,6 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/isometric.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
 </head>
 <body>
   <div class="topProgress" id="topProgress"></div>
@@ -18,7 +20,7 @@
   <header class="navWrap" id="navWrap">
     <div class="nav">
       <a class="brand" data-target="home" href="#home" aria-label="Clarity Solutions Home">
-        <span class="mark" aria-hidden="true"></span>
+        <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Clarity Logo" class="brandLogo">
         <span class="brandText">Clarity</span>
       </a>
 
