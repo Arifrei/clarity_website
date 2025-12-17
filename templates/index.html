@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- HERO (top only) -->
+<section id="home" class="scene hero pinned">
+  <div class="heroInner">
+    <div class="grid">
+      <div class="heroLeft drift">
+        <div class="kicker">Clarity Solutions</div>
+
+        <h1 class="mega">
+          Turn scattered operations into
+          <span class="grad">a simple system</span>.
+        </h1>
+
+        <p class="oneLine">Scattered → Structured → Simple</p>
+        
+        <div id="dockPoint" class="dockPoint"></div>
+
+        <div class="heroActions">
+          <!-- keep buttons as buttons so your existing JS data-target navigation still works -->
+          <button class="btn primary" data-target="contact">Get Clarity</button>
+          <button class="btn ghost" data-target="services">See Our Services</button>
+        </div>
+      </div>
+
+      <!-- Keep this column so your grid + spacing stays exactly like the original design -->
+      <div class="heroRight drift"></div>
+    </div>
+
+    <!-- Background orbs (same as original style) -->
+    <div class="bgOrbs" aria-hidden="true">
+      <div class="orb a"></div>
+      <div class="orb b"></div>
+      <div class="orb c"></div>
+    </div>
+  </div>
+</section>
+
+<section id="introParagraph" class="introParagraph" aria-label="Intro">
+  <div class="introParagraphInner">
+    <p>
+      Clarity Solutions helps business owners whose operations live “in their head,” in notebooks, in WhatsApp, or across too many tools. We turn that into a clear, streamlined workflow your team can actually follow — whether you use no software at all or ten different apps.
+    </p>
+  </div>
+</section>
+
+
+{% endblock %}

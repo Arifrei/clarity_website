@@ -1,0 +1,295 @@
+:root{
+  --navH: 74px;
+  --container: 1100px;
+
+  --bg: #070A10;
+  --text: rgba(240,245,255,.96);
+  --muted: rgba(240,245,255,.72);
+  --muted2: rgba(240,245,255,.56);
+
+  --accent: rgb(61,220,255);
+  --accent2: rgb(155,123,255);
+
+  --radius2: 22px;
+  --shadow: 0 26px 80px rgba(0,0,0,.45);
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x:hidden;
+}
+
+a{ color:inherit; text-decoration:none; }
+
+main{ padding-top: var(--navH); }
+
+/* top progress bar (base.html uses it) */
+.topProgress{
+  position:fixed; top:0; left:0;
+  height:2px; width:0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  z-index:9999;
+}
+
+/* NAV (base.html uses these classes) */
+.navWrap{
+  position:fixed; top:0; left:0; right:0;
+  height: var(--navH);
+  z-index:2000;
+  background: rgba(8,10,15,.55);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.nav{
+  width:min(var(--container), calc(100% - 44px));
+  height:100%;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:900;
+  letter-spacing:-.04em;
+}
+
+.brandLogo{
+  width:32px;
+  height:32px;
+  object-fit:contain;
+  filter: drop-shadow(0 2px 8px rgba(61,220,255,.3));
+  transition: transform .2s ease;
+}
+.brand:hover .brandLogo{ transform: scale(1.1); }
+.brandText{ opacity:.96; }
+
+.navLinks{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:6px;
+  border-radius:999px;
+  background: rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+}
+
+.navBtn{
+  appearance:none;
+  border:0;
+  background:transparent;
+  color: var(--muted2);
+  padding:10px 12px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:700;
+  letter-spacing:-.01em;
+  transition:.2s ease;
+}
+.navBtn:hover{ color:var(--text); background: rgba(255,255,255,.05); }
+.navBtn.active{
+  color:var(--text);
+  background: linear-gradient(135deg, rgba(61,220,255,.14), rgba(155,123,255,.10));
+  border: 1px solid rgba(61,220,255,.18);
+}
+
+.cta{
+  border:0;
+  cursor:pointer;
+  font-weight:900;
+  letter-spacing:-.02em;
+  color:#071018;
+  padding:12px 14px;
+  border-radius:999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  box-shadow: 0 16px 46px rgba(61,220,255,.18);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  transition: transform .12s ease;
+}
+.cta:hover{ transform: translateY(-1px); }
+
+.ctaDot{
+  width:8px; height:8px; border-radius:50%;
+  background: rgba(7,16,24,.85);
+  box-shadow: 0 0 0 6px rgba(7,16,24,.15);
+}
+
+/* SCENE base (your original site uses scenes) */
+.scene{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  position:relative;
+}
+
+/* HERO */
+.hero{ padding:0; }
+.pinned{ height:100vh; }
+
+/* IMPORTANT: this is the key change to make hero vertically centered */
+.heroInner{
+  height: calc(100vh - var(--navH));
+  display:flex;
+  align-items:center;   /* was flex-start in your current file */
+  position: relative;   /* not sticky for this “top-only” version */
+}
+
+.grid{
+  width:min(var(--container), calc(100% - 44px));
+  margin:0 auto;
+  display:grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap:36px;
+  align-items:center;
+  position:relative;
+  z-index:2;
+}
+
+.kicker{
+  color: var(--muted2);
+  font-weight:800;
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+
+.mega{
+  margin:0;
+  font-size: clamp(44px, 5.2vw, 78px);
+  line-height:.98;
+  letter-spacing:-.06em;
+}
+
+.grad{
+  background: linear-gradient(135deg, var(--text), rgba(61,220,255,.92));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.oneLine{
+  margin: 14px 0 20px;
+  color: var(--muted);
+  font-weight:600;
+  letter-spacing:-.02em;
+}
+
+.heroActions{ display:flex; gap:12px; flex-wrap:wrap; }
+
+.dockPoint{
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.btn{
+  border:0;
+  border-radius:999px;
+  padding: 12px 14px;
+  font-weight:900;
+  letter-spacing:-.02em;
+  cursor:pointer;
+  transition: .18s ease;
+}
+.btn.primary{
+  color:#071018;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  box-shadow: 0 16px 46px rgba(61,220,255,.16);
+}
+.btn.primary:hover{ transform: translateY(-1px); }
+
+.btn.ghost{
+  color:var(--text);
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.09);
+}
+.btn.ghost:hover{
+  background: rgba(255,255,255,.05);
+  transform: translateY(-1px);
+}
+
+/* Background orbs */
+.bgOrbs{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+.orb{
+  position:absolute;
+  border-radius:50%;
+  filter: blur(26px);
+  opacity:.35;
+}
+.orb.a{ width:280px; height:280px; left:-80px; top:120px; background: rgba(61,220,255,.28); }
+.orb.b{ width:340px; height:340px; right:-120px; top:60px; background: rgba(155,123,255,.24); }
+.orb.c{ width:240px; height:240px; right:120px; bottom:40px; background: rgba(61,220,255,.18); }
+
+/* Small screens */
+@media (max-width: 900px){
+  .grid{ grid-template-columns: 1fr; }
+  .heroRight{ display:none; }
+}
+
+.introParagraph{
+  position: fixed;
+  left: 0;
+  width: 100%;
+  z-index: 30;              
+  top: 100vh;    
+  opacity: 0;              
+  pointer-events: none;     
+}
+
+.introParagraphInner{
+  width: min(var(--container), calc(100% - 44px));
+  margin-left: calc((100% - min(var(--container), calc(100% - 44px))) / 2);
+  margin-right: auto;
+  max-width: 720px;     
+}
+
+
+.introParagraphInner p{
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+/* Phase 1: hero pinned */
+body.phase1 #home .heroInner{
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--navH);
+  height: calc(100vh - var(--navH));
+  z-index: 20;
+}
+
+/* Phase 2: KEEP hero pinned (no layout jump) */
+body.phase2 #home .heroInner{
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--navH);
+  height: calc(100vh - var(--navH));
+  z-index: 20;
+}
+
+.heroActions.release {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: fit-content;
+}
+
+#home{
+  position: relative;
+}
