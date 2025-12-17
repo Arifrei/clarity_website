@@ -22,8 +22,9 @@
 
   let navH = 74;
   let translateMax = 0;
-  let dockTop = 0;        
   let startTop = 0;              
+  let dockOffsetInHero = 0;
+  let dockTopStart = 0;
 
   let ticking = false;
 
@@ -57,18 +58,15 @@
     // Amount we must shift upward in phase2
     translateMax = targetHeroLeftTop - centeredHeroLeftTop; // negative number
 
-    const oneLineEl = heroLeft.querySelector(".oneLine");
-    const kickerEl = heroLeft.querySelector(".kicker");
-    const megaEl = heroLeft.querySelector(".mega");
+    const heroInnerRect = heroInner.getBoundingClientRect();
+    const dockRect = dockPoint.getBoundingClientRect();
+    dockOffsetInHero = dockRect.top - heroInnerRect.top;
+    dockTopStart = navH + dockOffsetInHero + GAP_UNDER_HERO;
 
-    // Calculate dockTop as: centeredHeroLeftTop + (height up to dockPoint)
-    const topBlockH =
-      (kickerEl ? kickerEl.offsetHeight : 0) +
-      (megaEl ? megaEl.offsetHeight : 0) +
-      (oneLineEl ? oneLineEl.offsetHeight : 0) +
-      8; 
-
-    dockTop = centeredHeroLeftTop + topBlockH + GAP_UNDER_HERO;
+    const spacer = document.getElementById("introSpacer");
+    if (spacer) {
+      spacer.style.height = `${introInner.offsetHeight}px`;
+    }
 
     // Offscreen start
     startTop = vh + 24;
@@ -85,39 +83,73 @@
   function update() {
     const y = window.scrollY;
 
-    // progress for docking (paragraph coming in)
+    const bg = document.getElementById("bgTrack");
+    if (bg) {
+      const cycle = window.innerHeight;
+      const pos = -((y) % cycle);
+      document.documentElement.style.setProperty("--bgPos", `${pos}px`);
+    }
+
     const dockP = smoothstep(0, PHASE1_DIST, y);
 
-    // progress for lifting (hero + paragraph moving up together)
-    const liftStart = PHASE1_DIST;             // start lifting slightly BEFORE full dock
-    const liftEnd   = liftStart + PHASE2_DIST;
+    const liftStart = PHASE1_DIST;
+    const liftEnd = liftStart + PHASE2_DIST;
     const liftP = smoothstep(liftStart, liftEnd, y);
 
-    // keep your body classes if you want, but they’re no longer “behavior switches”
-    document.body.classList.toggle("phase1", y < PHASE1_DIST);
-    document.body.classList.toggle("phase2", y >= PHASE1_DIST);
-
-    // HERO lift
     const liftT = lerp(0, translateMax, liftP);
-    heroInner.style.transform = `translateY(${liftT}px)`;
+    const postLift = Math.max(0, y - liftEnd);
 
-    // PARAGRAPH: keep top fixed at dockTop, and slide in via transform (no stopping/jump)
-    // start offset is "below fold" relative to dockTop
-    const startOffset = (startTop - dockTop);
+    // HERO (fixed throughout; translate out after lift to avoid handoff jump)
+    heroInner.style.position = "fixed";
+    heroInner.style.left = "0";
+    heroInner.style.right = "0";
+    heroInner.style.top = `${navH}px`;
+    heroInner.style.transform = `translateY(${liftT - postLift}px)`;
+
+    const dockTopNow = navH + liftT + dockOffsetInHero + GAP_UNDER_HERO;
+
+    // PARAGRAPH (fixed throughout to avoid handoff jitter)
+    const startOffset = startTop - dockTopStart;
     const dockOffset = lerp(startOffset, 0, dockP);
+    const releaseOffset = -postLift;
 
-    intro.style.top = `${dockTop}px`;
-    intro.style.transform = `translateY(${dockOffset + liftT}px)`;
+    intro.style.position = "fixed";
+    intro.style.left = "0";
+    intro.style.width = "100%";
+    intro.style.top = `${dockTopNow}px`;
+    intro.style.transform = `translateY(${dockOffset + releaseOffset}px)`;
     intro.style.opacity = `${clamp(dockP * 1.1, 0, 1)}`;
+    intro.style.pointerEvents = dockP > 0.05 ? "auto" : "none";
 
-    // Buttons fade out as dock happens (smooth)
+    // Buttons fade
     if (heroActions) {
       const fade = clamp(1 - dockP * 1.25, 0, 1);
       heroActions.style.opacity = `${fade}`;
       heroActions.style.pointerEvents = fade < 0.15 ? "none" : "auto";
     }
-  }
 
+    const qualify = document.getElementById("qualify");
+    if (qualify) {
+      const scenarios = qualify.querySelectorAll(".scenario");
+      const rect = qualify.getBoundingClientRect();
+      const sectionTop = rect.top + y;
+      const sectionHeight = qualify.offsetHeight;
+
+      const progress = (y - sectionTop) / sectionHeight;
+
+      let activeIndex = -1;
+      if (progress > 0 && progress < 1) {
+        activeIndex = Math.min(
+          scenarios.length - 1,
+          Math.floor(progress * scenarios.length)
+        );
+      }
+
+      scenarios.forEach((el, i) => {
+        el.classList.toggle("active", i === activeIndex);
+      });
+    }
+  }
 
   function onScroll() {
     if (ticking) return;

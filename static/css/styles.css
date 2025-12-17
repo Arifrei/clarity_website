@@ -23,6 +23,29 @@ body{
   color: var(--text);
   overflow-x:hidden;
 }
+/* Moving gradient track (distinct seam line) */
+#bgTrack{
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  /* ONE viewport tall, repeating */
+  background-image: linear-gradient(
+    180deg,
+  #0C1017 0%,     /* soft charcoal */
+  #0D1220 45%,    /* tiny lift */
+  #0D1422 100% 
+  );
+
+  background-size: 100% 100vh;
+  background-repeat: repeat-y;
+  background-position: 0 var(--bgPos, 0px);
+}
+
+@media (prefers-reduced-motion: reduce){
+  #bgTrack{ transform: none !important; }
+}
 
 a{ color:inherit; text-decoration:none; }
 
@@ -147,8 +170,10 @@ main{ padding-top: var(--navH); }
 }
 
 .grid{
-  width:min(var(--container), calc(100% - 44px));
-  margin:0 auto;
+  width: calc(100% - 44px);
+  max-width: var(--container);
+  margin-left: 22px;
+  margin-right: auto;
   display:grid;
   grid-template-columns: 1.15fr .85fr;
   gap:36px;
@@ -240,7 +265,6 @@ main{ padding-top: var(--navH); }
 }
 
 .introParagraph{
-  position: fixed;
   left: 0;
   width: 100%;
   z-index: 30;              
@@ -250,10 +274,10 @@ main{ padding-top: var(--navH); }
 }
 
 .introParagraphInner{
-  width: min(var(--container), calc(100% - 44px));
-  margin-left: calc((100% - min(var(--container), calc(100% - 44px))) / 2);
+  width: calc(100% - 44px);
+  max-width: min(47vw, 720px);
+  margin-left: 22px;
   margin-right: auto;
-  max-width: 720px;     
 }
 
 
@@ -263,25 +287,6 @@ main{ padding-top: var(--navH); }
   line-height: 1.6;
   color: var(--muted);
 }
-/* Phase 1: hero pinned */
-body.phase1 #home .heroInner{
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: var(--navH);
-  height: calc(100vh - var(--navH));
-  z-index: 20;
-}
-
-/* Phase 2: KEEP hero pinned (no layout jump) */
-body.phase2 #home .heroInner{
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: var(--navH);
-  height: calc(100vh - var(--navH));
-  z-index: 20;
-}
 
 .heroActions.release {
   position: absolute;
@@ -290,6 +295,75 @@ body.phase2 #home .heroInner{
   width: fit-content;
 }
 
+#heroRelease{
+  height: 1px;
+}
+
 #home{
   position: relative;
+}
+
+#introSpacer { height: 0; }
+
+.qualifySection{
+  position: relative;
+  min-height: 180vh; /* enough scroll to cycle 3 scenarios */
+  padding: 0 24px;
+}
+
+.qualifyInner{
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Pinned header */
+.qualifyTitle{
+  position: sticky;
+  top: calc(var(--navH) + 24px);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  margin-bottom: 48px;
+  z-index: 2;
+}
+
+/* Scenario container */
+.qualifyScenarios{
+  position: relative;
+  height: 140px; /* fixed height so text swaps in-place */
+}
+
+/* Individual scenario */
+.scenario{
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Active scenario */
+.scenario.active{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Checkmark */
+.scenario .check{
+  color: #7aa2ff;
+  font-size: 18px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* Text */
+.scenario p{
+  font-size: 18px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.9);
+  margin: 0;
 }
