@@ -668,9 +668,21 @@ window.addEventListener('resize', () => {
     const startOffset = (startTop - dockTop);
     const dockOffset = lerpPara(startOffset, 0, dockP);
 
-    intro.style.top = `${dockTop}px`;
-    intro.style.transform = `translateY(${dockOffset + liftT}px)`;
-    intro.style.opacity = `${clampPara(dockP * 1.1, 0, 1)}`;
+    // After animation completes, convert to absolute positioning relative to home section
+    const animationThreshold = liftEnd + 50;
+    if (y > animationThreshold) {
+      // Animation complete - make it absolute and positioned relative to home
+      intro.style.position = 'absolute';
+      intro.style.top = `${dockTop + translateMax}px`;
+      intro.style.transform = 'none';
+      intro.style.opacity = '1';
+    } else {
+      // Animation in progress - keep it fixed
+      intro.style.position = 'fixed';
+      intro.style.top = `${dockTop}px`;
+      intro.style.transform = `translateY(${dockOffset + liftT}px)`;
+      intro.style.opacity = `${clampPara(dockP * 1.1, 0, 1)}`;
+    }
 
     if (heroActions) {
       const fade = clampPara(1 - dockP * 1.25, 0, 1);

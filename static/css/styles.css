@@ -2659,6 +2659,10 @@ main{ padding-top: var(--navH); }
 }
 
 /* ===== PARAGRAPH SLIDE-IN ANIMATION ===== */
+#home{
+  position: relative;
+}
+
 .dockPoint{
   height: 0;
   margin: 0;
