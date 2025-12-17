@@ -590,7 +590,7 @@ window.addEventListener('resize', () => {
     return;
   }
 
-  const GAP_UNDER_HERO = 5;
+  const GAP_UNDER_HERO = -20;
   const HERO_TOP_PADDING = 22;
   let PHASE1_DIST = 420;
   let PHASE2_DIST = 520;
@@ -634,8 +634,7 @@ window.addEventListener('resize', () => {
     const topBlockH =
       (kickerEl ? kickerEl.offsetHeight : 0) +
       (megaEl ? megaEl.offsetHeight : 0) +
-      (oneLineEl ? oneLineEl.offsetHeight : 0) +
-      8;
+      (oneLineEl ? oneLineEl.offsetHeight : 0);
 
     dockTop = centeredHeroLeftTop + topBlockH + GAP_UNDER_HERO;
 
