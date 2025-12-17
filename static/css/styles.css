@@ -796,46 +796,6 @@ main{ padding-top: var(--navH); }
   100%{ transform: translate(-50%,12px); opacity:0; }
 }
 
-/* ---- INTRO PARAGRAPH (Two-phase scroll) ---- */
-.introParagraph{
-  position: relative;
-  z-index: 50;
-  padding: 0;
-  margin: 0;
-  /* Will be controlled by JS to create slide-up effect */
-}
-
-.introParagraphInner{
-  width: min(var(--container), calc(100% - 44px));
-  margin: 0 auto;
-  padding: 32px 0;
-  background: rgba(8, 10, 15, 0.85);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.introText{
-  margin: 0;
-  font-size: clamp(16px, 1.8vw, 20px);
-  line-height: 1.7;
-  color: var(--muted);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  text-align: center;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-/* Hero buttons fade during scroll */
-.heroActions{
-  transition: opacity 0.4s ease, pointer-events 0.4s;
-}
-
-.heroActions.fading{
-  opacity: 0;
-  pointer-events: none;
-}
-
 /* hero right card */
 .glassCard{
   border-radius: var(--radius2);

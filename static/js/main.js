@@ -537,99 +537,6 @@ $$('.magnetic-scroll').forEach(card => {
   }, { passive: true });
 });
 
-/* -------- TWO-PHASE SCROLL: HERO + INTRO PARAGRAPH -------- */
-const heroSection = $('#home');
-const heroInner = $('.heroInner', heroSection);
-const heroActions = $('.heroActions', heroSection);
-const introParagraph = $('#introParagraph');
-const introParagraphInner = $('.introParagraphInner', introParagraph);
-
-// Calculate the scroll distance for phase 1
-let phase1ScrollDistance = 400; // Default, will be recalculated
-
-function initTwoPhaseScroll() {
-  if (!heroInner || !introParagraphInner) return;
-
-  const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navH')) || 74;
-  const heroHeight = heroInner.offsetHeight;
-  const viewportHeight = window.innerHeight;
-
-  // Phase 1 should last for enough scroll to feel natural
-  phase1ScrollDistance = Math.max(300, (viewportHeight - navH - heroHeight) * 0.6);
-}
-
-// Initialize on load and resize
-initTwoPhaseScroll();
-window.addEventListener('resize', initTwoPhaseScroll);
-
-function updateTwoPhaseScroll() {
-  if (!heroSection || !introParagraph || !heroInner || !introParagraphInner) return;
-
-  const scrollY = window.scrollY;
-  const navH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navH')) || 74;
-  const heroHeight = heroInner.offsetHeight;
-  const viewportHeight = window.innerHeight;
-
-  // Phase 1: Scroll from 0 to phase1ScrollDistance
-  // During this phase, hero stays fixed, paragraph slides up from below
-  if (scrollY > 0 && scrollY < phase1ScrollDistance) {
-    const progress = scrollY / phase1ScrollDistance;
-
-    // Make paragraph visible and position it
-    if (introParagraph) {
-      introParagraph.style.position = 'fixed';
-      introParagraph.style.left = '0';
-      introParagraph.style.right = '0';
-      introParagraph.style.zIndex = '50';
-
-      // Slide from bottom of viewport to just under hero
-      const startPos = viewportHeight;
-      const endPos = navH + heroHeight;
-      const currentPos = startPos - ((startPos - endPos) * progress);
-
-      introParagraph.style.top = `${currentPos}px`;
-    }
-
-    // Fade out hero buttons
-    if (heroActions) {
-      heroActions.style.opacity = `${1 - Math.min(progress * 2, 1)}`;
-      heroActions.style.pointerEvents = progress > 0.5 ? 'none' : 'auto';
-    }
-
-  } else if (scrollY >= phase1ScrollDistance) {
-    // Phase 2: Both scroll together
-    // Release paragraph from fixed positioning
-    if (introParagraph) {
-      introParagraph.style.position = '';
-      introParagraph.style.top = '';
-      introParagraph.style.left = '';
-      introParagraph.style.right = '';
-      introParagraph.style.zIndex = '';
-    }
-
-    // Fade hero buttons back in
-    if (heroActions) {
-      heroActions.style.opacity = '1';
-      heroActions.style.pointerEvents = 'auto';
-    }
-  } else {
-    // At the very top (scrollY = 0): Keep paragraph in normal flow
-    if (introParagraph) {
-      introParagraph.style.position = '';
-      introParagraph.style.top = '';
-      introParagraph.style.left = '';
-      introParagraph.style.right = '';
-      introParagraph.style.zIndex = '';
-    }
-
-    // Hero buttons visible
-    if (heroActions) {
-      heroActions.style.opacity = '1';
-      heroActions.style.pointerEvents = 'auto';
-    }
-  }
-}
-
 /* -------- ENHANCED SCROLL ENGINE -------- */
 let rafId = null;
 
@@ -642,7 +549,6 @@ function scrollEffects() {
   updateScrollVelocity();
   detectScrollDirection();
   updateSectionScale();
-  updateTwoPhaseScroll(); // Add two-phase scroll logic
 }
 
 // Throttled scroll listener
