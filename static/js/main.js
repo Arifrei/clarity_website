@@ -590,7 +590,7 @@ window.addEventListener('resize', () => {
     return;
   }
 
-  const GAP_UNDER_HERO = 30;
+  const GAP_UNDER_HERO = 5;
   const HERO_TOP_PADDING = 22;
   let PHASE1_DIST = 420;
   let PHASE2_DIST = 520;
