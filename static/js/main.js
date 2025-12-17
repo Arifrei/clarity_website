@@ -573,3 +573,123 @@ window.addEventListener('resize', () => {
     scrollEffects();
   }, 100);
 });
+
+/* ========== PARAGRAPH SLIDE-IN ANIMATION ========== */
+(() => {
+  const home = $("#home");
+  const heroInner = $(".heroInner", home);
+  const heroLeft = $(".heroLeft", home);
+  const heroActions = $(".heroActions", home);
+  const dockPoint = document.querySelector("#dockPoint");
+
+  const intro = $("#introParagraph");
+  const introInner = $(".introParagraphInner", intro);
+
+  if (!home || !heroInner || !heroLeft || !intro || !introInner || !dockPoint) {
+    console.warn("Missing required elements for paragraph scroll animation.");
+    return;
+  }
+
+  const GAP_UNDER_HERO = 30;
+  const HERO_TOP_PADDING = 22;
+  let PHASE1_DIST = 420;
+  let PHASE2_DIST = 520;
+
+  let navH = 74;
+  let translateMax = 0;
+  let dockTop = 0;
+  let startTop = 0;
+
+  let paragraphTicking = false;
+
+  const clampPara = (v, a, b) => Math.max(a, Math.min(b, v));
+  const lerpPara = (a, b, t) => a + (b - a) * t;
+
+  function setScrollSpace() {
+    const vh = window.innerHeight;
+    home.style.minHeight = `${vh + PHASE1_DIST + PHASE2_DIST + 200}px`;
+  }
+
+  function recalcParagraph() {
+    navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--navH")) || 74;
+
+    PHASE1_DIST = Math.max(320, Math.min(520, window.innerHeight * 0.45));
+    PHASE2_DIST = Math.max(420, Math.min(720, window.innerHeight * 0.65));
+
+    const vh = window.innerHeight;
+    const availableH = vh - navH;
+
+    const heroLeftH = heroLeft.offsetHeight;
+
+    const centeredHeroLeftTop = navH + (availableH - heroLeftH) / 2;
+
+    const targetHeroLeftTop = navH + HERO_TOP_PADDING;
+
+    translateMax = targetHeroLeftTop - centeredHeroLeftTop;
+
+    const oneLineEl = heroLeft.querySelector(".oneLine");
+    const kickerEl = heroLeft.querySelector(".kicker");
+    const megaEl = heroLeft.querySelector(".mega");
+
+    const topBlockH =
+      (kickerEl ? kickerEl.offsetHeight : 0) +
+      (megaEl ? megaEl.offsetHeight : 0) +
+      (oneLineEl ? oneLineEl.offsetHeight : 0) +
+      8;
+
+    dockTop = centeredHeroLeftTop + topBlockH + GAP_UNDER_HERO;
+
+    startTop = vh + 24;
+
+    setScrollSpace();
+    updateParagraph();
+  }
+
+  function smoothstepPara(edge0, edge1, x) {
+    const t = clampPara((x - edge0) / (edge1 - edge0), 0, 1);
+    return t * t * (3 - 2 * t);
+  }
+
+  function updateParagraph() {
+    const y = window.scrollY;
+
+    const dockP = smoothstepPara(0, PHASE1_DIST, y);
+
+    const liftStart = PHASE1_DIST;
+    const liftEnd   = liftStart + PHASE2_DIST;
+    const liftP = smoothstepPara(liftStart, liftEnd, y);
+
+    document.body.classList.toggle("phase1", y < PHASE1_DIST);
+    document.body.classList.toggle("phase2", y >= PHASE1_DIST);
+
+    const liftT = lerpPara(0, translateMax, liftP);
+    heroInner.style.transform = `translateY(${liftT}px)`;
+
+    const startOffset = (startTop - dockTop);
+    const dockOffset = lerpPara(startOffset, 0, dockP);
+
+    intro.style.top = `${dockTop}px`;
+    intro.style.transform = `translateY(${dockOffset + liftT}px)`;
+    intro.style.opacity = `${clampPara(dockP * 1.1, 0, 1)}`;
+
+    if (heroActions) {
+      const fade = clampPara(1 - dockP * 1.25, 0, 1);
+      heroActions.style.opacity = `${fade}`;
+      heroActions.style.pointerEvents = fade < 0.15 ? "none" : "auto";
+    }
+  }
+
+  function onParagraphScroll() {
+    if (paragraphTicking) return;
+    paragraphTicking = true;
+    requestAnimationFrame(() => {
+      paragraphTicking = false;
+      updateParagraph();
+    });
+  }
+
+  window.addEventListener("scroll", onParagraphScroll, { passive: true });
+  window.addEventListener("resize", recalcParagraph);
+
+  recalcParagraph();
+})();

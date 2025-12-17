@@ -2657,3 +2657,61 @@ main{ padding-top: var(--navH); }
   will-change: opacity;
   transition: opacity 0.3s ease-out;
 }
+
+/* ===== PARAGRAPH SLIDE-IN ANIMATION ===== */
+.dockPoint{
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.introParagraph{
+  position: fixed;
+  left: 0;
+  width: 100%;
+  z-index: 30;
+  top: 100vh;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.introParagraphInner{
+  width: min(var(--container), calc(100% - 44px));
+  margin-left: calc((100% - min(var(--container), calc(100% - 44px))) / 2);
+  margin-right: auto;
+  max-width: 720px;
+}
+
+.introParagraphInner p{
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Phase 1: hero pinned */
+body.phase1 #home .heroInner{
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--navH);
+  height: calc(100vh - var(--navH));
+  z-index: 20;
+}
+
+/* Phase 2: KEEP hero pinned (no layout jump) */
+body.phase2 #home .heroInner{
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--navH);
+  height: calc(100vh - var(--navH));
+  z-index: 20;
+}
+
+.heroActions.release {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: fit-content;
+}
