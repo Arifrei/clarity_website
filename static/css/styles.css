@@ -206,10 +206,11 @@ main{ padding-top: var(--navH); }
 }
 
 .oneLine{
-  margin: 14px 0 20px;
-  color: var(--muted);
-  font-weight:600;
-  letter-spacing:-.02em;
+  margin: 16px 0 22px;
+  font-size: clamp(16px, 2vw, 20px);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: rgba(61,220,255,0.85);
 }
 
 .heroActions{ display:flex; gap:12px; flex-wrap:wrap; }
@@ -283,9 +284,11 @@ main{ padding-top: var(--navH); }
 
 .introParagraphInner p{
   margin: 0;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--muted);
+  font-size: clamp(1.05rem, 1.6vw, 1.15rem);
+  line-height: 1.65;
+  color: rgba(240,245,255,0.8);
+  font-weight: 450;
+  letter-spacing: -0.01em;
 }
 
 .heroActions.release {
@@ -307,63 +310,202 @@ main{ padding-top: var(--navH); }
 
 .qualifySection{
   position: relative;
-  min-height: 180vh; /* enough scroll to cycle 3 scenarios */
-  padding: 0 24px;
+  padding: 80px 22px;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
 }
 
-.qualifyInner{
-  max-width: 900px;
+.qualifyCard{
+  position: relative;
+  width: min(520px, 100%);
   margin: 0 auto;
+  padding: 36px 32px 42px;
+  border-radius: var(--radius2);
+
+  /* Gradient border effect */
+  background:
+    linear-gradient(135deg,
+      rgba(15,18,28,0.95),
+      rgba(12,16,24,0.92)
+    ),
+    linear-gradient(135deg,
+      rgba(61,220,255,0.4),
+      rgba(155,123,255,0.3)
+    );
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+  border: 2px solid transparent;
+
+  backdrop-filter: blur(24px);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.3),
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    0 40px 120px rgba(61,220,255,0.08);
+
+  color: var(--text);
+  z-index: 40;
+  opacity: 0;
+  transform: translateY(40px) scale(0.96);
+  transition:
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s ease;
 }
 
-/* Pinned header */
+.qualifyCard::before{
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius2);
+  padding: 2px;
+  background: linear-gradient(135deg,
+    rgba(61,220,255,0.5),
+    rgba(155,123,255,0.4),
+    rgba(61,220,255,0.3)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.qualifyCard.visible::before{
+  opacity: 1;
+}
+
 .qualifyTitle{
-  position: sticky;
-  top: calc(var(--navH) + 24px);
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 700;
-  margin-bottom: 48px;
-  z-index: 2;
+  font-size: clamp(28px, 3.8vw, 38px);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  margin: 0 0 28px;
+  background: linear-gradient(135deg,
+    var(--text),
+    rgba(61,220,255,0.95)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 40px rgba(61,220,255,0.2);
 }
 
-/* Scenario container */
 .qualifyScenarios{
   position: relative;
-  height: 140px; /* fixed height so text swaps in-place */
+  min-height: 200px;
 }
 
-/* Individual scenario */
 .scenario{
   position: absolute;
   left: 0;
   top: 0;
+  width: 100%;
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-
+  gap: 18px;
+  padding: 24px 26px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transform: translateY(30px) translateX(-10px);
+  transition:
+    opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.5s cubic-bezier(0.16, 1, 0.3, 1),
+    background 1s ease,
+    border-color 1s ease;
 }
 
-/* Active scenario */
 .scenario.active{
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) translateX(0);
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(61,220,255,0.12);
 }
 
-/* Checkmark */
 .scenario .check{
-  color: #7aa2ff;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
   font-size: 18px;
-  line-height: 1.4;
+  font-weight: 900;
+  line-height: 1;
   margin-top: 2px;
+  border-radius: 8px;
+  background: linear-gradient(135deg,
+    rgba(61,220,255,0.15),
+    rgba(155,123,255,0.1)
+  );
+  box-shadow:
+    0 0 20px rgba(61,220,255,0.2),
+    0 0 0 1px rgba(61,220,255,0.3) inset;
+  transition: all 0.3s ease;
 }
 
-/* Text */
+.scenario.active .check{
+  animation: checkPulse 0.6s ease;
+  background: linear-gradient(135deg,
+    rgba(61,220,255,0.25),
+    rgba(155,123,255,0.18)
+  );
+}
+
+@keyframes checkPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 20px rgba(61,220,255,0.2),
+      0 0 0 1px rgba(61,220,255,0.3) inset;
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow:
+      0 0 30px rgba(61,220,255,0.4),
+      0 0 0 1px rgba(61,220,255,0.5) inset;
+  }
+}
+
 .scenario p{
+  flex: 1;
   font-size: 18px;
-  line-height: 1.5;
-  color: rgba(255,255,255,0.9);
+  line-height: 1.65;
+  color: rgba(240,245,255,0.85);
+  font-weight: 500;
   margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.scenario.active p{
+  color: var(--text);
+}
+
+@media (max-width: 900px){
+  .qualifyCard{
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    opacity: 1 !important;
+    width: min(520px, calc(100% - 48px));
+  }
+
+  .scenario{
+    padding: 20px 22px;
+  }
+
+  .scenario p{
+    font-size: 17px;
+    line-height: 1.6;
+  }
 }
