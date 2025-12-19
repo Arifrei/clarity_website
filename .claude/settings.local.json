@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(git -C \"/c/Users/Aron/Clarity Projects/calrity_new2\" log --oneline -10)"
+    ]
+  }
+}

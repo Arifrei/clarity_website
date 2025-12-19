@@ -21,9 +21,6 @@
   const testimonialsTrack = testimonialsSection
     ? testimonialsSection.querySelector(".testimonialsTrack")
     : null;
-  const testimonialsCards = testimonialsTrack
-    ? testimonialsTrack.querySelectorAll(".testimonialCard")
-    : [];
   const testimonialsSpacer = document.getElementById("testimonialsSpacer");
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -242,9 +239,11 @@
       testimonialsVisibleWidth = testimonialsContainer.clientWidth - padL - padR;
 
       testimonialsTrackWidth = testimonialsTrack.scrollWidth;
+      // Add extra space to ensure last card is fully visible with balanced spacing
+      const extraSpace = padL + 250;
       testimonialsTrackTravel = Math.max(
         0,
-        testimonialsTrackWidth - testimonialsVisibleWidth
+        testimonialsTrackWidth - testimonialsVisibleWidth + extraSpace
       );
 
       if (testimonialsTrackTravel <= 0) {
