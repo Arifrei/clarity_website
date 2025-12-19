@@ -37,6 +37,16 @@
   let PHASE4_DIST = 520; // lift together
   const SCENARIO_DWELL_DIST = 220; // extra scroll distance between scenario switches for dwell
 
+  // WORKFLOW (Phase 5) - tweak points
+  let WORKFLOW_DIST = 520; // scroll distance for workflow animation
+  let WORKFLOW_DELAY_DIST = 0; // optional delay before workflow starts
+  let WORKFLOW_HOLD_DIST = 220; // extra scroll distance to hold the pin after last card
+  let workflowBaseOffset = 0; // vertical offset adjustment
+  let workflowPinEnabled = false; // desktop pinning flag
+  let workflowScrollStart = 0; // scrollY where workflow animation begins
+  let workflowPinTop = 0; // pinned top position for workflow
+  let workflowPinOffset = 0; // distance below nav for pin
+
   let navH = 74;
   let translateMax = 0;
   let startTop = 0;
@@ -51,8 +61,24 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const lerp = (a, b, t) => a + (b - a) * t;
 
+  function equalizeWorkflowCards() {
+    const contents = document.querySelectorAll(".workflowCard .cardContent");
+    if (!contents.length) return;
+    contents.forEach((c) => {
+      c.style.minHeight = "";
+    });
+    let maxH = 0;
+    contents.forEach((c) => {
+      maxH = Math.max(maxH, c.offsetHeight);
+    });
+    contents.forEach((c) => {
+      c.style.minHeight = `${maxH}px`;
+    });
+  }
+
   function setScrollSpace() {
     const vh = window.innerHeight;
+    // Workflow section is in normal flow, so don't include WORKFLOW_DIST in hero height
     home.style.minHeight = `${vh + PHASE1_DIST + QUALIFY_DELAY_DIST + PHASE2_DIST + PHASE3_DIST + PHASE4_DIST + 200}px`;
   }
 
@@ -73,6 +99,12 @@
 
     PHASE4_DIST = Math.max(420, Math.min(720, window.innerHeight * 0.65));
 
+    // Workflow (Phase 5) responsive distance - tweak point
+    WORKFLOW_DIST = Math.max(420, Math.min(720, window.innerHeight * 0.65));
+    WORKFLOW_HOLD_DIST = Math.max(160, Math.min(320, window.innerHeight * 0.22)); // about ~2s scroll dwell
+    workflowBaseOffset = 0; // tweak point
+    workflowPinEnabled = window.innerWidth > 900; // mirrors qualify pin behavior
+
     const vh = window.innerHeight;
     const availableH = vh - navH;
     const heroLeftH = heroLeft.offsetHeight;
@@ -89,6 +121,48 @@
     const spacer = document.getElementById("introSpacer");
     if (spacer) {
       spacer.style.height = `${introInner.offsetHeight}px`;
+    }
+
+    const workflow = document.getElementById("workflow");
+    const workflowSpacer = document.getElementById("workflowSpacer");
+    if (workflowSpacer && workflowPinEnabled && workflow) {
+      // Provide extra scroll room equal to the animation distance + hold + the section's own height
+      const spacerH = workflow.offsetHeight + WORKFLOW_DIST + WORKFLOW_HOLD_DIST;
+      workflowSpacer.style.height = `${spacerH}px`;
+    } else if (workflowSpacer) {
+      workflowSpacer.style.height = "0px";
+    }
+
+    if (workflow) {
+      const prevPosition = workflow.style.position;
+      const prevLeft = workflow.style.left;
+      const prevRight = workflow.style.right;
+      const prevTop = workflow.style.top;
+      const prevTransform = workflow.style.transform;
+
+      // Measure in normal flow to avoid pin-induced shifts
+      workflow.style.position = "relative";
+      workflow.style.left = "";
+      workflow.style.right = "";
+      workflow.style.top = "";
+      workflow.style.transform = "";
+
+      const rect = workflow.getBoundingClientRect();
+      const docTop = rect.top + window.scrollY;
+      workflowPinOffset = window.innerHeight * 0.17;
+      workflowPinTop = navH + workflowPinOffset;
+      workflowScrollStart = Math.max(0, docTop - workflowPinTop);
+
+      // Restore previous positioning
+      workflow.style.position = prevPosition;
+      workflow.style.left = prevLeft;
+      workflow.style.right = prevRight;
+      workflow.style.top = prevTop;
+      workflow.style.transform = prevTransform;
+    } else {
+      workflowScrollStart = 0;
+      workflowPinTop = navH;
+      workflowPinOffset = 0;
     }
 
     startTop = vh + 24;
@@ -124,6 +198,7 @@
     }
 
     setScrollSpace();
+    equalizeWorkflowCards();
     update();
   }
 
@@ -244,6 +319,83 @@
         el.classList.toggle("active", i === activeIndex);
       });
     }
+
+    // PHASE 5: Workflow section
+    const workflow = document.getElementById("workflow");
+    if (workflow && workflowScrollStart >= 0) {
+      const start = workflowScrollStart + WORKFLOW_DELAY_DIST + workflowBaseOffset;
+      const endAnim = start + WORKFLOW_DIST;
+      const endHold = endAnim + WORKFLOW_HOLD_DIST;
+
+      const before = y < start;
+      const during = y >= start && y < endAnim;
+      const hold = y >= endAnim && y < endHold;
+
+      const scrollProgress = before ? 0 : y - start;
+      const workflowP = clamp(scrollProgress / WORKFLOW_DIST, 0, 1);
+
+      renderWorkflow(workflowP);
+
+      if (workflowPinEnabled && (during || hold)) {
+        workflow.style.position = "fixed";
+        workflow.style.left = "0";
+        workflow.style.right = "0";
+        workflow.style.top = `${workflowPinTop}px`;
+        workflow.style.transform = "none";
+      } else if (workflowPinEnabled && !before) {
+        // After animation: place the section at the end of the spacer so it remains visible
+        workflow.style.position = "relative";
+        workflow.style.left = "";
+        workflow.style.right = "";
+        workflow.style.top = "";
+        workflow.style.transform = `translateY(${WORKFLOW_DIST + WORKFLOW_HOLD_DIST}px)`;
+      } else {
+        workflow.style.position = "relative";
+        workflow.style.left = "";
+        workflow.style.right = "";
+        workflow.style.top = "";
+        workflow.style.transform = "";
+      }
+    }
+  }
+
+  // Workflow animation render function
+  // Phase breakpoints (tweak points)
+  const WORKFLOW_PHASE_A = 0.33;
+  const WORKFLOW_PHASE_B = 0.66;
+
+  function renderWorkflow(p) {
+    const cards = document.querySelectorAll(".workflowCard");
+    const connectors = document.querySelectorAll(".workflowCard .connector");
+
+    if (!cards.length) return;
+
+    // Phase A: 0 → 0.33 (connector 1, card 1)
+    const p1 = smoothstep(0, WORKFLOW_PHASE_A, p);
+
+    // Phase B: 0.33 → 0.66 (connector 2, card 2)
+    const p2 = smoothstep(WORKFLOW_PHASE_A, WORKFLOW_PHASE_B, p);
+
+    // Phase C: 0.66 → 1 (connector 3, all cards finalize)
+    const p3 = smoothstep(WORKFLOW_PHASE_B, 1, p);
+
+    // Card 1 (Clarify)
+    cards[0].style.setProperty("--card-opacity", p1);
+    cards[0].style.setProperty("--card-offset", `${lerp(30, 0, p1)}px`);
+    connectors[0].style.setProperty("--connector-scale", p1);
+    connectors[0].style.setProperty("--connector-opacity", p1);
+
+    // Card 2 (Design)
+    cards[1].style.setProperty("--card-opacity", p2);
+    cards[1].style.setProperty("--card-offset", `${lerp(30, 0, p2)}px`);
+    connectors[1].style.setProperty("--connector-scale", p2);
+    connectors[1].style.setProperty("--connector-opacity", p2);
+
+    // Card 3 (Implement)
+    cards[2].style.setProperty("--card-opacity", p3);
+    cards[2].style.setProperty("--card-offset", `${lerp(30, 0, p3)}px`);
+    connectors[2].style.setProperty("--connector-scale", p3);
+    connectors[2].style.setProperty("--connector-opacity", p3);
   }
 
   function onScroll() {
@@ -257,6 +409,7 @@
 
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", recalc);
+  window.addEventListener("load", recalc);
 
   recalc();
 })();

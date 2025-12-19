@@ -307,11 +307,12 @@ main{ padding-top: var(--navH); }
 }
 
 #introSpacer { height: 0; }
+#workflowSpacer { height: 0; }
 
 .qualifySection{
   position: relative;
-  padding: 80px 22px;
-  min-height: 60vh;
+  padding: 60px 22px;
+  min-height: auto;
   display: flex;
   align-items: center;
 }
@@ -490,6 +491,168 @@ main{ padding-top: var(--navH); }
   color: var(--text);
 }
 
+/* WORKFLOW SECTION (Phase 5) */
+.workflowSection {
+  position: relative;
+  z-index: 50;
+  width: 100%;
+  min-height: 100vh;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.workflowInner {
+  width: min(var(--container), calc(100% - 44px));
+  max-width: var(--container);
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
+  position: relative;
+}
+
+.workflowHeader {
+  text-align: center;
+  z-index: 2;
+}
+
+.workflowTitle {
+  margin: 0 0 12px;
+  font-size: clamp(36px, 4.5vw, 56px);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  background: linear-gradient(135deg, var(--text), rgba(61,220,255,0.92));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.workflowSubline {
+  margin: 0;
+  font-size: clamp(16px, 1.8vw, 20px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+/* Rail - horizontal line across the section */
+.workflowRail {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg,
+    rgba(61,220,255,0.3),
+    rgba(61,220,255,0.6) 50%,
+    rgba(61,220,255,0.3)
+  );
+  transform: translateY(-50%);
+  box-shadow: 0 0 20px rgba(61,220,255,0.2);
+  z-index: 1;
+}
+
+.workflowCards {
+  display: flex;
+  gap: 32px;
+  width: 100%;
+  max-width: 1000px;
+  align-items: stretch;
+  z-index: 2;
+  position: relative;
+}
+
+.workflowCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 20px;
+  opacity: var(--card-opacity, 0);
+  transform: translateY(var(--card-offset, 0px));
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Connector - vertical line from rail to card */
+.connector {
+  width: 2px;
+  height: 80px;
+  background: linear-gradient(180deg,
+    rgba(61,220,255,0.8),
+    rgba(155,123,255,0.6)
+  );
+  transform: scaleY(var(--connector-scale, 0));
+  transform-origin: top center;
+  opacity: var(--connector-opacity, 0);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 16px rgba(61,220,255,0.4);
+  border-radius: 1px;
+}
+
+.cardContent {
+  background: linear-gradient(135deg,
+    rgba(15,18,28,0.85),
+    rgba(12,16,24,0.82)
+  );
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 28px 24px 32px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.3),
+    0 0 0 1px rgba(255,255,255,0.03) inset;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+}
+
+.workflowCard[style*="--card-opacity: 1"] .cardContent,
+.workflowCard[style*="--card-opacity: 0.9"] .cardContent {
+  border-color: rgba(61,220,255,0.15);
+  box-shadow:
+    0 12px 40px rgba(0,0,0,0.4),
+    0 0 0 1px rgba(61,220,255,0.1) inset,
+    0 0 40px rgba(61,220,255,0.08);
+}
+
+.cardTitle {
+  margin: 0 0 14px;
+  font-size: clamp(22px, 2.2vw, 28px);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--text), rgba(61,220,255,0.9));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.cardDesc {
+  margin: 0;
+  font-size: clamp(14px, 1.4vw, 16px);
+  line-height: 1.6;
+  color: var(--muted);
+  font-weight: 450;
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connector,
+  .workflowCard {
+    transition: none !important;
+  }
+}
+
 @media (max-width: 900px){
   .qualifyCard{
     position: relative !important;
@@ -507,5 +670,42 @@ main{ padding-top: var(--navH); }
   .scenario p{
     font-size: 17px;
     line-height: 1.6;
+  }
+
+  /* Workflow mobile layout */
+  .workflowSection {
+    position: relative !important;
+    min-height: auto;
+    height: auto;
+    padding: 80px 22px;
+    /* Opacity and pointer-events controlled by JS */
+  }
+
+  .workflowInner {
+    gap: 36px;
+  }
+
+  .workflowRail {
+    display: none;
+  }
+
+  .workflowCards {
+    flex-direction: column;
+    gap: 40px;
+    max-width: 100%;
+  }
+
+  .workflowCard {
+    width: 100%;
+    /* Transform and opacity controlled by JS via CSS variables */
+  }
+
+  .connector {
+    height: 60px;
+    /* Transform and opacity controlled by JS via CSS variables */
+  }
+
+  .cardContent {
+    min-height: auto;
   }
 }
