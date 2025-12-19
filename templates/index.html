@@ -133,4 +133,49 @@
 </section>
 <div id="testimonialsSpacer" aria-hidden="true"></div>
 
+<!-- CONTACT SECTION -->
+<section id="contact" class="contactSection" aria-label="Contact">
+  <div class="contactInner">
+    <div class="contactSurface">
+      <h2 class="contactTitle contactReveal" style="--delay: 0s;">Take the first step toward clarity.</h2>
+      <p class="contactSubline contactReveal" style="--delay: 0.06s;">A short conversation to understand what’s working, what’s not, and whether a system makes sense.</p>
+
+      <form id="contactForm" class="contactForm contactReveal" action="/contact" method="post" novalidate style="--delay: 0.12s;">
+        <div class="honeypot">
+          <label for="website">Leave this empty</label>
+          <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="formRow">
+          <div class="field">
+            <label for="name">Name *</label>
+            <input type="text" id="name" name="name" required maxlength="120" autocomplete="name" placeholder="Your name">
+          </div>
+          <div class="field">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" required maxlength="160" autocomplete="email" placeholder="you@example.com">
+          </div>
+        </div>
+
+        <div class="field contactReveal" style="--delay: 0.16s;">
+          <label for="company">Company (optional)</label>
+          <input type="text" id="company" name="company" maxlength="160" autocomplete="organization" placeholder="Company name">
+        </div>
+
+        <div class="field contactReveal" style="--delay: 0.2s;">
+          <label for="message">Message *</label>
+          <textarea id="message" name="message" required rows="4" maxlength="3000" placeholder="What’s happening in your operations?"></textarea>
+        </div>
+
+        <div class="contactActions contactReveal" style="--delay: 0.26s;">
+          <button type="submit" class="btn primary contactButton">Start the conversation</button>
+          <div class="contactMicrotext">No pressure. No obligation.</div>
+        </div>
+
+        <div id="contactStatus" class="contactStatus" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
 {% endblock %}

@@ -615,3 +615,117 @@
 
   recalc();
 })();
+
+// Smooth scroll for data-target buttons (hero/nav)
+(() => {
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  document.querySelectorAll("[data-target]").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      const target = btn.getAttribute("data-target");
+      if (!target) return;
+      event.preventDefault();
+      scrollToSection(target);
+    });
+  });
+})();
+
+// Contact form animation + submission
+(() => {
+  const contactSection = document.getElementById("contact");
+  if (!contactSection) return;
+
+  const revealEls = contactSection.querySelectorAll(".contactReveal");
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+            entry.target.classList.add("in-view");
+          } else {
+            entry.target.classList.remove("in-view");
+          }
+        });
+      },
+      { threshold: [0, 0.6, 0.75], rootMargin: "0px 0px -10% 0px" }
+    );
+    revealEls.forEach((el) => observer.observe(el));
+  } else {
+    revealEls.forEach((el) => el.classList.add("in-view"));
+  }
+
+  const form = document.getElementById("contactForm");
+  const statusEl = document.getElementById("contactStatus");
+  const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+
+  const setStatus = (message, type = "") => {
+    if (!statusEl) return;
+    statusEl.textContent = message || "";
+    statusEl.classList.remove("error", "success");
+    if (type) statusEl.classList.add(type);
+  };
+
+  const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+
+  if (form) {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const payload = {
+        name: (formData.get("name") || "").trim(),
+        email: (formData.get("email") || "").trim(),
+        company: (formData.get("company") || "").trim(),
+        message: (formData.get("message") || "").trim(),
+        website: (formData.get("website") || "").trim(),
+      };
+
+      if (!payload.name || !payload.email || !payload.message) {
+        setStatus("Please fill out required fields.", "error");
+        return;
+      }
+
+      if (!isValidEmail(payload.email)) {
+        setStatus("Add a valid email so we can reach you.", "error");
+        return;
+      }
+
+      setStatus("Sending...");
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.dataset.originalText = submitBtn.textContent;
+        submitBtn.textContent = "Sending...";
+      }
+
+      try {
+        const res = await fetch("/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || "Something went wrong. Please try again.");
+        }
+        setStatus("Thanks - your note is on the way.", "success");
+        form.reset();
+      } catch (err) {
+        setStatus(err.message || "Could not send message right now.", "error");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent =
+            submitBtn.dataset.originalText || "Start the conversation";
+          delete submitBtn.dataset.originalText;
+        }
+      }
+    });
+  }
+})();
