@@ -14,6 +14,19 @@
   const qualifySection = $("#qualify");
   const qualifyCard = qualifySection ? $(".qualifyCard", qualifySection) : null;
   const scenarios = qualifyCard ? qualifyCard.querySelectorAll(".scenario") : [];
+  const testimonialsSection = document.getElementById("testimonials");
+  const testimonialsContainer = testimonialsSection
+    ? testimonialsSection.querySelector(".testimonialsContainer")
+    : null;
+  const testimonialsTrack = testimonialsSection
+    ? testimonialsSection.querySelector(".testimonialsTrack")
+    : null;
+  const testimonialsCards = testimonialsTrack
+    ? testimonialsTrack.querySelectorAll(".testimonialCard")
+    : [];
+  const testimonialsSpacer = document.getElementById("testimonialsSpacer");
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   if (
     !home ||
@@ -46,6 +59,21 @@
   let workflowScrollStart = 0; // scrollY where workflow animation begins
   let workflowPinTop = 0; // pinned top position for workflow
   let workflowPinOffset = 0; // distance below nav for pin
+  let workflowSpacerHeight = 0;
+
+  // TESTIMONIALS (Phase 6)
+  let testimonialsTrackWidth = 0;
+  let testimonialsTrackTravel = 0;
+  let testimonialsPinEnabled = false;
+  let testimonialsPinOffset = 0;
+  let testimonialsPinTop = 0;
+  let testimonialsScrollStart = 0;
+  let testimonialsScrollEnd = 0;
+  let TESTIMONIALS_PIN_DIST = 0;
+  let testimonialsContainerWidth = 0;
+  let testimonialsContainerHeight = 0;
+  let testimonialsVisibleWidth = 0;
+  let testimonialsSpacerHeight = 0;
 
   let navH = 74;
   let translateMax = 0;
@@ -126,11 +154,12 @@
     const workflow = document.getElementById("workflow");
     const workflowSpacer = document.getElementById("workflowSpacer");
     if (workflowSpacer && workflowPinEnabled && workflow) {
-      // Provide extra scroll room equal to the animation distance + hold + the section's own height
-      const spacerH = workflow.offsetHeight + WORKFLOW_DIST + WORKFLOW_HOLD_DIST;
-      workflowSpacer.style.height = `${spacerH}px`;
+      // Spacer at final post-pin height for consistent measurements
+      workflowSpacerHeight = WORKFLOW_DIST + WORKFLOW_HOLD_DIST;
+      workflowSpacer.style.height = `${workflowSpacerHeight}px`;
     } else if (workflowSpacer) {
       workflowSpacer.style.height = "0px";
+      workflowSpacerHeight = 0;
     }
 
     if (workflow) {
@@ -163,6 +192,102 @@
       workflowScrollStart = 0;
       workflowPinTop = navH;
       workflowPinOffset = 0;
+    }
+
+    // Testimonials (Phase 6)
+    testimonialsPinEnabled =
+      !!testimonialsContainer &&
+      !!testimonialsTrack &&
+      window.innerWidth > 900 &&
+      !prefersReducedMotion.matches;
+
+    if (testimonialsContainer && testimonialsTrack) {
+      // Reset workflow to post-pin state for accurate testimonials measurement
+      const workflowPrevPosition = workflow ? workflow.style.position : null;
+      const workflowPrevTransform = workflow ? workflow.style.transform : null;
+
+      if (workflow) {
+        workflow.style.position = "relative";
+        workflow.style.transform = `translateY(${workflowSpacerHeight}px)`;
+      }
+
+      const prevPosition = testimonialsContainer.style.position;
+      const prevLeft = testimonialsContainer.style.left;
+      const prevRight = testimonialsContainer.style.right;
+      const prevTop = testimonialsContainer.style.top;
+      const prevTransform = testimonialsContainer.style.transform;
+      const prevOverflow = testimonialsContainer.style.overflow;
+      const prevWidth = testimonialsContainer.style.width;
+      const prevZ = testimonialsContainer.style.zIndex;
+
+      testimonialsContainer.style.position = "relative";
+      testimonialsContainer.style.left = "";
+      testimonialsContainer.style.right = "";
+      testimonialsContainer.style.top = "";
+      testimonialsContainer.style.transform = "";
+      testimonialsContainer.style.overflow = "visible";
+      testimonialsContainer.style.width = "";
+      testimonialsContainer.style.zIndex = "";
+
+      const rect = testimonialsContainer.getBoundingClientRect();
+      const docTop = rect.top + window.scrollY;
+      testimonialsContainerWidth = rect.width;
+      testimonialsContainerHeight = testimonialsContainer.offsetHeight;
+
+      const containerStyles = getComputedStyle(testimonialsContainer);
+      const padL =
+        parseFloat(containerStyles.paddingLeft.replace("px", "")) || 0;
+      const padR =
+        parseFloat(containerStyles.paddingRight.replace("px", "")) || 0;
+      testimonialsVisibleWidth = testimonialsContainer.clientWidth - padL - padR;
+
+      testimonialsTrackWidth = testimonialsTrack.scrollWidth;
+      testimonialsTrackTravel = Math.max(
+        0,
+        testimonialsTrackWidth - testimonialsVisibleWidth
+      );
+
+      if (testimonialsTrackTravel <= 0) {
+        testimonialsPinEnabled = false;
+      }
+
+      TESTIMONIALS_PIN_DIST = Math.max(
+        820,
+        Math.min(1400, window.innerHeight * 1.1)
+      );
+
+      testimonialsPinOffset = window.innerHeight * 0.17;
+      testimonialsPinTop = navH + testimonialsPinOffset;
+
+      testimonialsScrollStart = testimonialsPinEnabled
+        ? docTop - testimonialsPinTop
+        : 0;
+      testimonialsScrollEnd = testimonialsScrollStart + TESTIMONIALS_PIN_DIST;
+
+      if (testimonialsSpacer) {
+        testimonialsSpacerHeight = testimonialsPinEnabled
+          ? testimonialsContainerHeight + TESTIMONIALS_PIN_DIST
+          : 0;
+        testimonialsSpacer.style.height = `${testimonialsSpacerHeight}px`;
+      }
+
+      testimonialsContainer.style.position = prevPosition;
+      testimonialsContainer.style.left = prevLeft;
+      testimonialsContainer.style.right = prevRight;
+      testimonialsContainer.style.top = prevTop;
+      testimonialsContainer.style.transform = prevTransform;
+      testimonialsContainer.style.overflow = prevOverflow;
+      testimonialsContainer.style.width = prevWidth;
+      testimonialsContainer.style.zIndex = prevZ;
+
+      // Restore workflow state
+      if (workflow) {
+        workflow.style.position = workflowPrevPosition || "";
+        workflow.style.transform = workflowPrevTransform || "";
+      }
+    } else if (testimonialsSpacer) {
+      testimonialsSpacer.style.height = "0px";
+      testimonialsSpacerHeight = 0;
     }
 
     startTop = vh + 24;
@@ -336,25 +461,100 @@
 
       renderWorkflow(workflowP);
 
+      // Pin during animation, then return to flow with offset
       if (workflowPinEnabled && (during || hold)) {
+        // During pin: increase spacer to prevent jump
+        if (workflowSpacer) {
+          workflowSpacer.style.height = `${workflow.offsetHeight + WORKFLOW_DIST + WORKFLOW_HOLD_DIST}px`;
+        }
         workflow.style.position = "fixed";
         workflow.style.left = "0";
         workflow.style.right = "0";
         workflow.style.top = `${workflowPinTop}px`;
         workflow.style.transform = "none";
       } else if (workflowPinEnabled && !before) {
-        // After animation: place the section at the end of the spacer so it remains visible
+        // After pin: reduce spacer and translate workflow
+        if (workflowSpacer) {
+          workflowSpacer.style.height = `${workflowSpacerHeight}px`;
+        }
         workflow.style.position = "relative";
         workflow.style.left = "";
         workflow.style.right = "";
         workflow.style.top = "";
-        workflow.style.transform = `translateY(${WORKFLOW_DIST + WORKFLOW_HOLD_DIST}px)`;
+        workflow.style.transform = `translateY(${workflowSpacerHeight}px)`;
       } else {
+        // Before pin: keep spacer at final height
+        if (workflowSpacer) {
+          workflowSpacer.style.height = `${workflowSpacerHeight}px`;
+        }
         workflow.style.position = "relative";
         workflow.style.left = "";
         workflow.style.right = "";
         workflow.style.top = "";
         workflow.style.transform = "";
+      }
+    }
+
+    // PHASE 6: Testimonials section
+    if (testimonialsContainer && testimonialsTrack) {
+      const start = testimonialsScrollStart;
+      const dist = TESTIMONIALS_PIN_DIST || 1;
+
+      const pinEnd = start + dist;
+
+      if (!testimonialsPinEnabled || y < start - 240) {
+        testimonialsContainer.style.position = "relative";
+        testimonialsContainer.style.left = "";
+        testimonialsContainer.style.right = "";
+        testimonialsContainer.style.top = "";
+        testimonialsContainer.style.transform = "";
+        testimonialsContainer.style.overflow = "";
+        testimonialsContainer.style.width = "";
+        testimonialsContainer.style.zIndex = "";
+        testimonialsTrack.style.transform = "";
+        return;
+      }
+
+      if (y < start) {
+        testimonialsContainer.style.position = "relative";
+        testimonialsContainer.style.left = "";
+        testimonialsContainer.style.right = "";
+        testimonialsContainer.style.top = "";
+        testimonialsContainer.style.transform = "";
+        testimonialsContainer.style.overflow = "";
+        testimonialsContainer.style.width = "";
+        testimonialsContainer.style.zIndex = "";
+        testimonialsTrack.style.transform = "";
+        return;
+      }
+
+      if (y >= start && y < pinEnd) {
+        const p = clamp((y - start) / dist, 0, 1);
+        const translateX = -p * testimonialsTrackTravel;
+
+        testimonialsContainer.style.position = "fixed";
+        testimonialsContainer.style.left = "50%";
+        testimonialsContainer.style.right = "";
+        testimonialsContainer.style.top = `${testimonialsPinTop}px`;
+        testimonialsContainer.style.transform = "translateX(-50%)";
+        testimonialsContainer.style.overflow = "hidden";
+        testimonialsContainer.style.width = `${testimonialsContainerWidth}px`;
+        testimonialsContainer.style.zIndex = "60";
+        testimonialsTrack.style.transform = `translateX(${translateX}px)`;
+      } else {
+        testimonialsContainer.style.position = "relative";
+        testimonialsContainer.style.left = "";
+        testimonialsContainer.style.right = "";
+        testimonialsContainer.style.top = "";
+        testimonialsContainer.style.overflow = "";
+        const offsetY = Math.max(
+          0,
+          testimonialsSpacerHeight - testimonialsContainerHeight
+        );
+        testimonialsContainer.style.transform = `translateY(${offsetY}px)`;
+        testimonialsContainer.style.width = "";
+        testimonialsContainer.style.zIndex = "";
+        testimonialsTrack.style.transform = `translateX(-${testimonialsTrackTravel}px)`;
       }
     }
   }
@@ -410,6 +610,9 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", recalc);
   window.addEventListener("load", recalc);
+  if (prefersReducedMotion && prefersReducedMotion.addEventListener) {
+    prefersReducedMotion.addEventListener("change", recalc);
+  }
 
   recalc();
 })();

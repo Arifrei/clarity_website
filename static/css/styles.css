@@ -646,10 +646,84 @@ main{ padding-top: var(--navH); }
   flex: 1;
 }
 
+/* TESTIMONIALS SECTION */
+#testimonialsSpacer { height: 0; }
+
+.testimonialsSection {
+  position: relative;
+  width: 100%;
+  padding: 72px 0;
+  background: transparent;
+  z-index: 60;
+}
+
+.testimonialsContainer {
+  width: min(90vw, 1100px);
+  margin: 0 auto;
+  padding: 48px 40px;
+  background: #f5f3ee;
+  color: #2c2c2c;
+  border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.testimonialsTitle {
+  margin: 0 0 32px;
+  font-size: clamp(34px, 4.4vw, 52px);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: #1f1f1f;
+  text-align: center;
+}
+
+.testimonialsTrack {
+  display: flex;
+  gap: 32px;
+  align-items: stretch;
+  will-change: transform;
+  padding: 0 40px 0 0;
+}
+
+.testimonialCard {
+  flex: 0 0 auto;
+  width: min(400px, calc(33vw + 40px));
+  min-width: 280px;
+  max-width: 420px;
+  padding: 28px 26px;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+  background: #fdfcf8;
+  color: #2c2c2c;
+}
+
+.testimonialCard .quote {
+  margin: 0 0 18px;
+  font-size: clamp(18px, 2vw, 20px);
+  line-height: 1.65;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.testimonialCard .attribution {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.6);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .connector,
   .workflowCard {
     transition: none !important;
+  }
+
+  .testimonialsTrack {
+    transition: none !important;
+    transform: none !important;
   }
 }
 
@@ -707,5 +781,25 @@ main{ padding-top: var(--navH); }
 
   .cardContent {
     min-height: auto;
+  }
+
+  .testimonialsSection {
+    padding: 56px 18px;
+  }
+
+  .testimonialsContainer {
+    width: 95vw;
+    padding: 40px 24px;
+  }
+
+  .testimonialsTrack {
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 0 24px 0 0;
+  }
+
+  .testimonialCard {
+    flex: 1 1 calc(100% - 10px);
+    width: 100%;
   }
 }
