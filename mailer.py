@@ -41,7 +41,7 @@ def send_contact_email(payload: Dict[str, Any], meta: Dict[str, Any]) -> None:
         raise EmailConfigError(f"Missing SMTP configuration: {', '.join(missing)}")
 
     msg = EmailMessage()
-    msg["Subject"] = "New Contact Form Submission — Clarity Solutions"
+    msg["Subject"] = "New Contact Form Submission - Clarity Solutions"
     msg["From"] = from_email
     msg["To"] = to_email
     if payload.get("email"):

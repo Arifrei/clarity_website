@@ -5,7 +5,31 @@ from datetime import datetime, timezone
 
 from flask import Flask, jsonify, render_template, request
 
-from mailer import EmailConfigError, send_contact_email
+
+def _load_env_from_file() -> None:
+    """Load .env into process env using python-dotenv if available, else a small parser."""
+    env_file = os.getenv("ENV_FILE", ".env")
+    if not os.path.exists(env_file):
+        return
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        with open(env_file, encoding="utf-8") as fh:
+            for raw in fh:
+                line = raw.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip().strip('"').strip("'")
+                os.environ.setdefault(key, value)
+    else:
+        load_dotenv(env_file)
+
+
+_load_env_from_file()
+
+from mailer import EmailConfigError, send_contact_email  # noqa: E402  (import after env load)
 
 app = Flask(__name__)
 

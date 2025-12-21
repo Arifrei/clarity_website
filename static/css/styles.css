@@ -552,6 +552,7 @@ body.js-ready .testimonialsSection {
 }
 
 #introSpacer { height: 0; }
+#qualifySpacer { height: 0; }
 #workflowSpacer { height: 0; }
 
 .qualifySection{
@@ -1143,12 +1144,13 @@ body.js-ready .testimonialsSection {
     line-height: 1.7;
   }
 
+  .qualifySection {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+
   .qualifyCard{
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
-    transform: none !important;
-    opacity: 1 !important;
     width: min(520px, calc(100% - 48px));
   }
 
@@ -1162,14 +1164,6 @@ body.js-ready .testimonialsSection {
   }
 
   /* Workflow mobile layout */
-  .workflowSection {
-    position: relative !important;
-    min-height: auto;
-    height: auto;
-    padding: 80px 22px;
-    /* Opacity and pointer-events controlled by JS */
-  }
-
   .workflowInner {
     gap: 36px;
   }
@@ -1186,12 +1180,10 @@ body.js-ready .testimonialsSection {
 
   .workflowCard {
     width: 100%;
-    /* Transform and opacity controlled by JS via CSS variables */
   }
 
   .connector {
     height: 60px;
-    /* Transform and opacity controlled by JS via CSS variables */
   }
 
   .cardContent {
@@ -1209,16 +1201,13 @@ body.js-ready .testimonialsSection {
   }
 
   .testimonialsTrack {
-    flex-direction: column;
+    display: flex;
     gap: 20px;
-    padding: 0;
-    transform: none !important;
   }
 
   .testimonialCard {
     flex: 0 0 auto;
-    width: 100%;
-    max-width: 100%;
+    width: min(320px, calc(85vw));
     min-width: 280px;
   }
 

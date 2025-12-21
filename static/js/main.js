@@ -14,6 +14,12 @@
   const qualifySection = $("#qualify");
   const qualifyCard = qualifySection ? $(".qualifyCard", qualifySection) : null;
   const scenarios = qualifyCard ? qualifyCard.querySelectorAll(".scenario") : [];
+
+  // Mobile qualify variables
+  let qualifyMobilePinEnabled = false;
+  let qualifyMobilePinStart = 0;
+  let qualifyMobilePinEnd = 0;
+  let qualifyMobileScrollDist = 0;
   const testimonialsSection = document.getElementById("testimonials");
   const testimonialsContainer = testimonialsSection
     ? testimonialsSection.querySelector(".testimonialsContainer")
@@ -142,7 +148,7 @@
     WORKFLOW_DIST = Math.max(420, Math.min(720, window.innerHeight * 0.65));
     WORKFLOW_HOLD_DIST = Math.max(160, Math.min(320, window.innerHeight * 0.22)); // about ~2s scroll dwell
     workflowBaseOffset = 0; // tweak point
-    workflowPinEnabled = window.innerWidth > 900; // mirrors qualify pin behavior
+    workflowPinEnabled = true; // Enable pinning on all screen sizes
 
     const vh = window.innerHeight;
     const availableH = vh - navH;
@@ -205,11 +211,10 @@
       workflowPinOffset = 0;
     }
 
-    // Testimonials (Phase 6)
+    // Testimonials (Phase 6) - Enable on all screen sizes for horizontal scroll effect
     testimonialsPinEnabled =
       !!testimonialsContainer &&
       !!testimonialsTrack &&
-      window.innerWidth > 900 &&
       !prefersReducedMotion.matches;
 
     if (testimonialsContainer && testimonialsTrack) {
@@ -310,29 +315,63 @@
       !heroRight ||
       heroRightStyle.display === "none" ||
       heroRight.getBoundingClientRect().width === 0;
+
+    // On desktop: pin qualify during hero phase
+    // On mobile: separate phase with independent pinning
     qualifyPinEnabled = !!qualifyCard && !heroRightHidden && window.innerWidth > 900;
 
     if (qualifyPinEnabled && heroRight) {
+      // Desktop: qualify pins during hero phase
       const cardHeight = qualifyCard.offsetHeight;
       const vh = window.innerHeight;
       const verticalCenter = navH + (vh - navH - cardHeight) / 2;
       const screenWidth = window.innerWidth;
-      const leftPosition = screenWidth * 0.55; // 45% from the right = 55% from the left
+      const leftPosition = screenWidth * 0.55;
 
       qualifyGeometry = {
         left: leftPosition,
         top: verticalCenter,
         width: qualifyCard.offsetWidth,
       };
-    } else if (qualifyCard) {
+      qualifyMobilePinEnabled = false;
+    } else if (qualifyCard && qualifySection) {
+      // Mobile: qualify is separate phase with independent pinning
       qualifyGeometry = { left: 0, top: 0, width: 0 };
-      qualifyCard.style.position = "relative";
-      qualifyCard.style.left = "";
-      qualifyCard.style.top = "";
-      qualifyCard.style.width = "";
-      qualifyCard.style.transform = "none";
-      qualifyCard.style.opacity = "1";
-      qualifyCard.style.pointerEvents = "auto";
+      qualifyMobilePinEnabled = true;
+
+      // Calculate mobile pinning positions
+      // Start qualify after hero section is completely scrolled out of view
+      const heroPhaseEnd = PHASE1_DIST + QUALIFY_DELAY_DIST + PHASE2_DIST + PHASE3_DIST + PHASE4_DIST;
+
+      // Buffer to ensure paragraph is fully out of view before qualify starts
+      const bufferDist = 250; // Gap to prevent overlap when scrolling up
+      const slideInDist = 200;
+
+      // Qualify starts sliding in shortly after hero phase completes
+      qualifyMobilePinStart = heroPhaseEnd + bufferDist + slideInDist;
+
+      // Scroll distance for scenario cycling (based on number of scenarios)
+      const scenarioCount = scenarios.length || 1;
+      const scenarioDist = Math.max(600, scenarioCount * 250); // Increased for smoother cycling
+
+      qualifyMobileScrollDist = scenarioDist;
+      qualifyMobilePinEnd = qualifyMobilePinStart + qualifyMobileScrollDist;
+
+      // Set spacer height to account for slide-in + scenario cycling
+      const qualifySpacer = document.getElementById("qualifySpacer");
+      if (qualifySpacer) {
+        const totalScrollDist = slideInDist + qualifyMobileScrollDist;
+        qualifySpacer.style.height = `${totalScrollDist}px`;
+      }
+    } else {
+      qualifyGeometry = { left: 0, top: 0, width: 0 };
+      qualifyMobilePinEnabled = false;
+
+      // Reset spacer on desktop
+      const qualifySpacer = document.getElementById("qualifySpacer");
+      if (qualifySpacer) {
+        qualifySpacer.style.height = "0px";
+      }
     }
 
     setScrollSpace();
@@ -443,19 +482,88 @@
             Math.floor(scenarioProgress * scenarios.length)
           );
         }
+      } else if (qualifyMobilePinEnabled) {
+        // Mobile: independent pinning phase with slide-in animation
+        const slideInDist = 200; // Distance for slide-in animation
+        const slideInStart = qualifyMobilePinStart - slideInDist;
+
+        const beforeSlide = y < slideInStart;
+        const duringSlide = y >= slideInStart && y < qualifyMobilePinStart;
+        const duringPin = y >= qualifyMobilePinStart && y < qualifyMobilePinEnd;
+        const afterPin = y >= qualifyMobilePinEnd;
+
+        const vh = window.innerHeight;
+        const cardHeight = qualifyCard.offsetHeight;
+        const pinTop = navH + (vh - navH - cardHeight) / 2;
+
+        if (beforeSlide) {
+          // Before slide: card hidden, positioned off-screen right
+          qualifyCard.style.position = "fixed";
+          qualifyCard.style.left = "50%";
+          qualifyCard.style.top = `${pinTop}px`;
+          qualifyCard.style.width = `${qualifyCard.offsetWidth}px`;
+          qualifyCard.style.transform = "translateX(100vw)";
+          qualifyCard.style.opacity = "0";
+          qualifyCard.style.pointerEvents = "none";
+          qualifyCard.classList.remove("visible");
+        } else if (duringSlide) {
+          // During slide: animate in from right
+          const slideProgress = (y - slideInStart) / slideInDist;
+          const slideX = lerp(100, -50, smoothstep(0, 1, slideProgress)); // From 100vw to -50% (centered)
+          const opacity = clamp(slideProgress * 1.5, 0, 1);
+
+          qualifyCard.style.position = "fixed";
+          qualifyCard.style.left = "50%";
+          qualifyCard.style.top = `${pinTop}px`;
+          qualifyCard.style.width = `${qualifyCard.offsetWidth}px`;
+          qualifyCard.style.transform = `translateX(${slideX}%)`;
+          qualifyCard.style.opacity = `${opacity}`;
+          qualifyCard.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
+
+          if (slideProgress > 0.5) {
+            qualifyCard.classList.add("visible");
+          }
+        } else if (duringPin) {
+          // During pinning: fixed at center, cycle scenarios
+          qualifyCard.style.position = "fixed";
+          qualifyCard.style.left = "50%";
+          qualifyCard.style.top = `${pinTop}px`;
+          qualifyCard.style.width = `${qualifyCard.offsetWidth}px`;
+          qualifyCard.style.transform = "translateX(-50%)";
+          qualifyCard.style.opacity = "1";
+          qualifyCard.style.pointerEvents = "auto";
+          qualifyCard.classList.add("visible");
+
+          // Cycle through scenarios
+          const progress = (y - qualifyMobilePinStart) / qualifyMobileScrollDist;
+          if (scenarios.length) {
+            activeIndex = Math.min(
+              scenarios.length - 1,
+              Math.floor(progress * scenarios.length)
+            );
+          }
+        } else if (afterPin) {
+          // After pinning: unpin and return to normal flow
+          qualifyCard.style.position = "relative";
+          qualifyCard.style.left = "";
+          qualifyCard.style.top = "";
+          qualifyCard.style.width = "";
+          qualifyCard.style.transform = "";
+          qualifyCard.style.opacity = "1";
+          qualifyCard.style.pointerEvents = "auto";
+          qualifyCard.classList.add("visible");
+
+          // Show last scenario
+          if (scenarios.length) {
+            activeIndex = scenarios.length - 1;
+          }
+        }
       } else {
+        // Fallback: normal flow
         const rect = qualifySection.getBoundingClientRect();
         const sectionTop = rect.top + y;
         const sectionHeight = qualifySection.offsetHeight || 1;
         const progress = clamp((y - sectionTop) / sectionHeight, 0, 1);
-
-        // Add visible class for mobile
-        const vh = window.innerHeight;
-        const cardRect = qualifyCard.getBoundingClientRect();
-        const cardVisible = cardRect.top < vh * 0.75 && cardRect.bottom > vh * 0.25;
-        if (cardVisible) {
-          qualifyCard.classList.add("visible");
-        }
 
         if (scenarios.length) {
           activeIndex = Math.min(
@@ -567,16 +675,13 @@
         testimonialsContainer.style.zIndex = "60";
         testimonialsTrack.style.transform = `translateX(${translateX}px)`;
       } else {
+        // After pin ends, return to normal flow
         testimonialsContainer.style.position = "relative";
         testimonialsContainer.style.left = "";
         testimonialsContainer.style.right = "";
         testimonialsContainer.style.top = "";
         testimonialsContainer.style.overflow = "";
-        const offsetY = Math.max(
-          0,
-          testimonialsSpacerHeight - testimonialsContainerHeight
-        );
-        testimonialsContainer.style.transform = `translateY(${offsetY}px)`;
+        testimonialsContainer.style.transform = "";
         testimonialsContainer.style.width = "";
         testimonialsContainer.style.zIndex = "";
         testimonialsTrack.style.transform = `translateX(-${testimonialsTrackTravel}px)`;
