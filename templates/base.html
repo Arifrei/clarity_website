@@ -14,14 +14,16 @@
   <link rel="icon" href="{{ url_for('static', filename='favicon2.png') }}" type="image/png">
 </head>
 <body>
-  <div id="bgTrack" aria-hidden="true"></div>
   <div class="topProgress" id="topProgress"></div>
 
   <header class="navWrap" id="navWrap">
     <div class="nav">
       <a class="brand" data-target="home" href="#home" aria-label="Clarity Solutions Home">
         <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Clarity Logo" class="brandLogo">
-        <span class="brandText">Clarity Solutions</span>
+        <span>
+          <span class="brandText">Clarity Solutions</span>
+          <span class="brandSlogan">Helping businesses run smarter</span>
+        </span>
       </a>
 
       <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false">

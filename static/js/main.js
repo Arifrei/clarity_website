@@ -387,16 +387,6 @@
   function update() {
     const y = window.scrollY;
 
-    // Skip background animation on low-end devices
-    if (!shouldSimplifyAnimations) {
-      const bg = document.getElementById("bgTrack");
-      if (bg) {
-        const cycle = window.innerHeight;
-        const pos = -y % cycle;
-        document.documentElement.style.setProperty("--bgPos", `${pos}px`);
-      }
-    }
-
     const phase1End = PHASE1_DIST;
     const delayEnd = phase1End + QUALIFY_DELAY_DIST;
     const phase2Start = delayEnd;
