@@ -25,6 +25,20 @@
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+  // Detect low-end devices
+  const isLowEndDevice = () => {
+    const memory = navigator.deviceMemory;
+    const cores = navigator.hardwareConcurrency;
+    const connection = navigator.connection;
+
+    if (memory && memory < 4) return true;
+    if (cores && cores < 4) return true;
+    if (connection && connection.saveData) return true;
+    return prefersReducedMotion.matches;
+  };
+
+  const shouldSimplifyAnimations = isLowEndDevice();
+
   if (
     !home ||
     !heroInner ||
@@ -334,11 +348,14 @@
   function update() {
     const y = window.scrollY;
 
-    const bg = document.getElementById("bgTrack");
-    if (bg) {
-      const cycle = window.innerHeight;
-      const pos = -y % cycle;
-      document.documentElement.style.setProperty("--bgPos", `${pos}px`);
+    // Skip background animation on low-end devices
+    if (!shouldSimplifyAnimations) {
+      const bg = document.getElementById("bgTrack");
+      if (bg) {
+        const cycle = window.innerHeight;
+        const pos = -y % cycle;
+        document.documentElement.style.setProperty("--bgPos", `${pos}px`);
+      }
     }
 
     const phase1End = PHASE1_DIST;
@@ -353,6 +370,15 @@
     const dockP = smoothstep(0, phase1End, y);
     const qualifyP = smoothstep(phase2Start, phase2End, y);
     const liftP = smoothstep(phase4Start, phase4End, y);
+
+    // Add/remove will-change class dynamically
+    const heroInnerAnimating = liftP > 0 && liftP < 1;
+    heroInner.classList.toggle('animating', heroInnerAnimating);
+
+    if (qualifyCard && qualifyPinEnabled) {
+      const qualifyAnimating = qualifyP > 0 && qualifyP < 1;
+      qualifyCard.classList.toggle('animating', qualifyAnimating);
+    }
 
     const liftT = lerp(0, translateMax, liftP);
     const postLift = Math.max(0, y - phase4End);
@@ -597,8 +623,24 @@
     connectors[2].style.setProperty("--connector-opacity", p3);
   }
 
+  // Adaptive throttling based on device
+  const getThrottleDelay = () => {
+    if (window.innerWidth < 768) return 32;  // ~30fps on mobile
+    if (window.innerWidth < 1024) return 16; // ~60fps on tablet
+    return 0;  // No delay on desktop
+  };
+
+  let lastScrollTime = 0;
+
   function onScroll() {
     if (ticking) return;
+
+    const now = Date.now();
+    const throttleDelay = getThrottleDelay();
+
+    if (now - lastScrollTime < throttleDelay) return;
+    lastScrollTime = now;
+
     ticking = true;
     requestAnimationFrame(() => {
       ticking = false;
@@ -614,6 +656,9 @@
   }
 
   recalc();
+
+  // Mark body as JS-ready after initialization
+  document.body.classList.add('js-ready');
 })();
 
 // Smooth scroll for data-target buttons (hero/nav)
@@ -632,6 +677,41 @@
       event.preventDefault();
       scrollToSection(target);
     });
+  });
+})();
+
+// Mobile navigation toggle
+(() => {
+  const hamburger = document.getElementById('hamburgerBtn');
+  const navLinks = document.querySelector('.navLinks');
+
+  if (!hamburger || !navLinks) return;
+
+  const toggleNav = () => {
+    const isOpen = navLinks.classList.toggle('open');
+    hamburger.classList.toggle('active');
+    hamburger.setAttribute('aria-expanded', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  };
+
+  hamburger.addEventListener('click', toggleNav);
+
+  // Close on link click
+  navLinks.querySelectorAll('.navBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (navLinks.classList.contains('open')) {
+        toggleNav();
+      }
+    });
+  });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (navLinks.classList.contains('open') &&
+        !navLinks.contains(e.target) &&
+        !hamburger.contains(e.target)) {
+      toggleNav();
+    }
   });
 })();
 
