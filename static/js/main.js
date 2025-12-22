@@ -133,24 +133,38 @@
         getComputedStyle(document.documentElement).getPropertyValue("--navH")
       ) || 74;
 
-    PHASE1_DIST = Math.max(320, Math.min(520, window.innerHeight * 0.45));
-    QUALIFY_DELAY_DIST = Math.max(180, Math.min(320, window.innerHeight * 0.26)); // approx ~2s scroll cushion
-    PHASE2_DIST = Math.max(260, Math.min(520, window.innerHeight * 0.35));
+    // Mobile-optimized scroll distances for smoother animations
+    const isMobile = window.innerWidth <= 900;
+    const vh = window.innerHeight;
+
+    if (isMobile) {
+      // Mobile: tighter, more responsive distances
+      PHASE1_DIST = vh * 0.6;  // Paragraph dock
+      QUALIFY_DELAY_DIST = vh * 0.25;  // Delay before qualify
+      PHASE2_DIST = 0;  // No qualify slide on mobile in hero phase
+    } else {
+      // Desktop distances
+      PHASE1_DIST = Math.max(320, Math.min(520, vh * 0.45));
+      QUALIFY_DELAY_DIST = Math.max(180, Math.min(320, vh * 0.26));
+      PHASE2_DIST = Math.max(260, Math.min(520, vh * 0.35));
+    }
 
     const scenarioCount = Math.max(1, scenarios.length || 1);
-    const basePhase3 = Math.max(340, Math.min(620, window.innerHeight * 0.55));
+    const basePhase3 = isMobile
+      ? 0  // No scenario cycling in hero phase on mobile
+      : Math.max(340, Math.min(620, vh * 0.55));
     const dwellTotal = SCENARIO_DWELL_DIST * Math.max(0, scenarioCount - 1);
     PHASE3_DIST = basePhase3 + dwellTotal;
 
-    PHASE4_DIST = Math.max(420, Math.min(720, window.innerHeight * 0.65));
+    PHASE4_DIST = isMobile
+      ? vh * 0.5  // Shorter lift on mobile
+      : Math.max(420, Math.min(720, vh * 0.65));
 
     // Workflow (Phase 5) responsive distance - tweak point
-    WORKFLOW_DIST = Math.max(420, Math.min(720, window.innerHeight * 0.65));
-    WORKFLOW_HOLD_DIST = Math.max(160, Math.min(320, window.innerHeight * 0.22)); // about ~2s scroll dwell
+    WORKFLOW_DIST = Math.max(420, Math.min(720, vh * 0.65));
+    WORKFLOW_HOLD_DIST = Math.max(160, Math.min(320, vh * 0.22)); // about ~2s scroll dwell
     workflowBaseOffset = 0; // tweak point
     workflowPinEnabled = true; // Enable pinning on all screen sizes
-
-    const vh = window.innerHeight;
     const availableH = vh - navH;
     const heroLeftH = heroLeft.offsetHeight;
 
@@ -308,7 +322,8 @@
       testimonialsSpacerHeight = 0;
     }
 
-    startTop = vh + 24;
+    // Mobile-optimized startTop calculation
+    startTop = isMobile ? vh : vh + 24;
 
     const heroRightStyle = heroRight ? getComputedStyle(heroRight) : null;
     const heroRightHidden =
@@ -718,10 +733,10 @@
     connectors[2].style.setProperty("--connector-opacity", p3);
   }
 
-  // Adaptive throttling based on device
+  // Adaptive throttling based on device - reduced throttling on mobile for smoother animations
   const getThrottleDelay = () => {
-    if (window.innerWidth < 768) return 32;  // ~30fps on mobile
-    if (window.innerWidth < 1024) return 16; // ~60fps on tablet
+    if (window.innerWidth < 768) return 8;   // ~120fps on mobile (reduced from 32ms)
+    if (window.innerWidth < 1024) return 8;  // ~120fps on tablet (reduced from 16ms)
     return 0;  // No delay on desktop
   };
 
@@ -743,17 +758,51 @@
     });
   }
 
+  // Debounced resize handler for mobile
+  let resizeTimeout;
+  const handleResize = () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      recalc();
+      update();
+    }, 150);
+  };
+
   window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", recalc);
-  window.addEventListener("load", recalc);
+  window.addEventListener("resize", handleResize);
+  window.addEventListener("orientationchange", () => {
+    // Mobile orientation change - recalc after a delay
+    setTimeout(() => {
+      recalc();
+      update();
+    }, 300);
+  });
+  window.addEventListener("load", () => {
+    recalc();
+    // Extra recalc after load for mobile browsers
+    setTimeout(recalc, 100);
+  });
+
+  // Add touch events for mobile devices
+  window.addEventListener("touchmove", onScroll, { passive: true });
+  window.addEventListener("touchend", () => {
+    // Force update after touch ends to ensure final position
+    setTimeout(update, 50);
+  }, { passive: true });
+
   if (prefersReducedMotion && prefersReducedMotion.addEventListener) {
     prefersReducedMotion.addEventListener("change", recalc);
   }
 
+  // Initial calculations
   recalc();
 
-  // Mark body as JS-ready after initialization
-  document.body.classList.add('js-ready');
+  // Force initial update to ensure elements are positioned correctly
+  requestAnimationFrame(() => {
+    update();
+    // Mark body as JS-ready after initialization
+    document.body.classList.add('js-ready');
+  });
 })();
 
 // Smooth scroll for data-target buttons (hero/nav)
