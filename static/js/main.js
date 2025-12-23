@@ -33,12 +33,6 @@
     : null;
   const testimonialsSpacer = document.getElementById("testimonialsSpacer");
 
-  const resultSection = document.getElementById("result");
-  const resultStack = resultSection ? resultSection.querySelector(".resultStack") : null;
-  const resultCards = resultStack ? Array.from(resultStack.querySelectorAll(".resultCard")) : [];
-  const resultHeader = resultSection ? resultSection.querySelector(".resultHeader") : null;
-  const resultSpacer = document.getElementById("resultSpacer");
-
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   // Detect low-end devices
@@ -103,16 +97,6 @@
   let testimonialsVisibleWidth = 0;
   let testimonialsSpacerHeight = 0;
 
-  // RESULT (new section between workflow and testimonials)
-  let RESULT_CARD_DIST = 160;
-  let RESULT_HOLD_DIST = 180;
-  let RESULT_TOTAL_DIST = 0;
-  let resultPinEnabled = false;
-  let resultScrollStart = 0;
-  let resultPinTop = 0;
-  let resultSpacerHeight = 0;
-  let resultPinOffset = 0;
-
   let navH = 74;
   let translateMax = 0;
   let startTop = 0;
@@ -139,26 +123,6 @@
     });
     contents.forEach((c) => {
       c.style.minHeight = `${maxH}px`;
-    });
-  }
-
-  function setupResultCards() {
-    if (!resultCards.length) return;
-    const offsets = [
-      { x: -6, y: -10, r: -1.5 },
-      { x: 10, y: 2, r: 1 },
-      { x: -14, y: 14, r: -2 },
-      { x: 8, y: 24, r: 1.6 },
-      { x: -4, y: 32, r: -0.8 },
-    ];
-
-    resultCards.forEach((card, idx) => {
-      const off = offsets[idx] || offsets[offsets.length - 1];
-      card.style.setProperty("--x", `${off.x}px`);
-      card.style.setProperty("--y", `${off.y}px`);
-      card.style.setProperty("--r", `${off.r}deg`);
-      card.style.zIndex = `${resultCards.length - idx}`;
-      card.classList.add("visible");
     });
   }
 
@@ -207,11 +171,6 @@
     workflowBaseOffset = 0; // tweak point
     workflowPinEnabled = !isMobile; // Disable pinning on mobile for seamless scrolling
 
-    // Result section distances (between workflow and testimonials)
-    RESULT_CARD_DIST = isMobile ? 120 : 160;
-    RESULT_HOLD_DIST = isMobile ? 140 : 180;
-    RESULT_TOTAL_DIST = RESULT_CARD_DIST * Math.max(1, resultCards.length || 1);
-    resultPinEnabled = !prefersReducedMotion.matches;
     const availableH = vh - navH;
     const heroLeftH = heroLeft.offsetHeight;
 
@@ -272,47 +231,6 @@
       workflowPinOffset = 0;
     }
 
-    // Result section measurement (between workflow and testimonials)
-    if (resultSection) {
-      const prevPos = resultSection.style.position;
-      const prevLeft = resultSection.style.left;
-      const prevRight = resultSection.style.right;
-      const prevTop = resultSection.style.top;
-      const prevTransform = resultSection.style.transform;
-
-      resultSection.style.position = "relative";
-      resultSection.style.left = "";
-      resultSection.style.right = "";
-      resultSection.style.top = "";
-      resultSection.style.transform = "";
-
-      const rect = resultSection.getBoundingClientRect();
-      const docTop = rect.top + window.scrollY;
-      // Adjust docTop by workflow spacer when workflow pins, so result start sits after workflow span
-      const docTopAdjusted = docTop + (workflowPinEnabled ? workflowSpacerHeight : 0);
-      resultPinOffset = window.innerHeight * 0.17;
-      resultPinTop = navH + resultPinOffset;
-      // Start when section top reaches pinTop, but not before workflow finishes pin/hold
-      const workflowEnd = workflowPinEnabled
-        ? workflowScrollStart + WORKFLOW_DIST + WORKFLOW_HOLD_DIST
-        : 0;
-      resultScrollStart = Math.max(0, docTopAdjusted - resultPinTop, workflowEnd + 20);
-
-      resultSection.style.position = prevPos;
-      resultSection.style.left = prevLeft;
-      resultSection.style.right = prevRight;
-      resultSection.style.top = prevTop;
-      resultSection.style.transform = prevTransform;
-
-      if (resultSpacer) {
-        resultSpacerHeight = RESULT_TOTAL_DIST + RESULT_HOLD_DIST;
-        resultSpacer.style.height = resultPinEnabled ? `${resultSpacerHeight}px` : "0px";
-      }
-    } else if (resultSpacer) {
-      resultSpacer.style.height = "0px";
-      resultSpacerHeight = 0;
-    }
-
     // Testimonials (Phase 6) - Enable on all screen sizes for horizontal scroll effect
     testimonialsPinEnabled =
       !!testimonialsContainer &&
@@ -327,15 +245,6 @@
       if (workflow) {
         workflow.style.position = "relative";
         workflow.style.transform = `translateY(${workflowSpacerHeight}px)`;
-      }
-
-      // Also reset result to post-pin state so testimonials measure correctly
-      const resultPrevPosition = resultSection ? resultSection.style.position : null;
-      const resultPrevTransform = resultSection ? resultSection.style.transform : null;
-      if (resultSection) {
-        resultSection.style.position = "relative";
-        const resultTranslate = resultPinEnabled ? resultSpacerHeight : 0;
-        resultSection.style.transform = `translateY(${resultTranslate}px)`;
       }
 
       const prevPosition = testimonialsContainer.style.position;
@@ -424,10 +333,6 @@
         workflow.style.position = workflowPrevPosition || "";
         workflow.style.transform = workflowPrevTransform || "";
       }
-      if (resultSection) {
-        resultSection.style.position = resultPrevPosition || "";
-        resultSection.style.transform = resultPrevTransform || "";
-      }
     } else if (testimonialsSpacer) {
       testimonialsSpacer.style.height = "0px";
       testimonialsSpacerHeight = 0;
@@ -506,7 +411,6 @@
 
     setScrollSpace();
     equalizeWorkflowCards();
-    setupResultCards();
     update();
   }
 
@@ -886,145 +790,6 @@
         workflow.style.right = "";
         workflow.style.top = "";
         workflow.style.transform = "";
-      }
-    }
-
-    // RESULT SECTION (between workflow and testimonials)
-    if (resultSection && resultScrollStart >= 0) {
-      const totalCards = Math.max(1, resultCards.length || 1);
-      const resultSpacerEl = resultSpacer;
-      const start = resultScrollStart;
-      const endAnim = start + RESULT_TOTAL_DIST;
-      const endHold = endAnim + RESULT_HOLD_DIST;
-
-      const before = y < start;
-      const during = y >= start && y < endAnim;
-      const hold = y >= endAnim && y < endHold;
-
-      let p = 0;
-      if (during) {
-        p = clamp((y - start) / RESULT_TOTAL_DIST, 0, 1);
-      } else if (y >= endAnim) {
-        p = 1;
-      }
-
-      // Positioning & spacer
-      if (resultPinEnabled && (during || hold)) {
-        if (resultSpacerEl) {
-          resultSpacerEl.style.height = `${RESULT_TOTAL_DIST + RESULT_HOLD_DIST}px`;
-        }
-        resultSection.style.position = "fixed";
-        resultSection.style.left = "0";
-        resultSection.style.right = "0";
-        resultSection.style.top = `${resultPinTop}px`;
-        resultSection.style.transform = "none";
-        resultSection.classList.add("result-pinned");
-      } else if (resultPinEnabled && !before) {
-        if (resultSpacerEl) {
-          resultSpacerEl.style.height = `${resultSpacerHeight}px`;
-        }
-        resultSection.style.position = "relative";
-        resultSection.style.left = "";
-        resultSection.style.right = "";
-        resultSection.style.top = "";
-        resultSection.style.transform = `translateY(${resultSpacerHeight}px)`;
-        resultSection.classList.remove("result-pinned");
-      } else {
-        if (resultSpacerEl) {
-          resultSpacerEl.style.height = resultPinEnabled ? `${resultSpacerHeight}px` : "0px";
-        }
-        resultSection.style.position = "relative";
-        resultSection.style.left = "";
-        resultSection.style.right = "";
-        resultSection.style.top = "";
-        resultSection.style.transform = "";
-        resultSection.classList.remove("result-pinned");
-      }
-
-      // Card animation
-      if (resultCards.length) {
-        const segmentSize = 1 / totalCards;
-        const activeFloat = clamp(p / segmentSize, 0, totalCards);
-        const activeIndex = Math.min(totalCards - 1, Math.floor(activeFloat));
-        const localT = clamp(activeFloat - activeIndex, 0, 1);
-
-        const maxDX = window.innerWidth * 0.12;
-        const maxDY = window.innerHeight * 0.42;
-
-        resultCards.forEach((card, idx) => {
-          const dir = idx % 2 === 0 ? 1 : -1;
-
-          // Cards already flown away
-          if (idx < activeIndex || p === 1) {
-            card.style.opacity = "0";
-            card.style.pointerEvents = "none";
-            card.style.transform = `translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r)) translate(${dir * maxDX}px, ${-maxDY}px) scale(1.04)`;
-            return;
-          }
-
-          // Active card (only one visible at a time)
-          if (idx === activeIndex) {
-            if (during || hold) {
-              const dx = lerp(0, dir * maxDX, localT);
-              const dy = lerp(0, -maxDY, localT);
-              const scale = lerp(1, 1.04, localT);
-              const opacity = clamp(1 - localT, 0, 1);
-              card.style.opacity = `${opacity}`;
-              card.style.pointerEvents = opacity > 0.05 ? "auto" : "none";
-              card.style.transform = `translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r)) translate(${dx}px, ${dy}px) scale(${scale})`;
-            } else {
-              // Before animation starts
-              card.style.opacity = "1";
-              card.style.pointerEvents = "auto";
-              card.style.transform = `translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r))`;
-            }
-            return;
-          }
-
-          // Future cards stay hidden until their turn
-          card.style.opacity = "0";
-          card.style.pointerEvents = "none";
-          card.style.transform = `translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r))`;
-        });
-      }
-
-      // Header fade near end
-      if (resultHeader) {
-        const fadeStart = 0.85;
-        const fadeP = p <= fadeStart ? 0 : clamp((p - fadeStart) / (1 - fadeStart), 0, 1);
-        resultHeader.style.opacity = `${1 - fadeP}`;
-        resultHeader.style.transform = `translateY(${lerp(0, -10, fadeP)}px)`;
-      }
-
-      // After hold, translate up (similar to hero/qualify)
-      if (resultPinEnabled && y >= endHold) {
-        const postResult = Math.max(0, y - endHold);
-        resultSection.style.position = "fixed";
-        resultSection.style.left = "0";
-        resultSection.style.right = "0";
-        resultSection.style.top = `${resultPinTop}px`;
-        resultSection.style.transform = `translateY(${-postResult}px)`;
-        resultSection.classList.add("result-pinned");
-      }
-
-      // Reduced motion fallback: show cards
-      if (!resultPinEnabled || prefersReducedMotion.matches) {
-        if (resultCards.length) {
-          resultCards.forEach((card) => {
-            card.style.opacity = "1";
-            card.style.pointerEvents = "auto";
-            card.style.transform = `translate(-50%, -50%) translate(var(--x), var(--y)) rotate(var(--r))`;
-          });
-        }
-        if (resultSpacerEl) {
-          resultSpacerEl.style.height = "0px";
-        }
-        resultSection.style.position = "relative";
-        resultSection.style.left = "";
-        resultSection.style.right = "";
-        resultSection.style.top = "";
-        resultSection.style.transform = "";
-        resultSection.classList.remove("result-pinned");
       }
     }
 
