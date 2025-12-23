@@ -346,17 +346,13 @@
     qualifyPinEnabled = !!qualifyCard && !heroRightHidden && window.innerWidth > 900;
 
     if (qualifyPinEnabled && heroRight) {
-      // Desktop: qualify pins during hero phase
-      const cardHeight = qualifyCard.offsetHeight;
-      const vh = window.innerHeight;
-      const bottomQuarterPosition = navH + (vh - navH - cardHeight) * 0.75;
-      const screenWidth = window.innerWidth;
+      // Desktop: qualify appears in the exact position of heroRight
+      const heroRightRect = heroRight.getBoundingClientRect();
       const cardWidth = qualifyCard.offsetWidth;
-      const leftPosition = (screenWidth - cardWidth) / 2;
 
       qualifyGeometry = {
-        left: leftPosition,
-        top: bottomQuarterPosition,
+        left: heroRightRect.left,
+        top: heroRightRect.top,
         width: cardWidth,
       };
       qualifyMobilePinEnabled = false;
@@ -467,9 +463,19 @@
       heroActions.style.pointerEvents = fade < 0.15 ? "none" : "auto";
     }
 
-    // Fade out hero image on mobile when paragraph docks
+    // Fade out hero image conditionally based on screen size
     if (heroRight) {
-      const imageFade = clamp(1 - dockP * 1.5, 0, 1);
+      const isMobile = window.innerWidth <= 900;
+      let imageFade;
+
+      if (isMobile) {
+        // Mobile: fade when paragraph docks
+        imageFade = clamp(1 - dockP * 1.5, 0, 1);
+      } else {
+        // Desktop: fade when qualify section starts to come in
+        imageFade = clamp(1 - qualifyP * 1.5, 0, 1);
+      }
+
       heroRight.style.opacity = `${imageFade}`;
       heroRight.style.pointerEvents = imageFade < 0.15 ? "none" : "auto";
     }
