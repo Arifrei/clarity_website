@@ -70,6 +70,7 @@
   let PHASE3_DIST = 520; // scenario cycling
   let PHASE4_DIST = 520; // lift together
   const SCENARIO_DWELL_DIST = 220; // extra scroll distance between scenario switches for dwell
+  const FINAL_HOLD_DIST = 260; // extra dwell to keep final state visible longer
 
   // WORKFLOW (Phase 5) - tweak points
   let WORKFLOW_DIST = 520; // scroll distance for workflow animation
@@ -158,7 +159,7 @@
       ? 0  // No scenario cycling in hero phase on mobile
       : Math.max(340, Math.min(620, vh * 0.55));
     const dwellTotal = SCENARIO_DWELL_DIST * Math.max(0, scenarioCount - 1);
-    PHASE3_DIST = basePhase3 + dwellTotal;
+    PHASE3_DIST = basePhase3 + dwellTotal + FINAL_HOLD_DIST;
 
     PHASE4_DIST = isMobile
       ? vh * 0.2  // Minimal distance before lift on mobile
@@ -385,7 +386,7 @@
 
       // Scroll distance for scenario cycling (based on number of scenarios)
       const scenarioCount = scenarios.length || 1;
-      const scenarioDist = Math.max(600, scenarioCount * 250); // Increased for smoother cycling
+      const scenarioDist = Math.max(600, scenarioCount * 250) + FINAL_HOLD_DIST; // Added hold for final state
 
       qualifyMobileScrollDist = scenarioDist;
       qualifyMobilePinEnd = qualifyMobilePinStart + qualifyMobileScrollDist;
