@@ -13,6 +13,10 @@
   --accent4: rgb(255, 138, 128);  /* coral */
   --accent5: #8a8a8a;   /* neutral accent */
   --mustard: #d6a73b;
+  --workflow-bg:
+    radial-gradient(circle at 25% 25%, rgba(15, 32, 48, 0.38), transparent 38%),
+    radial-gradient(circle at 80% 20%, rgba(14, 24, 36, 0.28), transparent 36%),
+    linear-gradient(160deg, #05060a 0%, #0b0f1a 55%, #0f2030 100%);
 
   --radius2: 22px;
   --shadow: 0 26px 80px rgba(0,0,0,.45);
@@ -38,7 +42,8 @@ body{
   width: 100%;
   margin:0;
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background-color: #000000;
+  background-color: #05060a;
+  background-image: var(--workflow-bg);
   background-attachment: fixed;
   color: var(--text);
   overflow-x: hidden;
@@ -71,7 +76,7 @@ main{
   position:fixed; top:0; left:0; right:0;
   height: var(--navH);
   z-index:2000;
-  background: rgba(8,10,15,.55);
+  background: #000000;
   backdrop-filter: blur(14px);
 }
 
@@ -271,7 +276,7 @@ main{
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
-  background: #000;
+  background: var(--workflow-bg);
   position: relative;
 }
 
@@ -794,26 +799,7 @@ body.js-ready .testimonialsSection {
 
 /* Floating celebration particles - enhanced visibility */
 .qualifyCard.final-reveal::after {
-  content: none; /* remove floating particles */
-}
-
-@keyframes floatParticles {
-  0%, 100% {
-    transform: translateY(0) scale(1) rotate(0deg);
-    opacity: 1;
-  }
-  25% {
-    transform: translateY(-35px) scale(1.15) rotate(2deg);
-    opacity: 0.85;
-  }
-  50% {
-    transform: translateY(-20px) scale(0.95) rotate(-1deg);
-    opacity: 1;
-  }
-  75% {
-    transform: translateY(-45px) scale(1.08) rotate(1.5deg);
-    opacity: 0.9;
-  }
+  content: none; /* restore crisp edge below the takeover */
 }
 
 .qualifyCard.final-reveal::before {
@@ -823,7 +809,7 @@ body.js-ready .testimonialsSection {
   background: #c2edff; /* keep solid light blue */
   background-size: auto;
   animation: none;
-  z-index: -1;
+  z-index: -2;
 }
 
 @keyframes gradientShift {
@@ -1234,8 +1220,131 @@ body.js-ready .testimonialsSection {
   min-height: 100vh;
   opacity: 1;
   pointer-events: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   box-sizing: border-box;
+  isolation: isolate; /* keep background layer behind content */
+  margin-top: -1px;   /* overlap previous section to hide seams */
+  padding-top: 1px;
+}
+
+/* RESULT SECTION */
+.resultSection{
+  position: relative;
+  z-index: 55;
+  width: 100%;
+  max-width: 100vw;
+  min-height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  isolation: isolate;
+  padding: clamp(40px, 8vw, 80px) var(--container-padding) clamp(40px, 8vw, 80px);
+}
+
+.resultInner{
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(28px, 4vw, 42px);
+}
+
+.resultHeader{
+  text-align: center;
+  max-width: 720px;
+  color: var(--text);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.resultKicker{
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mustard);
+}
+
+.resultTitle{
+  margin: 0;
+  font-size: clamp(30px, 6vw, 54px);
+  letter-spacing: -0.05em;
+  font-weight: 900;
+}
+
+.resultStack{
+  position: relative;
+  width: min(90vw, 1080px);
+  height: 100vh;
+  min-height: 520px;
+}
+
+.resultCard{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) translate(var(--x, 0), var(--y, 0)) rotate(var(--r, 0deg));
+  width: min(520px, 86vw);
+  padding: clamp(22px, 4vw, 32px) clamp(18px, 3vw, 28px);
+  border-radius: 14px;
+  background: #05060a;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 18px 50px rgba(0,0,0,0.32),
+    0 0 0 1px rgba(255,255,255,0.03) inset;
+  color: #f2f6fb;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: opacity 0.25s ease;
+}
+
+.resultCard.visible{
+  opacity: 1;
+}
+
+.resultCardTitle{
+  margin: 0;
+  font-size: clamp(20px, 3vw, 26px);
+  letter-spacing: -0.03em;
+  font-weight: 800;
+}
+
+.resultCardDesc{
+  margin: 0;
+  font-size: clamp(15px, 2.6vw, 17px);
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.workflowSection::before,
+.workflowSection::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.workflowSection::before {
+  background: var(--workflow-bg);
+}
+
+.workflowSection::after {
+  background: none;
+}
+
+.workflowSection.workflow-pinned::before,
+.workflowSection.workflow-pinned::after {
+  opacity: 1;
+  position: fixed;
+  inset: 0;
 }
 
 .workflowInner {
@@ -1251,6 +1360,7 @@ body.js-ready .testimonialsSection {
   align-items: center;
   gap: 48px;
   position: relative;
+  z-index: 1;
   box-sizing: border-box;
 }
 
@@ -1387,7 +1497,7 @@ body.js-ready .testimonialsSection {
 }
 
 .testimonialsContainer {
-  width: min(90vw, 1100px);
+  width: min(94vw, 1180px);
   margin: 0 auto;
   padding: 0;
   background: transparent;
@@ -1469,8 +1579,8 @@ body.js-ready .testimonialsSection {
   position: relative;
   width: 100%;
   max-width: 100vw;
-  padding: 20px var(--container-padding) 140px;
-  background: transparent;
+  padding: 40px var(--container-padding) 80px;
+  background: #000000;
   z-index: 65;
   overflow-x: hidden;
   box-sizing: border-box;
@@ -1478,21 +1588,19 @@ body.js-ready .testimonialsSection {
 
 .contactInner{
   width: 100%;
-  max-width: var(--container);
-  padding-left: 22px;
-  padding-right: 22px;
-  margin: 0 auto;
+  max-width: 1100px;
+  padding-left: 16px;
+  padding-right: 16px;
+  margin: 0;
   box-sizing: border-box;
 }
 
 .contactSurface{
-  background: linear-gradient(135deg, rgba(12,16,25,0.85), rgba(10,14,22,0.92));
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 20px;
-  padding: 48px clamp(22px, 4vw, 42px) 44px;
-  box-shadow:
-    0 20px 60px rgba(0,0,0,0.45),
-    0 0 0 1px rgba(255,255,255,0.08) inset;
+  background: #000000;
+  border: none;
+  border-radius: 12px;
+  padding: 36px clamp(18px, 3vw, 32px) 36px;
+  box-shadow: none;
 }
 
 .contactTitle{
@@ -1574,6 +1682,23 @@ body.js-ready .testimonialsSection {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  background: #d6a73b;
+  color: #0b0b0b;
+  border: none;
+  box-shadow: 0 14px 40px rgba(214, 167, 59, 0.28);
+}
+
+/* Ensure mustard overrides the generic .btn.primary gradient */
+.contactSection .btn.contactButton,
+.contactSection .btn.primary.contactButton {
+  background: #d6a73b;
+  color: #0b0b0b;
+  border: none;
+}
+
+.contactButton:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 18px 46px rgba(214, 167, 59, 0.34);
 }
 
 .contactMicrotext{
