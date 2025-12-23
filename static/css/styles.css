@@ -2,16 +2,17 @@
   --navH: 74px;
   --container: 1100px;
 
-  --bg: #0C1115;
+  --bg: #000000;
   --text: rgba(242,248,252,.96);
   --muted: rgba(242,248,252,.72);
   --muted2: rgba(242,248,252,.56);
 
-  --accent: rgb(102, 255, 204);
-  --accent2: rgb(129, 230, 217);
+  --accent: #ffffff;
+  --accent2: #dcdcdc;
   --accent3: rgb(186, 148, 255);  /* soft purple */
   --accent4: rgb(255, 138, 128);  /* coral */
-  --accent5: rgb(94, 196, 255);   /* sky blue */
+  --accent5: #8a8a8a;   /* neutral accent */
+  --mustard: #d6a73b;
 
   --radius2: 22px;
   --shadow: 0 26px 80px rgba(0,0,0,.45);
@@ -37,7 +38,7 @@ body{
   width: 100%;
   margin:0;
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: linear-gradient(180deg, #0C1115 0%, #1a2d3f 100%);
+  background-color: #000000;
   background-attachment: fixed;
   color: var(--text);
   overflow-x: hidden;
@@ -96,7 +97,7 @@ main{
   width:32px;
   height:32px;
   object-fit:contain;
-  filter: drop-shadow(0 2px 8px rgba(102,255,204,.3));
+  filter: drop-shadow(0 2px 8px rgba(255,255,255,.18));
   transition: transform .2s ease;
 }
 .brand:hover .brandLogo{ transform: scale(1.1); }
@@ -104,7 +105,7 @@ main{
   opacity:1;
   color: #fff;
   letter-spacing:-.03em;
-  text-shadow: 0 1px 12px rgba(102,255,204,.26);
+  text-shadow: 0 1px 12px rgba(255,255,255,.2);
 }
 .brandSlogan{
   display:block;
@@ -112,7 +113,7 @@ main{
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(240,245,255,0.65);
+  color: var(--mustard);
   margin-top: 2px;
 }
 
@@ -145,7 +146,7 @@ main{
   color: var(--accent);
   background: transparent;
   border: none;
-  text-shadow: 0 0 12px rgba(102,255,204,0.25);
+  text-shadow: 0 0 12px rgba(255,255,255,0.2);
 }
 
 .cta{
@@ -153,12 +154,12 @@ main{
   cursor:pointer;
   font-weight:900;
   letter-spacing:-.02em;
-  color:#0C1115;
+  color:#ffffff;
   padding:12px 14px;
   min-height: 44px;
-  border-radius:999px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  box-shadow: 0 16px 46px rgba(102,255,204,.16);
+  border-radius: 10px;
+  background: linear-gradient(135deg, #e3b64c, #c8921e);
+  box-shadow: 0 16px 46px rgba(214,167,59,.2);
   display:flex;
   align-items:center;
   gap:10px;
@@ -168,8 +169,9 @@ main{
 
 .ctaDot{
   width:8px; height:8px; border-radius:50%;
-  background: rgba(7,16,24,.85);
-  box-shadow: 0 0 0 6px rgba(7,16,24,.15);
+  background: none;
+  box-shadow: none;
+  display: none;
 }
 
 /* Hamburger menu button - hidden by default */
@@ -291,7 +293,7 @@ main{
   max-width: var(--container);
   padding-left: 22px;
   padding-right: 22px;
-  margin: 0 auto;
+  margin: 0;
   display:grid;
   grid-template-columns: 1.15fr .85fr;
   gap:36px;
@@ -348,10 +350,7 @@ body.js-ready .mega{
 }
 
 .grad{
-  background: linear-gradient(135deg, var(--text), var(--accent));
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
+  color: var(--text);
 }
 
 .oneLine{
@@ -359,7 +358,7 @@ body.js-ready .mega{
   font-size: clamp(15px, 3.5vw, 20px);
   font-weight: 800;
   letter-spacing: 0.03em;
-  color: var(--accent);
+  color: var(--text);
 }
 
 .heroActions{ display:flex; gap:12px; flex-wrap:wrap; }
@@ -368,6 +367,21 @@ body.js-ready .mega{
   height: 0;
   margin: 0;
   padding: 0;
+}
+
+.heroRight{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  transition: opacity 0.3s ease;
+}
+
+.heroVisual{
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  object-fit: contain;
 }
 
 .btn{
@@ -385,9 +399,9 @@ body.js-ready .mega{
   justify-content: center;
 }
 .btn.primary{
-  color:#0C1115;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  box-shadow: 0 16px 46px rgba(102,255,204,.14);
+  color:#ffffff;
+  background: linear-gradient(135deg, #2f3338, #4c5159);
+  box-shadow: 0 16px 46px rgba(0,0,0,.34);
 }
 .btn.primary:hover{ transform: translateY(-1px); }
 
@@ -450,8 +464,26 @@ body.js-ready .testimonialsSection {
 
 /* Small screens */
 @media (max-width: 900px){
-  .grid{ grid-template-columns: 1fr; }
-  .heroRight{ display:none; }
+  .grid{
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .heroRight{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    order: 2;
+  }
+
+  .heroLeft {
+    order: 1;
+  }
+
+  .heroVisual {
+    max-width: min(280px, 70vw);
+    width: 100%;
+  }
 }
 
 /* Tablet landscape: 768px - 900px */
@@ -459,6 +491,10 @@ body.js-ready .testimonialsSection {
   .grid {
     grid-template-columns: 1fr;
     gap: 28px;
+  }
+
+  .heroVisual {
+    max-width: min(320px, 72vw);
   }
 
   .workflowCards {
@@ -482,6 +518,10 @@ body.js-ready .testimonialsSection {
 
   .mega {
     font-size: clamp(36px, 8vw, 54px);
+  }
+
+  .heroVisual {
+    max-width: min(300px, 68vw);
   }
 
   .workflowCards {
@@ -516,8 +556,10 @@ body.js-ready .testimonialsSection {
 
   .heroInner {
     padding-top: clamp(40px, 12vh, 100px);
-    height: calc(100vh - var(--navH));
-    height: calc(100dvh - var(--navH));
+    height: auto;
+    min-height: calc(100vh - var(--navH));
+    min-height: calc(100dvh - var(--navH));
+    padding-bottom: clamp(30px, 8vh, 60px);
   }
 
   .grid {
@@ -525,6 +567,7 @@ body.js-ready .testimonialsSection {
     padding-left: 12px;
     padding-right: 12px;
     margin: 0;
+    gap: 20px;
   }
 
   .mega {
@@ -540,6 +583,10 @@ body.js-ready .testimonialsSection {
   .oneLine {
     font-size: clamp(13px, 4vw, 16px);
     margin: 14px 0 20px;
+  }
+
+  .heroVisual {
+    max-width: min(240px, 65vw);
   }
 
   .introParagraphInner {
@@ -602,7 +649,7 @@ body.js-ready .testimonialsSection {
   max-width: min(47vw, 720px);
   padding-left: 22px;
   padding-right: 22px;
-  margin: 0 auto;
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -621,7 +668,7 @@ body.js-ready .testimonialsSection {
 .introQuote{
   margin: 0;
   padding: 0;
-  border-left: 3px solid rgba(186,148,255,0.5);
+  border-left: 3px solid #d6a73b;
   padding-left: 14px;
   color: rgba(242,248,252,0.8);
 }
@@ -667,6 +714,7 @@ body.js-ready .testimonialsSection {
   min-height: auto;
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
@@ -700,14 +748,8 @@ body.js-ready .testimonialsSection {
   font-weight: 900;
   letter-spacing: -0.04em;
   margin: 0 0 28px;
-  background: linear-gradient(135deg,
-    var(--text),
-    var(--accent)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 0 40px rgba(102,255,204,0.18);
+  color: var(--text);
+  text-shadow: none;
   text-align: center;
 }
 
@@ -866,10 +908,7 @@ body.js-ready .testimonialsSection {
   font-weight: 900;
   letter-spacing: -0.05em;
   line-height: 0.95;
-  background: linear-gradient(135deg, var(--text), var(--accent));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--text);
 }
 
 .workflowSubline {
@@ -888,12 +927,12 @@ body.js-ready .testimonialsSection {
   right: 10%;
   height: 2px;
   background: linear-gradient(90deg,
-    rgba(186,148,255,0.35),
-    rgba(94,196,255,0.5) 50%,
-    rgba(186,148,255,0.35)
+    rgba(214,167,59,0.12),
+    rgba(214,167,59,0.6) 50%,
+    rgba(214,167,59,0.12)
   );
   transform: translateY(-50%);
-  box-shadow: 0 0 20px rgba(94,196,255,0.2);
+  box-shadow: 0 0 20px rgba(214,167,59,0.32);
   z-index: 1;
 }
 
@@ -925,15 +964,15 @@ body.js-ready .testimonialsSection {
   width: 2px;
   height: 80px;
   background: linear-gradient(180deg,
-    rgba(94,196,255,0.72),
-    rgba(186,148,255,0.64)
+    rgba(214,167,59,0.9),
+    rgba(214,167,59,0.45)
   );
   transform: scaleY(var(--connector-scale, 0));
   transform-origin: top center;
   opacity: var(--connector-opacity, 0);
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
               opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 0 16px rgba(94,196,255,0.22);
+  box-shadow: 0 0 16px rgba(214,167,59,0.35);
   border-radius: 1px;
 }
 
@@ -963,10 +1002,7 @@ body.js-ready .testimonialsSection {
   font-size: clamp(20px, 3.5vw, 28px);
   font-weight: 900;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--text), var(--accent));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--text);
 }
 
 .cardDesc {
@@ -986,7 +1022,7 @@ body.js-ready .testimonialsSection {
   position: relative;
   width: 100%;
   max-width: 100vw;
-  padding: 72px var(--container-padding) 32px;
+  padding: 120px var(--container-padding) 0;
   background: transparent;
   z-index: 60;
   overflow-x: hidden;
@@ -1003,6 +1039,10 @@ body.js-ready .testimonialsSection {
   border: none;
   box-shadow: none;
   overflow: visible;
+}
+
+.testimonialsSection.pinned .testimonialsContainer {
+  transition: none;
 }
 
 .testimonialsTitle {
@@ -1072,7 +1112,7 @@ body.js-ready .testimonialsSection {
   position: relative;
   width: 100%;
   max-width: 100vw;
-  padding: 52px var(--container-padding) 140px;
+  padding: 20px var(--container-padding) 140px;
   background: transparent;
   z-index: 65;
   overflow-x: hidden;
@@ -1095,7 +1135,7 @@ body.js-ready .testimonialsSection {
   padding: 48px clamp(22px, 4vw, 42px) 44px;
   box-shadow:
     0 20px 60px rgba(0,0,0,0.45),
-    0 0 0 1px rgba(102,255,204,0.05) inset;
+    0 0 0 1px rgba(255,255,255,0.08) inset;
 }
 
 .contactTitle{
@@ -1160,8 +1200,8 @@ body.js-ready .testimonialsSection {
 .field input:focus,
 .field textarea:focus{
   outline: none;
-  border-color: rgba(102,255,204,0.35);
-  box-shadow: 0 0 0 1px rgba(102,255,204,0.18), 0 10px 30px rgba(102,255,204,0.08);
+  border-color: rgba(255,255,255,0.45);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.16), 0 10px 30px rgba(0,0,0,0.32);
   background: rgba(255,255,255,0.03);
 }
 
@@ -1191,7 +1231,7 @@ body.js-ready .testimonialsSection {
 }
 
 .contactStatus.error{ color: #ff9b9b; }
-.contactStatus.success{ color: #a6f3c6; }
+.contactStatus.success{ color: #d4e28a; }
 
 .honeypot{
   position: absolute;
@@ -1236,8 +1276,10 @@ body.js-ready .testimonialsSection {
 
   .heroInner {
     padding-top: clamp(60px, 15vh, 120px);
-    height: calc(100vh - var(--navH));
-    height: calc(100dvh - var(--navH)); /* Dynamic viewport height for mobile */
+    height: auto;
+    min-height: calc(100vh - var(--navH));
+    min-height: calc(100dvh - var(--navH)); /* Dynamic viewport height for mobile */
+    padding-bottom: clamp(40px, 10vh, 80px);
   }
 
   .grid {
@@ -1245,6 +1287,7 @@ body.js-ready .testimonialsSection {
     padding-left: 16px;
     padding-right: 16px;
     margin: 0;
+    gap: 28px;
   }
 
   .heroLeft {
@@ -1306,6 +1349,9 @@ body.js-ready .testimonialsSection {
   .workflowSection {
     padding-left: 0;
     padding-right: 0;
+    overflow-x: visible;
+    overflow-y: visible;
+    min-height: auto;
   }
 
   .workflowInner {
@@ -1313,6 +1359,9 @@ body.js-ready .testimonialsSection {
     width: 100%;
     padding-left: 16px;
     padding-right: 16px;
+    justify-content: flex-start;
+    padding-top: 60px;
+    padding-bottom: 60px;
   }
 
   .workflowRail {
@@ -1339,7 +1388,7 @@ body.js-ready .testimonialsSection {
   }
 
   .testimonialsSection {
-    padding: 56px 18px;
+    padding: 100px 18px 0;
   }
 
   .testimonialsContainer {
@@ -1360,7 +1409,7 @@ body.js-ready .testimonialsSection {
   }
 
   .contactSection{
-    padding: 80px 0 100px;
+    padding: 20px 0 100px;
   }
 
   .formRow{

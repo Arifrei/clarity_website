@@ -157,14 +157,14 @@
     PHASE3_DIST = basePhase3 + dwellTotal;
 
     PHASE4_DIST = isMobile
-      ? vh * 0.5  // Shorter lift on mobile
+      ? vh * 0.2  // Minimal distance before lift on mobile
       : Math.max(420, Math.min(720, vh * 0.65));
 
     // Workflow (Phase 5) responsive distance - tweak point
     WORKFLOW_DIST = Math.max(420, Math.min(720, vh * 0.65));
     WORKFLOW_HOLD_DIST = Math.max(160, Math.min(320, vh * 0.22)); // about ~2s scroll dwell
     workflowBaseOffset = 0; // tweak point
-    workflowPinEnabled = true; // Enable pinning on all screen sizes
+    workflowPinEnabled = !isMobile; // Disable pinning on mobile for seamless scrolling
     const availableH = vh - navH;
     const heroLeftH = heroLeft.offsetHeight;
 
@@ -260,7 +260,12 @@
       testimonialsContainer.style.zIndex = "";
 
       const rect = testimonialsContainer.getBoundingClientRect();
-      const docTop = rect.top + window.scrollY;
+      const currentScrollY = window.scrollY;
+
+      // Calculate where the container currently is in the document
+      // We need the top edge of the container relative to the document
+      const containerDocTop = rect.top + currentScrollY;
+
       testimonialsContainerWidth = rect.width;
       testimonialsContainerHeight = testimonialsContainer.offsetHeight;
 
@@ -272,11 +277,10 @@
       testimonialsVisibleWidth = testimonialsContainer.clientWidth - padL - padR;
 
       testimonialsTrackWidth = testimonialsTrack.scrollWidth;
-      // Add extra space to ensure last card is fully visible with balanced spacing
-      const extraSpace = padL + 250;
+      // Calculate exact scroll distance without extra padding
       testimonialsTrackTravel = Math.max(
         0,
-        testimonialsTrackWidth - testimonialsVisibleWidth + extraSpace
+        testimonialsTrackWidth - testimonialsVisibleWidth
       );
 
       if (testimonialsTrackTravel <= 0) {
@@ -291,14 +295,20 @@
       testimonialsPinOffset = window.innerHeight * 0.17;
       testimonialsPinTop = navH + testimonialsPinOffset;
 
+      // Calculate the scroll position where the container's top edge
+      // will naturally align with testimonialsPinTop
       testimonialsScrollStart = testimonialsPinEnabled
-        ? docTop - testimonialsPinTop
+        ? containerDocTop - testimonialsPinTop
         : 0;
       testimonialsScrollEnd = testimonialsScrollStart + TESTIMONIALS_PIN_DIST;
 
       if (testimonialsSpacer) {
+        // Spacer must compensate for container leaving flow when it goes fixed
+        // Plus provide scroll room for animation and unpinning
+        const containerHeight = testimonialsContainerHeight || 0;
+        const unpinBuffer = 0; // No buffer for very tight spacing
         testimonialsSpacerHeight = testimonialsPinEnabled
-          ? testimonialsContainerHeight + TESTIMONIALS_PIN_DIST
+          ? containerHeight + TESTIMONIALS_PIN_DIST + unpinBuffer
           : 0;
         testimonialsSpacer.style.height = `${testimonialsSpacerHeight}px`;
       }
@@ -339,14 +349,15 @@
       // Desktop: qualify pins during hero phase
       const cardHeight = qualifyCard.offsetHeight;
       const vh = window.innerHeight;
-      const verticalCenter = navH + (vh - navH - cardHeight) / 2;
+      const bottomQuarterPosition = navH + (vh - navH - cardHeight) * 0.75;
       const screenWidth = window.innerWidth;
-      const leftPosition = screenWidth * 0.55;
+      const cardWidth = qualifyCard.offsetWidth;
+      const leftPosition = (screenWidth - cardWidth) / 2;
 
       qualifyGeometry = {
         left: leftPosition,
-        top: verticalCenter,
-        width: qualifyCard.offsetWidth,
+        top: bottomQuarterPosition,
+        width: cardWidth,
       };
       qualifyMobilePinEnabled = false;
     } else if (qualifyCard && qualifySection) {
@@ -395,6 +406,9 @@
   }
 
   function smoothstep(edge0, edge1, x) {
+    if (edge1 === edge0) {
+      return x >= edge1 ? 1 : 0;
+    }
     const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
     return t * t * (3 - 2 * t);
   }
@@ -453,6 +467,13 @@
       heroActions.style.pointerEvents = fade < 0.15 ? "none" : "auto";
     }
 
+    // Fade out hero image on mobile when paragraph docks
+    if (heroRight) {
+      const imageFade = clamp(1 - dockP * 1.5, 0, 1);
+      heroRight.style.opacity = `${imageFade}`;
+      heroRight.style.pointerEvents = imageFade < 0.15 ? "none" : "auto";
+    }
+
     if (qualifyCard) {
       let activeIndex = -1;
 
@@ -501,6 +522,9 @@
         const cardHeight = qualifyCard.offsetHeight;
         const pinTop = navH + (vh - navH - cardHeight) / 2;
 
+        // Calculate post-qualify offset for smooth unpinning (similar to postLift for hero)
+        const postQualify = Math.max(0, y - qualifyMobilePinEnd);
+
         if (beforeSlide) {
           // Before slide: card hidden, positioned off-screen right
           qualifyCard.style.position = "fixed";
@@ -548,12 +572,12 @@
             );
           }
         } else if (afterPin) {
-          // After pinning: unpin and return to normal flow
-          qualifyCard.style.position = "relative";
-          qualifyCard.style.left = "";
-          qualifyCard.style.top = "";
-          qualifyCard.style.width = "";
-          qualifyCard.style.transform = "";
+          // After pinning: smooth unpinning with postQualify offset (like hero section)
+          qualifyCard.style.position = "fixed";
+          qualifyCard.style.left = "50%";
+          qualifyCard.style.top = `${pinTop}px`;
+          qualifyCard.style.width = `${qualifyCard.offsetWidth}px`;
+          qualifyCard.style.transform = `translate(-50%, ${-postQualify}px)`;
           qualifyCard.style.opacity = "1";
           qualifyCard.style.pointerEvents = "auto";
           qualifyCard.classList.add("visible");
@@ -586,18 +610,32 @@
     // PHASE 5: Workflow section
     const workflow = document.getElementById("workflow");
     if (workflow && workflowScrollStart >= 0) {
-      const start = workflowScrollStart + WORKFLOW_DELAY_DIST + workflowBaseOffset;
-      const endAnim = start + WORKFLOW_DIST;
-      const endHold = endAnim + WORKFLOW_HOLD_DIST;
+      let workflowP;
+      let before, during, hold, start, endAnim, endHold;
 
-      const before = y < start;
-      const during = y >= start && y < endAnim;
-      const hold = y >= endAnim && y < endHold;
+      if (!workflowPinEnabled) {
+        // Mobile: individual card animation based on viewport position
+        before = false;
+        during = false;
+        hold = false;
 
-      const scrollProgress = before ? 0 : y - start;
-      const workflowP = clamp(scrollProgress / WORKFLOW_DIST, 0, 1);
+        // Call renderWorkflow with mobile individual mode
+        renderWorkflow(0, true);
+      } else {
+        // Desktop: existing pinning logic
+        start = workflowScrollStart + WORKFLOW_DELAY_DIST + workflowBaseOffset;
+        endAnim = start + WORKFLOW_DIST;
+        endHold = endAnim + WORKFLOW_HOLD_DIST;
 
-      renderWorkflow(workflowP);
+        before = y < start;
+        during = y >= start && y < endAnim;
+        hold = y >= endAnim && y < endHold;
+
+        const scrollProgress = before ? 0 : y - start;
+        workflowP = clamp(scrollProgress / WORKFLOW_DIST, 0, 1);
+
+        renderWorkflow(workflowP, false);
+      }
 
       // Pin during animation, then return to flow with offset
       if (workflowPinEnabled && (during || hold)) {
@@ -637,10 +675,12 @@
     if (testimonialsContainer && testimonialsTrack) {
       const start = testimonialsScrollStart;
       const dist = TESTIMONIALS_PIN_DIST || 1;
-
       const pinEnd = start + dist;
 
-      if (!testimonialsPinEnabled || y < start - 240) {
+      // Calculate post-testimonials offset for smooth unpinning
+      const postTestimonials = Math.max(0, y - pinEnd);
+
+      if (!testimonialsPinEnabled) {
         testimonialsContainer.style.position = "relative";
         testimonialsContainer.style.left = "";
         testimonialsContainer.style.right = "";
@@ -653,8 +693,9 @@
         return;
       }
 
+      // Before pinning: keep in normal flow
       if (y < start) {
-        testimonialsContainer.style.position = "relative";
+        testimonialsContainer.style.position = "";
         testimonialsContainer.style.left = "";
         testimonialsContainer.style.right = "";
         testimonialsContainer.style.top = "";
@@ -662,33 +703,77 @@
         testimonialsContainer.style.overflow = "";
         testimonialsContainer.style.width = "";
         testimonialsContainer.style.zIndex = "";
+        testimonialsContainer.style.transition = "";
         testimonialsTrack.style.transform = "";
+        testimonialsSection.classList.remove("pinned");
         return;
       }
 
       if (y >= start && y < pinEnd) {
+        // During pinning: horizontal scroll effect
         const p = clamp((y - start) / dist, 0, 1);
         const translateX = -p * testimonialsTrackTravel;
 
+        // Calculate exact left position to match centered position
+        const leftPos = (window.innerWidth - testimonialsContainerWidth) / 2;
+
+        // Check if we're just entering the pinned state
+        const wasPinned = testimonialsSection.classList.contains("pinned");
+
+        if (!wasPinned) {
+          // At the moment of pinning, capture the exact current position to prevent jump
+          const currentRect = testimonialsContainer.getBoundingClientRect();
+          const exactTop = currentRect.top;
+
+          testimonialsContainer.style.position = "fixed";
+          testimonialsContainer.style.left = `${leftPos}px`;
+          testimonialsContainer.style.right = "";
+          testimonialsContainer.style.top = `${exactTop}px`;
+          testimonialsContainer.style.transform = "";
+          testimonialsContainer.style.overflow = "hidden";
+          testimonialsContainer.style.width = `${testimonialsContainerWidth}px`;
+          testimonialsContainer.style.zIndex = "60";
+          testimonialsSection.classList.add("pinned");
+          testimonialsTrack.style.transform = `translateX(${translateX}px)`;
+
+          // Smoothly transition to the target pin position
+          if (Math.abs(exactTop - testimonialsPinTop) > 2) {
+            requestAnimationFrame(() => {
+              if (testimonialsContainer && testimonialsSection.classList.contains("pinned")) {
+                testimonialsContainer.style.transition = "top 0.2s ease-out";
+                testimonialsContainer.style.top = `${testimonialsPinTop}px`;
+                setTimeout(() => {
+                  if (testimonialsContainer) {
+                    testimonialsContainer.style.transition = "";
+                  }
+                }, 200);
+              }
+            });
+          }
+        } else {
+          testimonialsContainer.style.position = "fixed";
+          testimonialsContainer.style.left = `${leftPos}px`;
+          testimonialsContainer.style.right = "";
+          testimonialsContainer.style.top = `${testimonialsPinTop}px`;
+          testimonialsContainer.style.transform = "";
+          testimonialsContainer.style.overflow = "hidden";
+          testimonialsContainer.style.width = `${testimonialsContainerWidth}px`;
+          testimonialsContainer.style.zIndex = "60";
+          testimonialsTrack.style.transform = `translateX(${translateX}px)`;
+        }
+      } else {
+        // After pin ends: smooth unpinning (like hero and qualify sections)
+        const leftPos = (window.innerWidth - testimonialsContainerWidth) / 2;
+
         testimonialsContainer.style.position = "fixed";
-        testimonialsContainer.style.left = "50%";
+        testimonialsContainer.style.left = `${leftPos}px`;
         testimonialsContainer.style.right = "";
         testimonialsContainer.style.top = `${testimonialsPinTop}px`;
-        testimonialsContainer.style.transform = "translateX(-50%)";
+        testimonialsContainer.style.transform = `translateY(${-postTestimonials}px)`;
         testimonialsContainer.style.overflow = "hidden";
         testimonialsContainer.style.width = `${testimonialsContainerWidth}px`;
         testimonialsContainer.style.zIndex = "60";
-        testimonialsTrack.style.transform = `translateX(${translateX}px)`;
-      } else {
-        // After pin ends, return to normal flow
-        testimonialsContainer.style.position = "relative";
-        testimonialsContainer.style.left = "";
-        testimonialsContainer.style.right = "";
-        testimonialsContainer.style.top = "";
-        testimonialsContainer.style.overflow = "";
-        testimonialsContainer.style.transform = "";
-        testimonialsContainer.style.width = "";
-        testimonialsContainer.style.zIndex = "";
+        testimonialsSection.classList.add("pinned");
         testimonialsTrack.style.transform = `translateX(-${testimonialsTrackTravel}px)`;
       }
     }
@@ -699,38 +784,61 @@
   const WORKFLOW_PHASE_A = 0.33;
   const WORKFLOW_PHASE_B = 0.66;
 
-  function renderWorkflow(p) {
+  function renderWorkflow(p, useMobileIndividual = false) {
     const cards = document.querySelectorAll(".workflowCard");
     const connectors = document.querySelectorAll(".workflowCard .connector");
 
     if (!cards.length) return;
 
-    // Phase A: 0 → 0.33 (connector 1, card 1)
-    const p1 = smoothstep(0, WORKFLOW_PHASE_A, p);
+    if (useMobileIndividual) {
+      // Mobile: Animate each card individually when top reaches 70% from top
+      const vh = window.innerHeight;
+      const triggerPoint = vh * 0.7; // Trigger when card top reaches 70% from top
+      const animationRange = vh * 0.3; // Animation happens over 30% of viewport
 
-    // Phase B: 0.33 → 0.66 (connector 2, card 2)
-    const p2 = smoothstep(WORKFLOW_PHASE_A, WORKFLOW_PHASE_B, p);
+      cards.forEach((card, index) => {
+        const rect = card.getBoundingClientRect();
+        const cardTop = rect.top;
+        const scrollIntoView = triggerPoint - cardTop;
+        const cardProgress = clamp(scrollIntoView / animationRange, 0, 1);
 
-    // Phase C: 0.66 → 1 (connector 3, all cards finalize)
-    const p3 = smoothstep(WORKFLOW_PHASE_B, 1, p);
+        card.style.setProperty("--card-opacity", cardProgress);
+        card.style.setProperty("--card-offset", `${lerp(30, 0, cardProgress)}px`);
 
-    // Card 1 (Clarify)
-    cards[0].style.setProperty("--card-opacity", p1);
-    cards[0].style.setProperty("--card-offset", `${lerp(30, 0, p1)}px`);
-    connectors[0].style.setProperty("--connector-scale", p1);
-    connectors[0].style.setProperty("--connector-opacity", p1);
+        if (connectors[index]) {
+          connectors[index].style.setProperty("--connector-scale", cardProgress);
+          connectors[index].style.setProperty("--connector-opacity", cardProgress);
+        }
+      });
+    } else {
+      // Desktop: Original phased animation
+      // Phase A: 0 → 0.33 (connector 1, card 1)
+      const p1 = smoothstep(0, WORKFLOW_PHASE_A, p);
 
-    // Card 2 (Design)
-    cards[1].style.setProperty("--card-opacity", p2);
-    cards[1].style.setProperty("--card-offset", `${lerp(30, 0, p2)}px`);
-    connectors[1].style.setProperty("--connector-scale", p2);
-    connectors[1].style.setProperty("--connector-opacity", p2);
+      // Phase B: 0.33 → 0.66 (connector 2, card 2)
+      const p2 = smoothstep(WORKFLOW_PHASE_A, WORKFLOW_PHASE_B, p);
 
-    // Card 3 (Implement)
-    cards[2].style.setProperty("--card-opacity", p3);
-    cards[2].style.setProperty("--card-offset", `${lerp(30, 0, p3)}px`);
-    connectors[2].style.setProperty("--connector-scale", p3);
-    connectors[2].style.setProperty("--connector-opacity", p3);
+      // Phase C: 0.66 → 1 (connector 3, all cards finalize)
+      const p3 = smoothstep(WORKFLOW_PHASE_B, 1, p);
+
+      // Card 1 (Clarify)
+      cards[0].style.setProperty("--card-opacity", p1);
+      cards[0].style.setProperty("--card-offset", `${lerp(30, 0, p1)}px`);
+      connectors[0].style.setProperty("--connector-scale", p1);
+      connectors[0].style.setProperty("--connector-opacity", p1);
+
+      // Card 2 (Design)
+      cards[1].style.setProperty("--card-opacity", p2);
+      cards[1].style.setProperty("--card-offset", `${lerp(30, 0, p2)}px`);
+      connectors[1].style.setProperty("--connector-scale", p2);
+      connectors[1].style.setProperty("--connector-opacity", p2);
+
+      // Card 3 (Implement)
+      cards[2].style.setProperty("--card-opacity", p3);
+      cards[2].style.setProperty("--card-offset", `${lerp(30, 0, p3)}px`);
+      connectors[2].style.setProperty("--connector-scale", p3);
+      connectors[2].style.setProperty("--connector-opacity", p3);
+    }
   }
 
   // Adaptive throttling based on device - reduced throttling on mobile for smoother animations
