@@ -70,7 +70,7 @@
   let PHASE3_DIST = 520; // scenario cycling
   let PHASE4_DIST = 520; // lift together
   const SCENARIO_DWELL_DIST = 220; // extra scroll distance between scenario switches for dwell
-  const FINAL_HOLD_DIST = 1200; // extra dwell to keep final state visible longer
+  const FINAL_HOLD_DIST = 2400; // extra dwell to keep final state visible longer (doubled for better UX)
 
   // WORKFLOW (Phase 5) - tweak points
   let WORKFLOW_DIST = 520; // scroll distance for workflow animation
@@ -145,7 +145,7 @@
     if (isMobile) {
       // Mobile: tighter, more responsive distances
       PHASE1_DIST = vh * 0.6;  // Paragraph dock
-      QUALIFY_DELAY_DIST = vh * 0.25;  // Delay before qualify
+      QUALIFY_DELAY_DIST = vh * 0.08;  // Delay before qualify (small lock-in)
       PHASE2_DIST = 0;  // No qualify slide on mobile in hero phase
     } else {
       // Desktop distances
@@ -158,11 +158,16 @@
     const basePhase3 = isMobile
       ? 0  // No scenario cycling in hero phase on mobile
       : Math.max(340, Math.min(620, vh * 0.55));
-    const dwellTotal = SCENARIO_DWELL_DIST * Math.max(0, scenarioCount - 1);
-    PHASE3_DIST = basePhase3 + dwellTotal + FINAL_HOLD_DIST;
+    const dwellTotal = isMobile
+      ? 0  // No dwell on mobile, qualify is separate
+      : SCENARIO_DWELL_DIST * Math.max(0, scenarioCount - 1);
+    const holdDist = isMobile
+      ? 0  // No hold on mobile hero, qualify is separate
+      : FINAL_HOLD_DIST;
+    PHASE3_DIST = basePhase3 + dwellTotal + holdDist;
 
     PHASE4_DIST = isMobile
-      ? vh * 0.2  // Minimal distance before lift on mobile
+      ? vh * 0.15  // Quick lift on mobile
       : Math.max(420, Math.min(720, vh * 0.65));
 
     // Workflow (Phase 5) responsive distance - tweak point
@@ -387,7 +392,8 @@
 
       // Scroll distance for scenario cycling (based on number of scenarios)
       const scenarioCount = scenarios.length || 1;
-      const scenarioDist = Math.max(600, scenarioCount * 250) + FINAL_HOLD_DIST; // Added hold for final state
+      const mobileHoldDist = 1000; // Shorter hold on mobile
+      const scenarioDist = Math.max(400, scenarioCount * 180) + mobileHoldDist; // Shorter per-scenario duration
 
       qualifyMobileScrollDist = scenarioDist;
       qualifyMobilePinEnd = qualifyMobilePinStart + qualifyMobileScrollDist;
@@ -541,7 +547,7 @@
           );
         }
 
-        const finalRevealStart = scenarioCount > 1 ? (scenarioCount - 0.2) / scenarioCount : 0.72;
+        const finalRevealStart = scenarioCount > 1 ? (scenarioCount - 0.5) / scenarioCount : 0.65;
         const finalRevealEnd = 0.995;
         const finalReveal =
           qualifyP > 0.6 && scenarioProgress >= finalRevealStart;
@@ -559,8 +565,19 @@
           qualifyCard.style.width = "100%";
           qualifyCard.style.maxWidth = "100vw";
           qualifyCard.style.transform = `translate(0px, ${yOffset}px) scale(1)`;
-          qualifyCard.style.opacity = `${finalTakeoverProgress}`;
+
+          // Fade out as it scrolls up past the viewport
+          const fadeOutDist = 200;
+          const fadeOutProgress = clamp(postLift / fadeOutDist, 0, 1);
+          qualifyCard.style.opacity = `${1 - fadeOutProgress}`;
+
           activeIndex = scenarios.length ? scenarios.length - 1 : activeIndex;
+        } else {
+          // Not in final reveal - hide the card if we're past the phase
+          if (postLift > 0) {
+            qualifyCard.style.opacity = "0";
+            qualifyCard.style.pointerEvents = "none";
+          }
         }
       } else if (qualifyMobilePinEnabled) {
         // Mobile: independent pinning phase with slide-in animation
@@ -627,7 +644,7 @@
             );
           }
 
-          const finalRevealStart = scenarioCount > 1 ? (scenarioCount - 0.2) / scenarioCount : 0.72;
+          const finalRevealStart = scenarioCount > 1 ? (scenarioCount - 0.5) / scenarioCount : 0.65;
           const finalRevealEnd = 0.995;
           const finalReveal = progress >= finalRevealStart;
           qualifyCard.classList.toggle("final-reveal", finalReveal);
@@ -644,7 +661,7 @@
             qualifyCard.style.width = "100%";
             qualifyCard.style.maxWidth = "100vw";
             qualifyCard.style.transform = `translate(0, 0)`;
-            qualifyCard.style.opacity = `${finalTakeoverProgress}`;
+            qualifyCard.style.opacity = "1"; // Keep at full opacity, let CSS children animations handle reveals
             activeIndex = scenarios.length ? scenarios.length - 1 : activeIndex;
           }
         } else if (afterPin) {
@@ -664,7 +681,7 @@
             qualifyCard.style.width = "100%";
             qualifyCard.style.maxWidth = "100vw";
             qualifyCard.style.transform = `translate(0, ${-postQualify}px)`;
-            qualifyCard.style.opacity = `${finalTakeoverProgress}`;
+            qualifyCard.style.opacity = "1"; // Keep visible during scroll-out
             qualifyCard.style.pointerEvents = "auto";
             qualifyCard.classList.add("visible");
           } else {
@@ -1099,14 +1116,14 @@
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
             entry.target.classList.add("in-view");
           } else {
             entry.target.classList.remove("in-view");
           }
         });
       },
-      { threshold: [0, 0.6, 0.75], rootMargin: "0px 0px -10% 0px" }
+      { threshold: [0, 0.35, 0.5], rootMargin: "0px 0px 5% 0px" }
     );
     revealEls.forEach((el) => observer.observe(el));
   } else {

@@ -9,8 +9,8 @@
 
   --accent: #ffffff;
   --accent2: #dcdcdc;
-  --accent3: rgb(186, 148, 255);  /* soft purple */
-  --accent4: rgb(255, 138, 128);  /* coral */
+  --accent3: #4A9FBE;  /* medium blue */
+  --accent4: #26C6B9;  /* teal blue */
   --accent5: #8a8a8a;   /* neutral accent */
   --mustard: #d6a73b;
   --workflow-bg:
@@ -714,7 +714,8 @@ body.js-ready .testimonialsSection {
   font-size: 14px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(240,245,255,0.6);
+  color: var(--mustard);
+  filter: drop-shadow(0 1px 4px rgba(214, 167, 59, 0.2));
 }
 
 .heroActions.release {
@@ -770,7 +771,12 @@ body.js-ready .testimonialsSection {
   transition:
     opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.3s ease;
+    box-shadow 0.3s ease,
+    width 2.2s cubic-bezier(0.16, 1, 0.3, 1),
+    background 2.2s cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 2.2s cubic-bezier(0.16, 1, 0.3, 1),
+    min-height 2.2s cubic-bezier(0.16, 1, 0.3, 1),
+    padding 2.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .qualifyCard.final-reveal{
@@ -808,8 +814,18 @@ body.js-ready .testimonialsSection {
   inset: 0;
   background: #c2edff; /* keep solid light blue */
   background-size: auto;
-  animation: none;
   z-index: -2;
+  opacity: 0;
+  animation: backgroundFadeIn 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes backgroundFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes gradientShift {
@@ -880,7 +896,7 @@ body.js-ready .testimonialsSection {
 
 .qualifyCard.final-reveal .scenarioFinalLabel{
   color: #00897B;
-  animation: finalLabelReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s backwards,
+  animation: finalLabelReveal 1.2s ease-out 0.5s backwards,
              shimmer 5s ease-in-out infinite 3s;
   position: relative;
   display: inline-block;
@@ -913,7 +929,7 @@ body.js-ready .testimonialsSection {
   text-shadow: none;
   font-size: clamp(36px, 6vw, 56px);
   text-align: center;
-  animation: finalTitleReveal 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s backwards,
+  animation: finalTitleReveal 1.5s ease-out 0.8s backwards,
              gentleFloat 4s ease-in-out infinite 2s;
   position: relative;
 }
@@ -1042,7 +1058,7 @@ body.js-ready .testimonialsSection {
 
 .qualifyCard.final-reveal .scenarioFinalActions{
   justify-content: center;
-  animation: finalActionsReveal 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 1.2s backwards;
+  animation: finalActionsReveal 1.4s ease-out 1.2s backwards;
 }
 
 @keyframes finalActionsReveal {
@@ -1066,8 +1082,11 @@ body.js-ready .testimonialsSection {
   font-weight: 900;
   letter-spacing: -0.04em;
   margin: 0 0 28px;
-  color: var(--text);
-  text-shadow: none;
+  background: linear-gradient(135deg, var(--text) 0%, var(--mustard) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 6px rgba(214, 167, 59, 0.12));
   text-align: center;
 }
 
@@ -1115,19 +1134,19 @@ body.js-ready .testimonialsSection {
   line-height: 1;
   margin-top: 2px;
   border-radius: 50%;
-  background: rgba(255,138,128,0.16);
+  background: rgba(38, 198, 185, 0.16);
   box-shadow:
-    0 0 0 1px rgba(255,138,128,0.32),
-    0 6px 18px rgba(255,138,128,0.18);
+    0 0 0 1px rgba(38, 198, 185, 0.32),
+    0 6px 18px rgba(38, 198, 185, 0.18);
   transition: all 0.3s ease;
 }
 
 .scenario.active .scenarioMark{
   animation: markerPulse 0.6s ease;
-  background: rgba(255,138,128,0.26);
+  background: rgba(38, 198, 185, 0.26);
   box-shadow:
-    0 0 0 1px rgba(255,138,128,0.5),
-    0 10px 24px rgba(255,138,128,0.28);
+    0 0 0 1px rgba(38, 198, 185, 0.5),
+    0 10px 24px rgba(38, 198, 185, 0.28);
 }
 
 @keyframes markerPulse {
@@ -1156,8 +1175,8 @@ body.js-ready .testimonialsSection {
 .scenarioFinal{
   align-items: flex-start;
   gap: 14px;
-  background: linear-gradient(135deg, rgba(186,148,255,0.14), rgba(255,138,128,0.1));
-  box-shadow: 0 18px 46px rgba(186,148,255,0.08);
+  background: linear-gradient(135deg, rgba(74, 159, 190, 0.14), rgba(38, 198, 185, 0.1));
+  box-shadow: 0 18px 46px rgba(74, 159, 190, 0.08);
 }
 
 .scenarioFinalContent{
@@ -1167,7 +1186,7 @@ body.js-ready .testimonialsSection {
 }
 
 .qualifyCard.final-reveal .scenarioFinalContent{
-  animation: finalContentReveal 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards;
+  animation: finalContentReveal 1.5s ease-out 0.3s backwards;
   align-items: center;
   text-align: center;
 }
@@ -1281,7 +1300,11 @@ body.js-ready .testimonialsSection {
   font-weight: 900;
   letter-spacing: -0.05em;
   line-height: 0.95;
-  color: var(--text);
+  background: linear-gradient(135deg, var(--mustard) 0%, var(--text) 60%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 8px rgba(214, 167, 59, 0.12));
 }
 
 .workflowSubline {
@@ -1289,7 +1312,11 @@ body.js-ready .testimonialsSection {
   font-size: clamp(16px, 1.8vw, 20px);
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: var(--muted);
+  background: linear-gradient(135deg, #e8c770 0%, #dab55d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 1px 4px rgba(232, 199, 112, 0.15));
 }
 
 /* Rail - horizontal line across the section */
@@ -1376,6 +1403,23 @@ body.js-ready .testimonialsSection {
   font-weight: 900;
   letter-spacing: -0.03em;
   color: var(--text);
+  width: fit-content;
+  background: linear-gradient(90deg, #e8c770 0%, #dab55d 15%, rgba(242,248,252,.96) 55%, rgba(242,248,252,.96) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.workflowCard[data-phase="design"] .cardTitle {
+  background: linear-gradient(90deg, rgba(242,248,252,.96) 0%, rgba(242,248,252,.96) 25%, #e8c770 45%, #dab55d 55%, rgba(242,248,252,.96) 75%, rgba(242,248,252,.96) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+}
+
+.workflowCard[data-phase="implement"] .cardTitle {
+  background: linear-gradient(90deg, rgba(242,248,252,.96) 0%, rgba(242,248,252,.96) 45%, #dab55d 85%, #e8c770 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
 }
 
 .cardDesc {
@@ -1423,7 +1467,11 @@ body.js-ready .testimonialsSection {
   font-size: clamp(28px, 6vw, 52px);
   font-weight: 900;
   letter-spacing: -0.05em;
-  color: var(--text);
+  background: linear-gradient(135deg, var(--accent4) 0%, var(--text) 60%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 8px rgba(38, 198, 185, 0.12));
   text-align: center;
 }
 
@@ -1460,7 +1508,8 @@ body.js-ready .testimonialsSection {
   font-size: 14px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.6);
+  font-weight: 600;
+  color: rgba(38, 198, 185, 0.65);
 }
 
 /* Dynamic will-change - enabled on all devices for smooth animations */
@@ -1514,7 +1563,11 @@ body.js-ready .testimonialsSection {
   font-size: clamp(28px, 6vw, 52px);
   letter-spacing: -0.05em;
   font-weight: 900;
-  color: var(--text);
+  background: linear-gradient(135deg, var(--mustard) 0%, var(--text) 70%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 8px rgba(214, 167, 59, 0.15));
 }
 
 .contactSubline{
