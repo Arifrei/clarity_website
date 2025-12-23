@@ -14,10 +14,7 @@
 
   const qualifySection = $("#qualify");
   const qualifyCard = qualifySection ? $(".qualifyCard", qualifySection) : null;
-  const finalScenario = qualifyCard ? qualifyCard.querySelector(".scenarioFinal") : null;
-  const scenarios = qualifyCard
-    ? qualifyCard.querySelectorAll(".scenario:not(.scenarioFinal)")
-    : [];
+  const scenarios = qualifyCard ? qualifyCard.querySelectorAll(".scenario") : [];
 
   // Mobile qualify variables
   let qualifyMobilePinEnabled = false;
@@ -352,11 +349,7 @@
     if (qualifyPinEnabled && heroRight) {
       // Desktop: qualify appears in the exact position of heroRight
       const heroRightRect = heroRight.getBoundingClientRect();
-      const maxCardWidth = Math.min(
-        560,
-        Math.max(420, qualifyCard.offsetWidth || 0),
-        window.innerWidth - 120
-      );
+      const cardWidth = qualifyCard.offsetWidth;
       // Nudge the pinned qualify card further right and slightly higher to clear the headline
       const rightNudge = Math.max(90, heroRightRect.width * 0.32);
       const topLift = Math.max(20, heroRightRect.height * 0.08);
@@ -364,7 +357,7 @@
       qualifyGeometry = {
         left: heroRightRect.left + rightNudge,
         top: heroRightRect.top - topLift,
-        width: maxCardWidth,
+        width: cardWidth,
       };
       qualifyMobilePinEnabled = false;
     } else if (qualifyCard && qualifySection) {
@@ -497,9 +490,6 @@
       heroRight.style.pointerEvents = imageFade < 0.15 ? "none" : "auto";
     }
 
-    let finalTakeover = false;
-    let finalTakeoverProgress = 0;
-
     if (qualifyCard) {
       let activeIndex = -1;
 
@@ -512,12 +502,9 @@
         qualifyCard.style.left = `${qualifyGeometry.left}px`;
         qualifyCard.style.top = `${qualifyGeometry.top}px`;
         qualifyCard.style.width = `${qualifyGeometry.width}px`;
-        qualifyCard.style.maxWidth = `${qualifyGeometry.width}px`;
         qualifyCard.style.transform = `translate(${slideX}px, ${yOffset}px) scale(${lerp(0.96, 1, qualifyP)})`;
         qualifyCard.style.opacity = `${opacity}`;
         qualifyCard.style.pointerEvents = opacity > 0.2 ? "auto" : "none";
-        qualifyCard.style.right = "";
-        qualifyCard.style.maxWidth = `${qualifyGeometry.width}px`;
 
         // Add visible class for glowing border effect
         if (qualifyP > 0.3) {
@@ -536,28 +523,6 @@
             scenarios.length - 1,
             Math.floor(scenarioProgress * scenarios.length)
           );
-        }
-
-        const finalRevealStart = 0.72;
-        const finalRevealEnd = 0.98;
-        const finalReveal =
-          qualifyP > 0.6 && scenarioProgress >= finalRevealStart;
-        qualifyCard.classList.toggle("final-reveal", finalReveal);
-        if (finalReveal) {
-          finalTakeover = true;
-          finalTakeoverProgress = smoothstep(
-            finalRevealStart,
-            finalRevealEnd,
-            scenarioProgress
-          );
-          qualifyCard.style.left = "0";
-          qualifyCard.style.right = "0";
-          qualifyCard.style.top = `${navH}px`;
-          qualifyCard.style.width = "100%";
-          qualifyCard.style.maxWidth = "100vw";
-          qualifyCard.style.transform = `translate(0px, ${yOffset}px) scale(1)`;
-          qualifyCard.style.opacity = `${finalTakeoverProgress}`;
-          activeIndex = scenarios.length ? scenarios.length - 1 : activeIndex;
         }
       } else if (qualifyMobilePinEnabled) {
         // Mobile: independent pinning phase with slide-in animation
@@ -622,57 +587,16 @@
               Math.floor(progress * scenarios.length)
             );
           }
-
-          const finalRevealStart = 0.72;
-          const finalRevealEnd = 0.98;
-          const finalReveal = progress >= finalRevealStart;
-          qualifyCard.classList.toggle("final-reveal", finalReveal);
-          if (finalReveal) {
-            finalTakeover = true;
-            finalTakeoverProgress = smoothstep(
-              finalRevealStart,
-              finalRevealEnd,
-              progress
-            );
-            qualifyCard.style.left = "0";
-            qualifyCard.style.right = "0";
-            qualifyCard.style.top = `${navH}px`;
-            qualifyCard.style.width = "100%";
-            qualifyCard.style.maxWidth = "100vw";
-            qualifyCard.style.transform = `translate(0, 0)`;
-            qualifyCard.style.opacity = `${finalTakeoverProgress}`;
-            activeIndex = scenarios.length ? scenarios.length - 1 : activeIndex;
-          }
         } else if (afterPin) {
           // After pinning: smooth unpinning with postQualify offset (like hero section)
-          const finalReveal = true;
-          qualifyCard.classList.toggle("final-reveal", finalReveal);
-          if (finalReveal) {
-            finalTakeover = true;
-            // Use progress based on how far past the pin end we've scrolled (longer fade for smoothness)
-            const fadeDist = 320;
-            const fadeProgress = clamp(postQualify / fadeDist, 0, 1);
-            finalTakeoverProgress = smoothstep(0, 1, fadeProgress);
-            qualifyCard.style.position = "fixed";
-            qualifyCard.style.left = "0";
-            qualifyCard.style.right = "0";
-            qualifyCard.style.top = `${navH}px`;
-            qualifyCard.style.width = "100%";
-            qualifyCard.style.maxWidth = "100vw";
-            qualifyCard.style.transform = `translate(0, ${-postQualify}px)`;
-            qualifyCard.style.opacity = `${finalTakeoverProgress}`;
-            qualifyCard.style.pointerEvents = "auto";
-            qualifyCard.classList.add("visible");
-          } else {
-            qualifyCard.style.position = "fixed";
-            qualifyCard.style.left = "50%";
-            qualifyCard.style.top = `${pinTop}px`;
-            qualifyCard.style.width = `${qualifyCard.offsetWidth}px`;
-            qualifyCard.style.transform = `translate(-50%, ${-postQualify}px)`;
-            qualifyCard.style.opacity = "1";
-            qualifyCard.style.pointerEvents = "auto";
-            qualifyCard.classList.add("visible");
-          }
+          qualifyCard.style.position = "fixed";
+          qualifyCard.style.left = "50%";
+          qualifyCard.style.top = `${pinTop}px`;
+          qualifyCard.style.width = `${qualifyCard.offsetWidth}px`;
+          qualifyCard.style.transform = `translate(-50%, ${-postQualify}px)`;
+          qualifyCard.style.opacity = "1";
+          qualifyCard.style.pointerEvents = "auto";
+          qualifyCard.classList.add("visible");
 
           // Show last scenario
           if (scenarios.length) {
@@ -692,23 +616,11 @@
             Math.floor(progress * scenarios.length)
           );
         }
-        qualifyCard.classList.remove("final-reveal");
-        qualifyCard.style.maxWidth = "";
-        qualifyCard.style.right = "";
       }
 
       scenarios.forEach((el, i) => {
         el.classList.toggle("active", i === activeIndex);
       });
-
-      if (finalScenario) {
-        finalScenario.classList.toggle("active", finalTakeover);
-      }
-    }
-
-    if (heroBg) {
-      const bgFade = finalTakeover ? smoothstep(0, 1, finalTakeoverProgress) : 0;
-      heroBg.style.opacity = `${1 - bgFade}`;
     }
 
     // PHASE 5: Workflow section
