@@ -441,10 +441,11 @@
       qualifyMobilePinTop =
         navH + (getViewportHeight() - navH - qualifyMobilePinnedHeight) / 2;
 
-      // Set spacer height to account for slide-in + scenario cycling
+      // Set spacer height to account for slide-in + scenario cycling + final hold
       const qualifySpacer = document.getElementById("qualifySpacer");
       if (qualifySpacer) {
-        const totalScrollDist = slideInDist + qualifyMobileScrollDist;
+        const finalHoldDist = 1300; // Spacer height (smaller than hold for tighter gap)
+        const totalScrollDist = slideInDist + qualifyMobileScrollDist + finalHoldDist;
         qualifySpacer.style.height = `${totalScrollDist}px`;
       }
     } else {
@@ -634,7 +635,8 @@
         const slideInStart = qualifyMobilePinStart - slideInDist;
 
         // Add buffer distance to hold final reveal before scrolling up
-        const finalHoldDist = 300; // Hold final reveal in place before scrolling up
+        // Provides time for stats animation to complete (1.6s delay + 1.2s duration = 2.8s total)
+        const finalHoldDist = 1600; // Hold final reveal in place before scrolling up
         const scrollUpStart = qualifyMobilePinEnd + finalHoldDist;
 
         const beforeSlide = y < slideInStart;
