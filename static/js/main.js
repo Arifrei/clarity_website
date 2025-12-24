@@ -144,8 +144,9 @@
 
   function setScrollSpace() {
     const vh = getViewportHeight();
+    const extraPad = window.innerWidth <= 900 ? 200 : 40; // keep mobile roomy, tighten desktop
     // Workflow section is in normal flow, so don't include WORKFLOW_DIST in hero height
-    home.style.minHeight = `${vh + PHASE1_DIST + QUALIFY_DELAY_DIST + PHASE2_DIST + PHASE3_DIST + PHASE4_DIST + 200}px`;
+    home.style.minHeight = `${vh + PHASE1_DIST + QUALIFY_DELAY_DIST + PHASE2_DIST + PHASE3_DIST + PHASE4_DIST + extraPad}px`;
   }
 
   function recalc() {
