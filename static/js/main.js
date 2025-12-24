@@ -24,6 +24,8 @@
   let qualifyMobilePinStart = 0;
   let qualifyMobilePinEnd = 0;
   let qualifyMobileScrollDist = 0;
+  let qualifyMobilePinnedHeight = 0;
+  let qualifyMobilePinTop = 0;
   const testimonialsSection = document.getElementById("testimonials");
   const testimonialsContainer = testimonialsSection
     ? testimonialsSection.querySelector(".testimonialsContainer")
@@ -48,6 +50,20 @@
   };
 
   const shouldSimplifyAnimations = isLowEndDevice();
+
+  // Stabilize viewport height on mobile to avoid jumps when browser chrome shows/hides
+  let stableVh = window.innerHeight;
+  const getViewportHeight = () =>
+    window.innerWidth <= 900 ? stableVh : window.innerHeight;
+  const refreshStableVh = () => {
+    const current =
+      (window.visualViewport && window.visualViewport.height) ||
+      window.innerHeight;
+    // Only grow or update on significant changes (e.g., orientation)
+    if (current > stableVh || Math.abs(current - stableVh) > 140) {
+      stableVh = current;
+    }
+  };
 
   if (
     !home ||
@@ -127,7 +143,7 @@
   }
 
   function setScrollSpace() {
-    const vh = window.innerHeight;
+    const vh = getViewportHeight();
     // Workflow section is in normal flow, so don't include WORKFLOW_DIST in hero height
     home.style.minHeight = `${vh + PHASE1_DIST + QUALIFY_DELAY_DIST + PHASE2_DIST + PHASE3_DIST + PHASE4_DIST + 200}px`;
   }
@@ -140,7 +156,7 @@
 
     // Mobile-optimized scroll distances for smoother animations
     const isMobile = window.innerWidth <= 900;
-    const vh = window.innerHeight;
+    const vh = getViewportHeight();
 
     if (isMobile) {
       // Mobile: tighter, more responsive distances
@@ -220,7 +236,7 @@
 
       const rect = workflow.getBoundingClientRect();
       const docTop = rect.top + window.scrollY;
-      workflowPinOffset = window.innerHeight * 0.17;
+      workflowPinOffset = getViewportHeight() * 0.17;
       workflowPinTop = navH + workflowPinOffset;
       workflowScrollStart = Math.max(0, docTop - workflowPinTop);
 
@@ -234,6 +250,22 @@
       workflowScrollStart = 0;
       workflowPinTop = navH;
       workflowPinOffset = 0;
+    }
+    // Expose a stable workflow scroll target for external triggers
+    if (typeof window !== "undefined") {
+      if (workflow && workflowPinEnabled) {
+        const start =
+          workflowScrollStart + WORKFLOW_DELAY_DIST + workflowBaseOffset;
+        const endHold = start + WORKFLOW_DIST + WORKFLOW_HOLD_DIST;
+        window.__workflowScrollTarget = endHold;
+      } else if (workflow) {
+        // Fallback: place just above the workflow section accounting for nav
+        const top =
+          workflow.getBoundingClientRect().top + window.scrollY - navH - 8;
+        window.__workflowScrollTarget = top;
+      } else {
+        window.__workflowScrollTarget = null;
+      }
     }
 
     // Testimonials (Phase 6) - Enable on all screen sizes for horizontal scroll effect
@@ -300,10 +332,10 @@
 
       TESTIMONIALS_PIN_DIST = Math.max(
         820,
-        Math.min(1400, window.innerHeight * 1.1)
+        Math.min(1400, getViewportHeight() * 1.1)
       );
 
-      testimonialsPinOffset = window.innerHeight * 0.17;
+      testimonialsPinOffset = getViewportHeight() * 0.17;
       testimonialsPinTop = navH + testimonialsPinOffset;
 
       // Calculate the scroll position where the container's top edge
@@ -392,11 +424,22 @@
 
       // Scroll distance for scenario cycling (based on number of scenarios)
       const scenarioCount = scenarios.length || 1;
-      const mobileHoldDist = 1000; // Shorter hold on mobile
-      const scenarioDist = Math.max(400, scenarioCount * 180) + mobileHoldDist; // Shorter per-scenario duration
+      const mobileHoldDist = 200; // Minimal hold on mobile
+      const scenarioDist = Math.max(200, scenarioCount * 140) + mobileHoldDist; // Per-scenario scroll duration
 
       qualifyMobileScrollDist = scenarioDist;
       qualifyMobilePinEnd = qualifyMobilePinStart + qualifyMobileScrollDist;
+
+      // Lock in a stable height/top for the mobile pin state to avoid mid-cycle jumps
+      const scenarioHeights = scenarios.length
+        ? Array.from(scenarios).map((el) => el.offsetHeight || 0)
+        : [qualifyCard.offsetHeight || 0];
+      const maxScenarioHeight = scenarioHeights.length
+        ? Math.max(...scenarioHeights)
+        : qualifyCard.offsetHeight || 0;
+      qualifyMobilePinnedHeight = Math.max(qualifyCard.offsetHeight || 0, maxScenarioHeight);
+      qualifyMobilePinTop =
+        navH + (getViewportHeight() - navH - qualifyMobilePinnedHeight) / 2;
 
       // Set spacer height to account for slide-in + scenario cycling
       const qualifySpacer = document.getElementById("qualifySpacer");
@@ -407,11 +450,17 @@
     } else {
       qualifyGeometry = { left: 0, top: 0, width: 0 };
       qualifyMobilePinEnabled = false;
+      qualifyMobilePinnedHeight = 0;
+      qualifyMobilePinTop = 0;
 
       // Reset spacer on desktop
       const qualifySpacer = document.getElementById("qualifySpacer");
+      const workflowSection = document.getElementById("workflow");
       if (qualifySpacer) {
         qualifySpacer.style.height = "0px";
+      }
+      if (workflowSection) {
+        workflowSection.style.marginTop = "0px";
       }
     }
 
@@ -584,17 +633,24 @@
         const slideInDist = 200; // Distance for slide-in animation
         const slideInStart = qualifyMobilePinStart - slideInDist;
 
+        // Add buffer distance to hold final reveal before scrolling up
+        const finalHoldDist = 300; // Hold final reveal in place before scrolling up
+        const scrollUpStart = qualifyMobilePinEnd + finalHoldDist;
+
         const beforeSlide = y < slideInStart;
         const duringSlide = y >= slideInStart && y < qualifyMobilePinStart;
-        const duringPin = y >= qualifyMobilePinStart && y < qualifyMobilePinEnd;
-        const afterPin = y >= qualifyMobilePinEnd;
+        const duringPin = y >= qualifyMobilePinStart && y < scrollUpStart;
+        const afterPin = y >= scrollUpStart;
 
-        const vh = window.innerHeight;
-        const cardHeight = qualifyCard.offsetHeight;
-        const pinTop = navH + (vh - navH - cardHeight) / 2;
+        const vh = getViewportHeight();
+        const cardHeight =
+          qualifyMobilePinnedHeight || qualifyCard.offsetHeight || 0;
+        const pinTop =
+          qualifyMobilePinTop ||
+          navH + (vh - navH - cardHeight) / 2;
 
-        // Calculate post-qualify offset for smooth unpinning (similar to postLift for hero)
-        const postQualify = Math.max(0, y - qualifyMobilePinEnd);
+        // Calculate post-qualify offset for smooth unpinning (starts after hold period)
+        const postQualify = Math.max(0, y - scrollUpStart);
 
         if (beforeSlide) {
           // Before slide: card hidden, positioned off-screen right
@@ -636,7 +692,6 @@
 
           // Cycle through scenarios
           const progress = (y - qualifyMobilePinStart) / qualifyMobileScrollDist;
-          const scenarioCount = Math.max(1, scenarios.length || 1);
           if (scenarios.length) {
             activeIndex = Math.min(
               scenarios.length - 1,
@@ -644,56 +699,43 @@
             );
           }
 
-          const finalRevealStart = scenarioCount > 1 ? (scenarioCount - 0.5) / scenarioCount : 0.65;
-          const finalRevealEnd = 0.995;
+          // Trigger final reveal at end of scenario cycling - delayed to give time to read last scenario
+          // Delay the final takeover on mobile so the last scenario stays visible longer
+          const finalRevealStart = 1.2;
           const finalReveal = progress >= finalRevealStart;
           qualifyCard.classList.toggle("final-reveal", finalReveal);
+
           if (finalReveal) {
             finalTakeover = true;
-            finalTakeoverProgress = smoothstep(
-              finalRevealStart,
-              finalRevealEnd,
-              progress
-            );
+            finalTakeoverProgress = 1;
+
+            // Snap to full-width immediately - CSS transition will smooth it
+            qualifyCard.style.position = "fixed";
             qualifyCard.style.left = "0";
-            qualifyCard.style.right = "0";
             qualifyCard.style.top = `${navH}px`;
             qualifyCard.style.width = "100%";
             qualifyCard.style.maxWidth = "100vw";
-            qualifyCard.style.transform = `translate(0, 0)`;
-            qualifyCard.style.opacity = "1"; // Keep at full opacity, let CSS children animations handle reveals
+            qualifyCard.style.transform = "translate(0, 0)";
+            qualifyCard.style.opacity = "1";
+            qualifyCard.style.pointerEvents = "auto";
             activeIndex = scenarios.length ? scenarios.length - 1 : activeIndex;
           }
         } else if (afterPin) {
-          // After pinning: smooth unpinning with postQualify offset (like hero section)
+          // After pinning: keep full-width and scroll up smoothly
           const finalReveal = true;
           qualifyCard.classList.toggle("final-reveal", finalReveal);
-          if (finalReveal) {
-            finalTakeover = true;
-            // Use progress based on how far past the pin end we've scrolled (longer fade for smoothness)
-            const fadeDist = 320;
-            const fadeProgress = clamp(postQualify / fadeDist, 0, 1);
-            finalTakeoverProgress = smoothstep(0, 1, fadeProgress);
-            qualifyCard.style.position = "fixed";
-            qualifyCard.style.left = "0";
-            qualifyCard.style.right = "0";
-            qualifyCard.style.top = `${navH}px`;
-            qualifyCard.style.width = "100%";
-            qualifyCard.style.maxWidth = "100vw";
-            qualifyCard.style.transform = `translate(0, ${-postQualify}px)`;
-            qualifyCard.style.opacity = "1"; // Keep visible during scroll-out
-            qualifyCard.style.pointerEvents = "auto";
-            qualifyCard.classList.add("visible");
-          } else {
-            qualifyCard.style.position = "fixed";
-            qualifyCard.style.left = "50%";
-            qualifyCard.style.top = `${pinTop}px`;
-            qualifyCard.style.width = `${qualifyCard.offsetWidth}px`;
-            qualifyCard.style.transform = `translate(-50%, ${-postQualify}px)`;
-            qualifyCard.style.opacity = "1";
-            qualifyCard.style.pointerEvents = "auto";
-            qualifyCard.classList.add("visible");
-          }
+          finalTakeover = true;
+          finalTakeoverProgress = 1; // Already at full expansion
+
+          qualifyCard.style.position = "fixed";
+          qualifyCard.style.left = "0";
+          qualifyCard.style.width = `${window.innerWidth}px`;
+          qualifyCard.style.maxWidth = "100vw";
+          qualifyCard.style.top = `${navH}px`;
+          qualifyCard.style.transform = `translate(0, ${-postQualify}px)`;
+          qualifyCard.style.opacity = "1"; // Keep visible during scroll-out
+          qualifyCard.style.pointerEvents = "auto";
+          qualifyCard.classList.add("visible");
 
           // Show last scenario
           if (scenarios.length) {
@@ -931,7 +973,7 @@
 
     if (useMobileIndividual) {
       // Mobile: Animate each card individually when top reaches 70% from top
-      const vh = window.innerHeight;
+      const vh = getViewportHeight();
       const triggerPoint = vh * 0.7; // Trigger when card top reaches 70% from top
       const animationRange = vh * 0.3; // Animation happens over 30% of viewport
 
@@ -1010,6 +1052,7 @@
   const handleResize = () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
+      refreshStableVh();
       recalc();
       update();
     }, 150);
@@ -1018,6 +1061,7 @@
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", handleResize);
   window.addEventListener("orientationchange", () => {
+    refreshStableVh();
     // Mobile orientation change - recalc after a delay
     setTimeout(() => {
       recalc();
@@ -1025,6 +1069,7 @@
     }, 300);
   });
   window.addEventListener("load", () => {
+    refreshStableVh();
     recalc();
     // Extra recalc after load for mobile browsers
     setTimeout(recalc, 100);
@@ -1054,11 +1099,49 @@
 
 // Smooth scroll for data-target buttons (hero/nav)
 (() => {
+  const prefersReducedMotionQuery = window.matchMedia
+    ? window.matchMedia("(prefers-reduced-motion: reduce)")
+    : { matches: false };
+
+  const easeInOutQuad = (t) =>
+    t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!el) return;
+
+    const navHeight =
+      parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--navH")
+      ) || 72;
+
+    // Special-case workflow: jump to end of its pinned animation/hold
+    let targetY =
+      el.getBoundingClientRect().top + window.scrollY - navHeight - 10;
+    if (id === "workflow" && typeof window !== "undefined") {
+      const stored = window.__workflowScrollTarget;
+      if (typeof stored === "number" && !Number.isNaN(stored)) {
+        targetY = stored;
+      }
     }
+    const startY = window.scrollY;
+    const dist = targetY - startY;
+    const duration = 650; // balanced: not too fast, not too slow
+    const startTime = performance.now();
+
+    if (prefersReducedMotionQuery.matches) {
+      window.scrollTo(0, targetY);
+      return;
+    }
+
+    const step = (now) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      const eased = easeInOutQuad(t);
+      window.scrollTo(0, startY + dist * eased);
+      if (t < 1) requestAnimationFrame(step);
+    };
+
+    requestAnimationFrame(step);
   };
 
   document.querySelectorAll("[data-target]").forEach((btn) => {
