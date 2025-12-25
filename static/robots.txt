@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://claritysolutionsco.com/static/sitemap.xml
