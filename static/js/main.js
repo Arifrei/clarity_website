@@ -616,11 +616,7 @@
           qualifyCard.style.width = "100%";
           qualifyCard.style.maxWidth = "100vw";
           qualifyCard.style.transform = `translate(0px, ${yOffset}px) scale(1)`;
-
-          // Fade out as it scrolls up past the viewport
-          const fadeOutDist = 200;
-          const fadeOutProgress = clamp(postLift / fadeOutDist, 0, 1);
-          qualifyCard.style.opacity = `${1 - fadeOutProgress}`;
+          qualifyCard.style.opacity = "1";
 
           activeIndex = scenarios.length ? scenarios.length - 1 : activeIndex;
         } else {

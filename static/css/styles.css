@@ -356,7 +356,7 @@ main{
 .mega{
   margin:0;
   font-size: clamp(32px, calc(8vw + 12px), 78px);
-  line-height:.98;
+  line-height:1.15;
   letter-spacing:-.06em;
   font-family: "DM Serif Display", "Bookman Old Style", "Bookman", "Serpentine", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
@@ -365,6 +365,8 @@ main{
   overflow-wrap: break-word;
   word-wrap: break-word;
   max-width: 100%;
+  padding-bottom: 8px;
+  overflow: visible;
 }
 
 body:not(.js-ready) .mega{
@@ -1504,12 +1506,14 @@ body.js-ready .testimonialsSection {
   font-size: clamp(28px, calc(6vw + 8px), 56px);
   font-weight: 900;
   letter-spacing: -0.05em;
-  line-height: 0.95;
+  line-height: 1.15;
   background: linear-gradient(135deg, var(--mustard) 0%, var(--text) 60%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   filter: drop-shadow(0 2px 8px rgba(214, 167, 59, 0.12));
+  padding-bottom: 8px;
+  overflow: visible;
 }
 
 .workflowSubline {
