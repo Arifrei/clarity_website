@@ -33,15 +33,18 @@
       </button>
 
       <div class="navLinks" aria-label="Primary navigation">
-        <button class="navBtn active" data-target="home">Home</button>
-        <button class="navBtn" data-target="workflow">Our Process</button>
-        <button class="navBtn" data-target="contact">Contact</button>
+        <a href="/#home" class="navBtn active" data-target="home">Home</a>
+        <a href="/#workflow" class="navBtn" data-target="workflow">Our Process</a>
+        <a href="/#contact" class="navBtn" data-target="contact">Contact</a>
       </div>
 
-      <button class="cta magnetic" id="ctaBtn" data-target="contact">
-        <span class="ctaDot" aria-hidden="true"></span>
-        <span>Let’s talk</span>
-      </button>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <a href="/why-clarity" class="navBtn secondary">Why Clarity</a>
+        <a href="/#contact" class="cta magnetic" id="ctaBtn" data-target="contact">
+          <span class="ctaDot" aria-hidden="true"></span>
+          <span>Let's talk</span>
+        </a>
+      </div>
     </div>
   </header>
 

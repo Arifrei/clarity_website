@@ -73,6 +73,26 @@ def index():
     return render_template("index.html")
 
 
+@app.get("/why-clarity")
+def why_clarity():
+    return render_template("why-clarity.html")
+
+
+@app.get("/articles/diy-software")
+def article_diy_software():
+    return render_template("article-diy-software.html")
+
+
+@app.get("/articles/custom-vs-ready")
+def article_custom_vs_ready():
+    return render_template("article-custom-vs-ready.html")
+
+
+@app.get("/articles/5-mistakes")
+def article_5_mistakes():
+    return render_template("article-5-mistakes.html")
+
+
 @app.post("/contact")
 def contact():
     data = request.get_json(silent=True) or request.form
