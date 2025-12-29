@@ -1486,8 +1486,8 @@ body.js-ready .testimonialsSection {
 @media (min-width: 901px) {
   .workflowSection {
     min-height: 46vh; /* tighter desktop gap */
-    margin-top: -120px; /* pull section further up toward previous block */
-    margin-bottom: 120px; /* restore a bit more space before testimonials on desktop */
+    margin: 0;
+    padding-bottom: 360px; /* extra-large breathing room before testimonials on desktop */
   }
 
   .workflowInner {

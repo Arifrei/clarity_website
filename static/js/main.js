@@ -237,7 +237,7 @@
 
       const rect = workflow.getBoundingClientRect();
       const docTop = rect.top + window.scrollY;
-      workflowPinOffset = getViewportHeight() * 0.17;
+      workflowPinOffset = getViewportHeight() * 0.14; // pin higher (~14% down) on desktop
       workflowPinTop = navH + workflowPinOffset;
       workflowScrollStart = Math.max(0, docTop - workflowPinTop);
 
@@ -1186,6 +1186,135 @@
       toggleNav();
     }
   });
+})();
+
+// Nav active state on scroll + clicks (sections + page links)
+(() => {
+  const allNavButtons = Array.from(
+    document.querySelectorAll(".navLinks .navBtn")
+  );
+  if (!allNavButtons.length) return;
+
+  const sectionButtons = allNavButtons.filter((btn) =>
+    btn.hasAttribute("data-target")
+  );
+  const pageButtons = allNavButtons.filter(
+    (btn) => !btn.hasAttribute("data-target") && btn.getAttribute("href")
+  );
+
+  const sections = sectionButtons
+    .map((btn) => {
+      const id = btn.getAttribute("data-target");
+      const el = id ? document.getElementById(id) : null;
+      return el ? { id, el, btn } : null;
+    })
+    .filter(Boolean);
+
+  const getNavHeight = () =>
+    parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--navH")
+    ) || 72;
+
+  const setActiveBtn = (btn) => {
+    allNavButtons.forEach((b) => b.classList.toggle("active", b === btn));
+  };
+
+  const updateSectionActive = () => {
+    if (!sections.length) return false;
+    const marker = getNavHeight() + Math.min(200, window.innerHeight * 0.28);
+    let activeEntry = null;
+    let closestEntry = sections[0];
+    let closestDelta = Infinity;
+
+    sections.forEach((entry) => {
+      const rect = entry.el.getBoundingClientRect();
+      const top = rect.top;
+      const bottom = rect.bottom;
+
+      if (top <= marker && bottom >= marker) {
+        activeEntry = entry;
+      }
+
+      const delta = Math.abs(top - marker);
+      if (delta < closestDelta) {
+        closestDelta = delta;
+        closestEntry = entry;
+      }
+    });
+
+    setActiveBtn((activeEntry || closestEntry).btn);
+    return true;
+  };
+
+  const normalizePath = (p) => {
+    if (!p) return "/";
+    let path = p.split("?")[0].split("#")[0] || "/";
+    if (path !== "/" && path.endsWith("/")) path = path.slice(0, -1);
+    if (path.endsWith("/index")) path = path.slice(0, -6) || "/";
+    if (path.endsWith("/index.html")) path = path.slice(0, -11) || "/";
+    if (path.endsWith(".html")) path = path.slice(0, -5) || "/";
+    return path || "/";
+  };
+
+  const updatePathActive = () => {
+    if (!pageButtons.length) return;
+    const current = normalizePath(window.location.pathname);
+    let matchedBtn = null;
+    pageButtons.forEach((btn) => {
+      const href = btn.getAttribute("href") || "";
+      try {
+        const url = new URL(href, window.location.origin);
+        const path = normalizePath(url.pathname);
+        // Special case: article pages belong to Why Clarity section
+        const isArticlePage = current.startsWith("/articles/");
+        const isWhyClarityBtn = path === "/why-clarity";
+        if ((isArticlePage && isWhyClarityBtn) || path === current || (path !== "/" && current.startsWith(path))) {
+          matchedBtn = btn;
+        }
+      } catch (err) {
+        /* ignore malformed href */
+      }
+    });
+    if (matchedBtn) {
+      setActiveBtn(matchedBtn);
+    }
+  };
+
+  const updateActive = () => {
+    // If we're on a different page (pathname not "/") prefer page match
+    const path = normalizePath(window.location.pathname);
+    if (path !== "/") {
+      updatePathActive();
+      return;
+    }
+    const handled = sections.length ? updateSectionActive() : false;
+    if (!handled) {
+      updatePathActive();
+    }
+  };
+
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      updateActive();
+    });
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", updateActive);
+  allNavButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      // For same-page anchors, section scroll will update active; for full-page links, set immediately
+      if (!btn.hasAttribute("data-target")) {
+        setActiveBtn(btn);
+      }
+    });
+  });
+
+  updateActive();
 })();
 
 // Contact form animation + submission
