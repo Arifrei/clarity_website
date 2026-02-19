@@ -37,6 +37,7 @@ EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 RATE_LIMIT_WINDOW = 15 * 60  # 15 minutes
 RATE_LIMIT_MAX = 5
 rate_memory = {}
+HOME_SECTIONS = {"home", "workflow", "contact"}
 
 
 def sanitize(value: str, max_len: int) -> str:
@@ -70,7 +71,27 @@ def within_rate_limit(ip: str) -> bool:
 
 @app.get("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", initial_section="home")
+
+
+def render_home_section(section: str):
+    section_name = section if section in HOME_SECTIONS else "home"
+    return render_template("index.html", initial_section=section_name)
+
+
+@app.get("/home")
+def home_section():
+    return render_home_section("home")
+
+
+@app.get("/workflow")
+def workflow_section():
+    return render_home_section("workflow")
+
+
+@app.get("/contact")
+def contact_section():
+    return render_home_section("contact")
 
 
 @app.get("/why-clarity")
@@ -94,7 +115,7 @@ def article_5_mistakes():
 
 
 @app.post("/contact")
-def contact():
+def contact_submit():
     data = request.get_json(silent=True) or request.form
 
     honeypot = sanitize(data.get("website"), 120)

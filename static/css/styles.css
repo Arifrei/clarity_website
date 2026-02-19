@@ -72,7 +72,7 @@ main{
 .topProgress{
   position:fixed; top:0; left:0;
   height:2px; width:0%;
-  background: linear-gradient(90deg, var(--mustard), var(--slate));
+  background: var(--mustard);
   z-index:9999;
 }
 
@@ -81,7 +81,8 @@ main{
   position:fixed; top:0; left:0; right:0;
   height: var(--navH);
   z-index:2000;
-  background: var(--bg);
+  background: rgba(17,17,17,.88);
+  border-bottom: 1px solid rgba(31,58,95,.35);
   backdrop-filter: blur(14px);
 }
 
@@ -456,7 +457,7 @@ body.js-ready .mega{
 }
 .btn.primary{
   color: var(--ink);
-  background: var(--mustard);
+  background: linear-gradient(165deg, #111111 0%, #151821 58%, #111111 100%);
   box-shadow: 0 12px 30px rgba(199,160,8,.32);
 }
 .btn.primary:hover{
@@ -996,7 +997,7 @@ body.js-ready .testimonialsSection {
   color: #C7A008;
   letter-spacing: 0.14em;
   font-weight: 700;
-  animation: finalLabelReveal 1s ease-out 0.35s backwards;
+  animation: finalLabelReveal 0.78s ease-out 0.18s backwards;
   position: relative;
   display: inline-block;
 }
@@ -1019,7 +1020,7 @@ body.js-ready .testimonialsSection {
   line-height: 1.08;
   text-align: center;
   max-width: 18ch;
-  animation: finalTitleReveal 1.1s ease-out 0.5s backwards;
+  animation: finalTitleReveal 0.88s ease-out 0.24s backwards;
   position: relative;
 }
 
@@ -1113,7 +1114,7 @@ body.js-ready .testimonialsSection {
   font-weight: 900;
   letter-spacing: -0.04em;
   margin: 0 0 28px;
-  background: linear-gradient(135deg, var(--text) 0%, var(--mustard) 100%);
+  background: var(--mustard);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1218,7 +1219,7 @@ body.js-ready .testimonialsSection {
 }
 
 .qualifyCard.final-reveal .scenarioFinalContent{
-  animation: finalContentReveal 1.5s ease-out 0.3s backwards;
+  animation: finalContentReveal 1.05s ease-out 0.14s backwards;
   align-items: center;
   text-align: center;
 }
@@ -1262,7 +1263,7 @@ body.js-ready .testimonialsSection {
 }
 
 .qualifyCard.final-reveal .statsGrid {
-  animation: statsReveal 1.2s ease-out 1.6s backwards;
+  animation: statsReveal 0.78s ease-out 0.42s backwards;
   opacity: 1;
   transform: translateY(0);
 }
@@ -1270,7 +1271,7 @@ body.js-ready .testimonialsSection {
 @keyframes statsReveal {
   0% {
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(26px);
   }
   100% {
     opacity: 1;
@@ -1479,7 +1480,7 @@ body.js-ready .testimonialsSection {
   font-size: clamp(16px, 1.8vw, 20px);
   font-weight: 700;
   letter-spacing: 0.02em;
-  background: linear-gradient(135deg, #e8c770 0%, #dab55d 100%);
+  background: var(--mustard);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1493,11 +1494,7 @@ body.js-ready .testimonialsSection {
   left: 10%;
   right: 10%;
   height: 2px;
-  background: linear-gradient(90deg,
-    rgba(214,167,59,0.12),
-    rgba(214,167,59,0.6) 50%,
-    rgba(214,167,59,0.12)
-  );
+  background: var(--mustard);
   transform: translateY(-50%);
   box-shadow: 0 0 20px rgba(214,167,59,0.32);
   z-index: 1;
@@ -1530,10 +1527,7 @@ body.js-ready .testimonialsSection {
 .connector {
   width: 2px;
   height: 80px;
-  background: linear-gradient(180deg,
-    rgba(214,167,59,0.9),
-    rgba(214,167,59,0.45)
-  );
+  background: var(--mustard);
   transform: scaleY(var(--connector-scale, 0));
   transform-origin: top center;
   opacity: var(--connector-opacity, 0);
@@ -1632,7 +1626,7 @@ body.js-ready .testimonialsSection {
   font-size: clamp(28px, 6vw, 52px);
   font-weight: 900;
   letter-spacing: -0.05em;
-  background: linear-gradient(135deg, var(--accent4) 0%, var(--text) 60%);
+  background: var(--mustard);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1699,7 +1693,7 @@ body.js-ready .testimonialsSection {
   position: relative;
   width: 100%;
   max-width: 100vw;
-  padding: 40px var(--container-padding) 80px;
+  padding: 6px var(--container-padding) 80px;
   background: #000000;
   z-index: 65;
   overflow-x: hidden;
@@ -1728,7 +1722,7 @@ body.js-ready .testimonialsSection {
   font-size: clamp(28px, 6vw, 52px);
   letter-spacing: -0.05em;
   font-weight: 900;
-  background: linear-gradient(135deg, var(--mustard) 0%, var(--text) 70%);
+  background: var(--mustard);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1755,8 +1749,8 @@ body.js-ready .testimonialsSection {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(31,58,95,.16);
+  border: 1px solid rgba(31,58,95,.4);
   border-radius: 8px;
   text-decoration: none;
   color: var(--text);
@@ -1766,10 +1760,10 @@ body.js-ready .testimonialsSection {
 }
 
 .contactMethod:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(214, 167, 59, 0.4);
+  background: rgba(31,58,95,.28);
+  border-color: rgba(31,58,95,.7);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(214, 167, 59, 0.15);
+  box-shadow: 0 6px 16px rgba(31,58,95,.28);
 }
 
 .contactMethodIcon {
@@ -1827,7 +1821,7 @@ body.js-ready .testimonialsSection {
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: var(--mustard);
 }
 
 .contactForm{
@@ -2052,7 +2046,7 @@ body.js-ready .testimonialsSection {
   }
 
   .qualifySection {
-    min-height: 100vh;
+    min-height: auto;
     display: flex;
     align-items: center;
     padding-top: 0;
@@ -2098,7 +2092,7 @@ body.js-ready .testimonialsSection {
   }
 
   .qualifyCard.final-reveal .scenarioFinalLabel {
-    animation: finalLabelRevealMobile 1s ease-out 0.3s backwards;
+    animation: finalLabelRevealMobile 0.78s ease-out 0.18s backwards;
   }
 
   @keyframes finalLabelRevealMobile {
@@ -2113,7 +2107,7 @@ body.js-ready .testimonialsSection {
   }
 
   .qualifyCard.final-reveal .scenarioFinalTitle {
-    animation: finalTitleRevealMobile 1.1s ease-out 0.4s backwards;
+    animation: finalTitleRevealMobile 0.9s ease-out 0.24s backwards;
   }
 
   @keyframes finalTitleRevealMobile {
@@ -2128,7 +2122,7 @@ body.js-ready .testimonialsSection {
   }
 
   .qualifyCard.final-reveal .scenarioFinalContent {
-    animation: finalContentRevealMobile 1.1s ease-out 0.5s backwards;
+    animation: finalContentRevealMobile 0.96s ease-out 0.3s backwards;
   }
 
   @keyframes finalContentRevealMobile {
@@ -2143,7 +2137,7 @@ body.js-ready .testimonialsSection {
   }
 
   .qualifyCard.final-reveal .scenarioFinalActions {
-    animation: finalActionsRevealMobile 1s ease-out 0.7s backwards;
+    animation: finalActionsRevealMobile 0.86s ease-out 0.48s backwards;
   }
 
   @keyframes finalActionsRevealMobile {
@@ -2268,7 +2262,7 @@ body.js-ready .testimonialsSection {
   }
 
   .contactSection{
-    padding: 20px 0 100px;
+    padding: 2px 0 100px;
   }
 
   .contactMethods {
@@ -2371,7 +2365,7 @@ body.js-ready .testimonialsSection {
   font-weight: 900;
   letter-spacing: -0.03em;
   margin: 0 0 var(--spacing-md);
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent3) 100%);
+  background: var(--mustard);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2402,8 +2396,8 @@ body.js-ready .testimonialsSection {
 .articleCard {
   display: block;
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(31,58,95,.12);
+  border: 1px solid rgba(31,58,95,.26);
   border-radius: var(--radius2);
   padding: var(--spacing-md);
   transition: all 0.3s ease;
@@ -2419,16 +2413,16 @@ body.js-ready .testimonialsSection {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--accent3), var(--accent4));
+  background: var(--mustard);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .articleCard:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  border-color: rgba(31,58,95,.42);
+  background: rgba(31,58,95,.18);
+  box-shadow: 0 12px 40px rgba(20,32,52,.38);
 }
 
 .articleCard:hover::before {
@@ -2439,7 +2433,7 @@ body.js-ready .testimonialsSection {
   width: 64px;
   height: 64px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(31,58,95,.18), rgba(199,160,8,.18));
+  background: var(--mustard);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2857,7 +2851,7 @@ body.js-ready .testimonialsSection {
 
 .lightTheme .articleHeroTitle {
   color: #1a1a1a;
-  background: linear-gradient(135deg, #1a1a1a 0%, #1F3A5F 100%);
+  background: var(--mustard);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

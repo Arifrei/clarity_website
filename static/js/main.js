@@ -85,8 +85,8 @@
   let PHASE2_DIST = 320; // qualify slide-in/pin
   let PHASE3_DIST = 520; // scenario cycling
   let PHASE4_DIST = 520; // lift together
-  const SCENARIO_DWELL_DIST = 220; // extra scroll distance between scenario switches for dwell
-  const FINAL_HOLD_DIST = 2400; // extra dwell to keep final state visible longer (doubled for better UX)
+  const SCENARIO_DWELL_DIST = 90; // minimal dwell between scenario switches
+  const FINAL_HOLD_DIST = 120; // near-immediate handoff to workflow
 
   // WORKFLOW (Phase 5) - tweak points
   let WORKFLOW_DIST = 520; // scroll distance for workflow animation
@@ -112,6 +112,7 @@
   let testimonialsContainerHeight = 0;
   let testimonialsVisibleWidth = 0;
   let testimonialsSpacerHeight = 0;
+  let testimonialsActivePinTop = 0;
 
   let navH = 74;
   let translateMax = 0;
@@ -174,7 +175,7 @@
     const scenarioCount = Math.max(1, scenarios.length || 1);
     const basePhase3 = isMobile
       ? 0  // No scenario cycling in hero phase on mobile
-      : Math.max(340, Math.min(620, vh * 0.55));
+      : Math.max(220, Math.min(360, vh * 0.32));
     const dwellTotal = isMobile
       ? 0  // No dwell on mobile, qualify is separate
       : SCENARIO_DWELL_DIST * Math.max(0, scenarioCount - 1);
@@ -184,8 +185,8 @@
     PHASE3_DIST = basePhase3 + dwellTotal + holdDist;
 
     PHASE4_DIST = isMobile
-      ? vh * 0.15  // Quick lift on mobile
-      : Math.max(420, Math.min(720, vh * 0.65));
+      ? vh * 0.06  // Very quick lift on mobile
+      : Math.max(100, Math.min(220, vh * 0.2));
 
     // Workflow (Phase 5) responsive distance - tweak point
     WORKFLOW_DIST = Math.max(420, Math.min(720, vh * 0.65));
@@ -336,7 +337,8 @@
         Math.min(1400, getViewportHeight() * 1.1)
       );
 
-      testimonialsPinOffset = getViewportHeight() * 0.17;
+      // Pin lower in the viewport so it engages closer to the page middle.
+      testimonialsPinOffset = getViewportHeight() * 0.32;
       testimonialsPinTop = navH + testimonialsPinOffset;
 
       // Calculate the scroll position where the container's top edge
@@ -348,11 +350,13 @@
 
       if (testimonialsSpacer) {
         // Spacer must compensate for container leaving flow when it goes fixed
-        // Plus provide scroll room for animation and unpinning
-        const containerHeight = testimonialsContainerHeight || 0;
-        const unpinBuffer = 0; // No buffer for very tight spacing
+        // Plus provide scroll room for animation/unpinning.
+        // Keep only a short post-pin lead-in so contact starts appearing
+        // as soon as testimonials begin moving up.
+        const scrollRoom = TESTIMONIALS_PIN_DIST;
+        const postPinLeadIn = 0;
         testimonialsSpacerHeight = testimonialsPinEnabled
-          ? containerHeight + TESTIMONIALS_PIN_DIST + unpinBuffer
+          ? scrollRoom + postPinLeadIn
           : 0;
         testimonialsSpacer.style.height = `${testimonialsSpacerHeight}px`;
       }
@@ -445,9 +449,14 @@
       // Set spacer height to account for slide-in + scenario cycling + final hold
       const qualifySpacer = document.getElementById("qualifySpacer");
       if (qualifySpacer) {
-        const finalHoldDist = 1300; // Spacer height (smaller than hold for tighter gap)
+        const finalHoldDist = 120; // Near-immediate handoff to workflow
         const totalScrollDist = slideInDist + qualifyMobileScrollDist + finalHoldDist;
         qualifySpacer.style.height = `${totalScrollDist}px`;
+      }
+      const workflowSection = document.getElementById("workflow");
+      if (workflowSection) {
+        // Mobile-only breathing room after qualify handoff.
+        workflowSection.style.marginTop = "28px";
       }
     } else {
       qualifyGeometry = { left: 0, top: 0, width: 0 };
@@ -563,6 +572,8 @@
       let activeIndex = -1;
 
       if (qualifyPinEnabled) {
+        // Desktop keeps stylesheet transitions.
+        qualifyCard.style.transition = "";
         const slideX = lerp(qualifyGeometry.width * 0.35, 0, qualifyP);
         const opacity = clamp(qualifyP * 1.1, 0, 1);
         const yOffset = liftT - postLift;
@@ -627,13 +638,14 @@
           }
         }
       } else if (qualifyMobilePinEnabled) {
+        // Mobile pinning is scroll-driven; disable card transition to prevent lag/catch-up.
+        qualifyCard.style.transition = "none";
         // Mobile: independent pinning phase with slide-in animation
         const slideInDist = 200; // Distance for slide-in animation
         const slideInStart = qualifyMobilePinStart - slideInDist;
 
-        // Add buffer distance to hold final reveal before scrolling up
-        // Provides time for stats animation to complete (1.6s delay + 1.2s duration = 2.8s total)
-        const finalHoldDist = 1600; // Hold final reveal in place before scrolling up
+        // Briefly hold final reveal before scrolling up to workflow.
+        const finalHoldDist = 140; // Hold very briefly, then hand off to workflow
         const scrollUpStart = qualifyMobilePinEnd + finalHoldDist;
 
         const beforeSlide = y < slideInStart;
@@ -742,6 +754,8 @@
           }
         }
       } else {
+        // Restore default transitions outside the pinned/mobile-scroll state.
+        qualifyCard.style.transition = "";
         // Fallback: normal flow
         const rect = qualifySection.getBoundingClientRect();
         const sectionTop = rect.top + y;
@@ -884,6 +898,7 @@
         testimonialsContainer.style.width = "";
         testimonialsContainer.style.zIndex = "";
         testimonialsTrack.style.transform = "";
+        testimonialsActivePinTop = testimonialsPinTop;
         return;
       }
 
@@ -900,6 +915,7 @@
         testimonialsContainer.style.transition = "";
         testimonialsTrack.style.transform = "";
         testimonialsSection.classList.remove("pinned");
+        testimonialsActivePinTop = testimonialsPinTop;
         return;
       }
 
@@ -918,37 +934,23 @@
           // At the moment of pinning, capture the exact current position to prevent jump
           const currentRect = testimonialsContainer.getBoundingClientRect();
           const exactTop = currentRect.top;
+          testimonialsActivePinTop = exactTop;
 
           testimonialsContainer.style.position = "fixed";
           testimonialsContainer.style.left = `${leftPos}px`;
           testimonialsContainer.style.right = "";
-          testimonialsContainer.style.top = `${exactTop}px`;
+          testimonialsContainer.style.top = `${testimonialsActivePinTop}px`;
           testimonialsContainer.style.transform = "";
           testimonialsContainer.style.overflow = "hidden";
           testimonialsContainer.style.width = `${testimonialsContainerWidth}px`;
           testimonialsContainer.style.zIndex = "60";
           testimonialsSection.classList.add("pinned");
           testimonialsTrack.style.transform = `translateX(${translateX}px)`;
-
-          // Smoothly transition to the target pin position
-          if (Math.abs(exactTop - testimonialsPinTop) > 2) {
-            requestAnimationFrame(() => {
-              if (testimonialsContainer && testimonialsSection.classList.contains("pinned")) {
-                testimonialsContainer.style.transition = "top 0.2s ease-out";
-                testimonialsContainer.style.top = `${testimonialsPinTop}px`;
-                setTimeout(() => {
-                  if (testimonialsContainer) {
-                    testimonialsContainer.style.transition = "";
-                  }
-                }, 200);
-              }
-            });
-          }
         } else {
           testimonialsContainer.style.position = "fixed";
           testimonialsContainer.style.left = `${leftPos}px`;
           testimonialsContainer.style.right = "";
-          testimonialsContainer.style.top = `${testimonialsPinTop}px`;
+          testimonialsContainer.style.top = `${testimonialsActivePinTop}px`;
           testimonialsContainer.style.transform = "";
           testimonialsContainer.style.overflow = "hidden";
           testimonialsContainer.style.width = `${testimonialsContainerWidth}px`;
@@ -962,7 +964,7 @@
         testimonialsContainer.style.position = "fixed";
         testimonialsContainer.style.left = `${leftPos}px`;
         testimonialsContainer.style.right = "";
-        testimonialsContainer.style.top = `${testimonialsPinTop}px`;
+        testimonialsContainer.style.top = `${testimonialsActivePinTop}px`;
         testimonialsContainer.style.transform = `translateY(${-postTestimonials}px)`;
         testimonialsContainer.style.overflow = "hidden";
         testimonialsContainer.style.width = `${testimonialsContainerWidth}px`;
@@ -1110,18 +1112,36 @@
   });
 })();
 
-// Smooth scroll for data-target buttons (hero/nav)
+// Instant jump for data-target buttons (hero/nav)
 (() => {
-  const prefersReducedMotionQuery = window.matchMedia
-    ? window.matchMedia("(prefers-reduced-motion: reduce)")
-    : { matches: false };
+  const normalizePath = (p) => {
+    if (!p) return "/";
+    let path = p.split("?")[0].split("#")[0] || "/";
+    if (path !== "/" && path.endsWith("/")) path = path.slice(0, -1);
+    if (path.endsWith("/index")) path = path.slice(0, -6) || "/";
+    if (path.endsWith("/index.html")) path = path.slice(0, -11) || "/";
+    if (path.endsWith(".html")) path = path.slice(0, -5) || "/";
+    return path || "/";
+  };
 
-  const easeInOutQuad = (t) =>
-    t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  const sectionToPath = {
+    home: "/",
+    workflow: "/workflow",
+    contact: "/contact",
+  };
+
+  const pathToSection = {
+    "/": "home",
+    "/home": "home",
+    "/workflow": "workflow",
+    "/contact": "contact",
+  };
+
+  const getSectionForPath = (pathname) => pathToSection[normalizePath(pathname)] || null;
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
-    if (!el) return;
+    if (!el) return false;
 
     const navHeight =
       parseFloat(
@@ -1131,30 +1151,29 @@
     // Special-case workflow: jump to end of its pinned animation/hold
     let targetY =
       el.getBoundingClientRect().top + window.scrollY - navHeight - 10;
+    if (id === "contact") {
+      const docHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
+      targetY = Math.max(0, docHeight - window.innerHeight);
+    }
     if (id === "workflow" && typeof window !== "undefined") {
       const stored = window.__workflowScrollTarget;
       if (typeof stored === "number" && !Number.isNaN(stored)) {
         targetY = stored;
       }
     }
-    const startY = window.scrollY;
-    const dist = targetY - startY;
-    const duration = 650; // balanced: not too fast, not too slow
-    const startTime = performance.now();
+    window.scrollTo(0, targetY);
+    return true;
+  };
 
-    if (prefersReducedMotionQuery.matches) {
-      window.scrollTo(0, targetY);
-      return;
-    }
-
-    const step = (now) => {
-      const t = Math.min(1, (now - startTime) / duration);
-      const eased = easeInOutQuad(t);
-      window.scrollTo(0, startY + dist * eased);
-      if (t < 1) requestAnimationFrame(step);
-    };
-
-    requestAnimationFrame(step);
+  const updateHistoryForSection = (id) => {
+    const nextPath = sectionToPath[id];
+    if (!nextPath || !window.history || !window.history.pushState) return;
+    const currentPath = normalizePath(window.location.pathname);
+    if (currentPath === normalizePath(nextPath)) return;
+    window.history.pushState({ section: id }, "", nextPath);
   };
 
   document.querySelectorAll("[data-target]").forEach((btn) => {
@@ -1162,10 +1181,44 @@
       const target = btn.getAttribute("data-target");
       if (!target) return;
       const targetEl = document.getElementById(target);
-      // On non-home pages, allow normal navigation for /# anchors.
+      // If this page does not contain the target section, allow normal link navigation.
       if (!targetEl) return;
       event.preventDefault();
-      scrollToSection(target);
+      const didScroll = scrollToSection(target);
+      if (didScroll && btn.hasAttribute("href")) {
+        updateHistoryForSection(target);
+      }
+    });
+  });
+
+  const applySectionFromPath = () => {
+    const bodySection = (document.body.dataset.initialSection || "").trim();
+    const section = bodySection || getSectionForPath(window.location.pathname);
+    if (!section) return;
+    if (section === "home") {
+      window.scrollTo(0, 0);
+      return;
+    }
+    scrollToSection(section);
+  };
+
+  if (document.readyState === "complete") {
+    requestAnimationFrame(() => applySectionFromPath());
+  } else {
+    window.addEventListener("load", () => {
+      requestAnimationFrame(() => applySectionFromPath());
+    });
+  }
+
+  window.addEventListener("popstate", () => {
+    const section = getSectionForPath(window.location.pathname);
+    if (!section) return;
+    requestAnimationFrame(() => {
+      if (section === "home") {
+        window.scrollTo(0, 0);
+        return;
+      }
+      scrollToSection(section);
     });
   });
 })();
@@ -1215,9 +1268,7 @@
   const sectionButtons = allNavButtons.filter((btn) =>
     btn.hasAttribute("data-target")
   );
-  const pageButtons = allNavButtons.filter(
-    (btn) => !btn.hasAttribute("data-target") && btn.getAttribute("href")
-  );
+  const pageButtons = allNavButtons.filter((btn) => btn.getAttribute("href"));
 
   const sections = sectionButtons
     .map((btn) => {
@@ -1288,7 +1339,8 @@
           current.startsWith("/article-") ||
           current.startsWith("/article/");
         const isWhyClarityBtn = path === "/why-clarity";
-        if ((isArticlePage && isWhyClarityBtn) || path === current || (path !== "/" && current.startsWith(path))) {
+        const isHomeAlias = current === "/home" && path === "/";
+        if ((isArticlePage && isWhyClarityBtn) || isHomeAlias || path === current || (path !== "/" && current.startsWith(path))) {
           matchedBtn = btn;
         }
       } catch (err) {
@@ -1325,6 +1377,7 @@
 
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", updateActive);
+  window.addEventListener("popstate", updateActive);
   allNavButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       // For same-page anchors, section scroll will update active; for full-page links, set immediately
