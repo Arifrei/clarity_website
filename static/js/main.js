@@ -788,6 +788,8 @@
       let before = false;
       let during = false;
       let hold = false;
+      let postWorkflow = 0;
+      let keepFixedAfter = false;
       let start, endAnim, endHold;
 
       if (!workflowPinEnabled) {
@@ -807,6 +809,8 @@
         before = y < start;
         during = y >= start && y < endAnim;
         hold = y >= endAnim && y < endHold;
+        postWorkflow = Math.max(0, y - endHold);
+        keepFixedAfter = !before && !during && !hold && postWorkflow < (workflow.offsetHeight || 0);
 
         const scrollProgress = before ? 0 : y - start;
         workflowP = clamp(scrollProgress / WORKFLOW_DIST, 0, 1);
@@ -814,7 +818,7 @@
         renderWorkflow(workflowP, false);
       }
 
-      const workflowIsPinned = workflowPinEnabled && (during || hold);
+      const workflowIsPinned = workflowPinEnabled && (during || hold || keepFixedAfter);
       workflow.classList.toggle("workflow-pinned", workflowIsPinned);
 
       // Pin during animation, then return to flow with offset
@@ -828,6 +832,16 @@
         workflow.style.right = "0";
         workflow.style.top = `${workflowPinTop}px`;
         workflow.style.transform = "none";
+      } else if (workflowPinEnabled && keepFixedAfter) {
+        // Smooth unpin: keep fixed briefly and translate up before returning to flow.
+        if (workflowSpacer) {
+          workflowSpacer.style.height = `${workflow.offsetHeight + WORKFLOW_DIST + WORKFLOW_HOLD_DIST}px`;
+        }
+        workflow.style.position = "fixed";
+        workflow.style.left = "0";
+        workflow.style.right = "0";
+        workflow.style.top = `${workflowPinTop}px`;
+        workflow.style.transform = `translateY(${-postWorkflow}px)`;
       } else if (workflowPinEnabled && !before) {
         // After pin: reduce spacer and translate workflow
         if (workflowSpacer) {
@@ -1147,6 +1161,9 @@
     btn.addEventListener("click", (event) => {
       const target = btn.getAttribute("data-target");
       if (!target) return;
+      const targetEl = document.getElementById(target);
+      // On non-home pages, allow normal navigation for /# anchors.
+      if (!targetEl) return;
       event.preventDefault();
       scrollToSection(target);
     });
@@ -1266,7 +1283,10 @@
         const url = new URL(href, window.location.origin);
         const path = normalizePath(url.pathname);
         // Special case: article pages belong to Why Clarity section
-        const isArticlePage = current.startsWith("/articles/");
+        const isArticlePage =
+          current.startsWith("/articles/") ||
+          current.startsWith("/article-") ||
+          current.startsWith("/article/");
         const isWhyClarityBtn = path === "/why-clarity";
         if ((isArticlePage && isWhyClarityBtn) || path === current || (path !== "/" && current.startsWith(path))) {
           matchedBtn = btn;
