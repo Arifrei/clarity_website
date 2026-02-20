@@ -337,8 +337,8 @@
         Math.min(1400, getViewportHeight() * 1.1)
       );
 
-      // Pin lower in the viewport so it engages closer to the page middle.
-      testimonialsPinOffset = getViewportHeight() * 0.32;
+      // Pin a bit higher in the viewport.
+      testimonialsPinOffset = getViewportHeight() * 0.24;
       testimonialsPinTop = navH + testimonialsPinOffset;
 
       // Calculate the scroll position where the container's top edge

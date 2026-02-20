@@ -1646,29 +1646,48 @@ body.js-ready .testimonialsSection {
   width: min(400px, calc(33vw + 40px));
   min-width: 280px;
   max-width: 420px;
+  height: 320px;
   padding: 28px 26px;
   border-radius: 18px;
   border: none;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.16);
   background: #fdfcf8;
   color: #2c2c2c;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .testimonialCard .quote {
-  margin: 0 0 18px;
-  font-size: clamp(16px, 2.8vw, 20px);
-  line-height: 1.65;
+  margin: 0;
+  font-size: clamp(14px, 2.2vw, 17px);
+  line-height: 1.56;
   font-weight: 600;
   letter-spacing: -0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 8;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .testimonialCard .attribution {
-  margin: 0;
+  margin: auto 0 0;
+  position: relative;
+  padding-left: 12px;
   font-size: 14px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   font-weight: 600;
   color: rgba(31,58,95,.8);
+}
+
+.testimonialCard .attribution::before {
+  content: "|";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--slate);
+  font-weight: 900;
 }
 
 /* Dynamic will-change - enabled on all devices for smooth animations */
@@ -2259,6 +2278,14 @@ body.js-ready .testimonialsSection {
     flex: 0 0 auto;
     width: min(320px, calc(85vw));
     min-width: 280px;
+    height: 340px;
+    padding: 22px 20px;
+  }
+
+  .testimonialCard .quote {
+    -webkit-line-clamp: 10;
+    font-size: clamp(13px, 4vw, 16px);
+    line-height: 1.5;
   }
 
   .contactSection{
