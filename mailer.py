@@ -22,6 +22,7 @@ def send_contact_email(payload: Dict[str, Any], meta: Dict[str, Any]) -> None:
     user = os.getenv("SMTP_USER")
     password = os.getenv("SMTP_PASS")
     to_email = os.getenv("CONTACT_TO_EMAIL")
+    bcc_email = os.getenv("CONTACT_BCC_EMAIL")
     from_email = os.getenv("CONTACT_FROM_EMAIL")
 
     missing = [
@@ -40,10 +41,14 @@ def send_contact_email(payload: Dict[str, Any], meta: Dict[str, Any]) -> None:
     if missing:
         raise EmailConfigError(f"Missing SMTP configuration: {', '.join(missing)}")
 
+    client_name = " ".join((payload.get("name") or "").split()) or "Unknown Client"
+
     msg = EmailMessage()
-    msg["Subject"] = "New Contact Form Submission - Clarity Solutions"
+    msg["Subject"] = f"New Form Submission - {client_name}"
     msg["From"] = from_email
     msg["To"] = to_email
+    if bcc_email:
+        msg["Bcc"] = bcc_email
     if payload.get("email"):
         msg["Reply-To"] = payload["email"]
 
