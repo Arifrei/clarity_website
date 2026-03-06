@@ -1138,6 +1138,11 @@
   };
 
   const getSectionForPath = (pathname) => pathToSection[normalizePath(pathname)] || null;
+  const getSectionForHash = (hash) => {
+    const normalized = (hash || "").replace(/^#/, "").trim().toLowerCase();
+    return sectionToPath[normalized] ? normalized : null;
+  };
+  const isMobileViewport = () => window.innerWidth <= 900;
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
@@ -1151,7 +1156,7 @@
     // Special-case workflow: jump to end of its pinned animation/hold
     let targetY =
       el.getBoundingClientRect().top + window.scrollY - navHeight - 10;
-    if (id === "contact") {
+    if (id === "contact" && !isMobileViewport()) {
       const docHeight = Math.max(
         document.body.scrollHeight,
         document.documentElement.scrollHeight
@@ -1192,8 +1197,10 @@
   });
 
   const applySectionFromPath = () => {
+    const hashSection = getSectionForHash(window.location.hash);
     const bodySection = (document.body.dataset.initialSection || "").trim();
-    const section = bodySection || getSectionForPath(window.location.pathname);
+    const section =
+      hashSection || bodySection || getSectionForPath(window.location.pathname);
     if (!section) return;
     if (section === "home") {
       window.scrollTo(0, 0);
@@ -1211,7 +1218,9 @@
   }
 
   window.addEventListener("popstate", () => {
-    const section = getSectionForPath(window.location.pathname);
+    const section =
+      getSectionForHash(window.location.hash) ||
+      getSectionForPath(window.location.pathname);
     if (!section) return;
     requestAnimationFrame(() => {
       if (section === "home") {
