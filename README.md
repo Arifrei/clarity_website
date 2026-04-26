@@ -6,13 +6,16 @@
   - `SMTP_PORT` – SMTP port (e.g., `587` for STARTTLS or `465` for SSL)
   - `SMTP_USER` / `SMTP_PASS` – credentials for the SMTP account
   - `CONTACT_TO_EMAIL` – the destination inbox for contact form submissions
-  - `CONTACT_FROM_EMAIL` – the from/sender address used on outgoing mail
+  - `CONTACT_FROM_NAME` – optional sender display name; defaults to `Clarity Solutions`
+  - `CONTACT_FROM_EMAIL` – the from/sender address used on outgoing mail; defaults to `sales@claritysolutionsco.com`
+  - `CONTACT_REPLY_TO_EMAIL` – optional override for where replies to the auto-response should go; defaults to `CONTACT_TO_EMAIL`
 
 ## Running locally
 1) Install dependencies (Flask only): `pip install flask`
 2) Export the env vars above (use a throwaway inbox or Mailtrap in dev).
 3) Start the app: `python app.py`
 4) Visit `http://localhost:5001` and submit the contact form. A JSON success response will appear and an email should be delivered.
+   The submission now sends the internal notification right away and the automatic reply to the submitter 5 minutes later.
 
 ### Safe dev email (Mailtrap)
 - Create a Mailtrap inbox and copy its SMTP host, port, user, and password into the env vars.

@@ -1444,6 +1444,7 @@
         name: (formData.get("name") || "").trim(),
         email: (formData.get("email") || "").trim(),
         company: (formData.get("company") || "").trim(),
+        phone: (formData.get("phone") || "").trim(),
         message: (formData.get("message") || "").trim(),
         website: (formData.get("website") || "").trim(),
       };
@@ -1458,11 +1459,11 @@
         return;
       }
 
-      setStatus("Sending...");
+      setStatus("Submitting...");
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.dataset.originalText = submitBtn.textContent;
-        submitBtn.textContent = "Sending...";
+        submitBtn.textContent = "Submitting...";
       }
 
       try {
@@ -1478,10 +1479,10 @@
         if (!res.ok || !data.success) {
           throw new Error(data.message || "Something went wrong. Please try again.");
         }
-        setStatus("Thanks - your note is on the way.", "success");
+        setStatus(data.message || "Thanks - we received your message.", "success");
         form.reset();
       } catch (err) {
-        setStatus(err.message || "Could not send message right now.", "error");
+        setStatus(err.message || "Could not submit your message right now.", "error");
       } finally {
         if (submitBtn) {
           submitBtn.disabled = false;
