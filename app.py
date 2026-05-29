@@ -5,8 +5,9 @@ import threading
 import time
 import json
 from datetime import datetime, timedelta, timezone
+from urllib.parse import urlparse
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, abort, jsonify, redirect, render_template, request
 
 
 def _load_env_from_file() -> None:
@@ -48,10 +49,22 @@ AUTO_REPLY_RETRY_DELAY_SECONDS = 5 * 60
 RATE_LIMIT_WINDOW = 15 * 60  # 15 minutes
 RATE_LIMIT_MAX = 5
 AUTO_REPLY_DB_PATH = os.path.join(app.root_path, "auto_reply_jobs.sqlite3")
+AD_TRACKING_DB_PATH = os.path.join(app.root_path, "ad_clicks.sqlite3")
 auto_reply_scheduler_lock = threading.Lock()
 auto_reply_scheduler_started = False
 rate_memory = {}
 HOME_SECTIONS = {"home", "workflow", "contact"}
+AD_TRACKING_TAGS = {
+    "a": {
+        "label": "OMI Status",
+        "destination": "/?utm_source=whatsapp&utm_medium=group&utm_campaign=ads&utm_content=omi-status",
+    },
+    "b": {
+        "label": "Jewish Networking Group",
+        "destination": "/?utm_source=whatsapp&utm_medium=group&utm_campaign=ads&utm_content=jewish-networking-group",
+    },
+}
+KNOWN_AD_UTM_CONTENT = {"omi-status", "jewish-networking-group"}
 
 
 def sanitize(value: str, max_len: int) -> str:
@@ -71,6 +84,49 @@ def get_client_ip() -> str:
     return request.remote_addr or "unknown"
 
 
+def _slug_source(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return slug[:80] or "unknown"
+
+
+def _get_external_referrer_host() -> str:
+    referrer = request.headers.get("Referer", "")
+    if not referrer:
+        return ""
+
+    referrer_host = urlparse(referrer).netloc.lower()
+    current_host = (request.host or "").lower()
+    if not referrer_host or referrer_host == current_host:
+        return ""
+    return referrer_host
+
+
+def _identify_inbound_source() -> tuple[str, str]:
+    utm_source = sanitize(request.args.get("utm_source"), 120)
+    utm_medium = sanitize(request.args.get("utm_medium"), 120)
+    utm_campaign = sanitize(request.args.get("utm_campaign"), 120)
+    utm_content = sanitize(request.args.get("utm_content"), 120)
+
+    if utm_source:
+        label_parts = [utm_source, utm_medium, utm_campaign, utm_content]
+        label = "UTM: " + " / ".join(part for part in label_parts if part)
+        tag_parts = [utm_source, utm_medium, utm_campaign, utm_content]
+        return "utm-" + _slug_source("-".join(part for part in tag_parts if part)), label
+
+    referrer_host = _get_external_referrer_host()
+    if referrer_host:
+        return "ref-" + _slug_source(referrer_host), f"Referral: {referrer_host}"
+
+    return "unnamed-source", "Unnamed source"
+
+
+def _is_known_ad_redirect_followup() -> bool:
+    return (
+        request.args.get("utm_campaign") == "ads"
+        and request.args.get("utm_content") in KNOWN_AD_UTM_CONTENT
+    )
+
+
 def within_rate_limit(ip: str) -> bool:
     now = time.time()
     window = rate_memory.get(ip, [])
@@ -87,6 +143,220 @@ def _get_auto_reply_conn() -> sqlite3.Connection:
     conn = sqlite3.connect(AUTO_REPLY_DB_PATH, timeout=30, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def _get_ad_tracking_conn() -> sqlite3.Connection:
+    conn = sqlite3.connect(AD_TRACKING_DB_PATH, timeout=30, check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _init_ad_tracking_store() -> None:
+    with _get_ad_tracking_conn() as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS ad_clicks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tag TEXT NOT NULL,
+                label TEXT NOT NULL,
+                destination_url TEXT NOT NULL,
+                clicked_at TEXT NOT NULL,
+                ip_address TEXT NOT NULL,
+                user_agent TEXT NOT NULL,
+                referrer TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_ad_clicks_tag_date
+            ON ad_clicks (tag, clicked_at)
+            """
+        )
+        conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_ad_clicks_ip
+            ON ad_clicks (ip_address)
+            """
+        )
+
+
+def _record_ad_click(tag: str, config: dict) -> None:
+    _init_ad_tracking_store()
+    with _get_ad_tracking_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO ad_clicks (
+                tag,
+                label,
+                destination_url,
+                clicked_at,
+                ip_address,
+                user_agent,
+                referrer
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                tag,
+                config["label"],
+                config["destination"],
+                datetime.now(timezone.utc).isoformat(),
+                get_client_ip(),
+                request.headers.get("User-Agent", "unknown")[:500],
+                request.headers.get("Referer", "")[:500],
+            ),
+        )
+
+
+def _record_inbound_page_visit() -> None:
+    if _is_known_ad_redirect_followup():
+        return
+
+    tag, label = _identify_inbound_source()
+    _init_ad_tracking_store()
+    with _get_ad_tracking_conn() as conn:
+        conn.execute(
+            """
+            INSERT INTO ad_clicks (
+                tag,
+                label,
+                destination_url,
+                clicked_at,
+                ip_address,
+                user_agent,
+                referrer
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                tag,
+                label,
+                request.full_path.rstrip("?")[:500],
+                datetime.now(timezone.utc).isoformat(),
+                get_client_ip(),
+                request.headers.get("User-Agent", "unknown")[:500],
+                request.headers.get("Referer", "")[:500],
+            ),
+        )
+
+
+def _row_dicts(rows: list[sqlite3.Row]) -> list[dict]:
+    return [dict(row) for row in rows]
+
+
+def _get_ad_click_report() -> dict:
+    _init_ad_tracking_store()
+    with _get_ad_tracking_conn() as conn:
+        totals_by_tag = {
+            row["tag"]: dict(row)
+            for row in conn.execute(
+                """
+                SELECT
+                    tag,
+                    label,
+                    COUNT(*) AS total_clicks,
+                    COUNT(DISTINCT ip_address) AS unique_ips,
+                    MIN(clicked_at) AS first_click,
+                    MAX(clicked_at) AS last_click
+                FROM ad_clicks
+                GROUP BY tag, label
+                ORDER BY tag
+                """
+            ).fetchall()
+        }
+
+        tag_totals = []
+        for tag, config in AD_TRACKING_TAGS.items():
+            row = totals_by_tag.get(tag)
+            tag_totals.append(
+                row
+                or {
+                    "tag": tag,
+                    "label": config["label"],
+                    "total_clicks": 0,
+                    "unique_ips": 0,
+                    "first_click": None,
+                    "last_click": None,
+                }
+            )
+        tag_totals.extend(
+            row
+            for tag, row in sorted(totals_by_tag.items(), key=lambda item: item[1]["label"].lower())
+            if tag not in AD_TRACKING_TAGS
+        )
+
+        daily_totals = _row_dicts(
+            conn.execute(
+                """
+                SELECT
+                    substr(clicked_at, 1, 10) AS click_date,
+                    tag,
+                    label,
+                    COUNT(*) AS total_clicks,
+                    COUNT(DISTINCT ip_address) AS unique_ips
+                FROM ad_clicks
+                GROUP BY click_date, tag, label
+                ORDER BY click_date DESC, tag
+                """
+            ).fetchall()
+        )
+        ip_totals = _row_dicts(
+            conn.execute(
+                """
+                SELECT
+                    ip_address,
+                    COUNT(*) AS total_clicks,
+                    COUNT(DISTINCT tag) AS sources_count,
+                    GROUP_CONCAT(DISTINCT label) AS sources,
+                    MIN(clicked_at) AS first_click,
+                    MAX(clicked_at) AS last_click
+                FROM ad_clicks
+                GROUP BY ip_address
+                ORDER BY total_clicks DESC, last_click DESC
+                """
+            ).fetchall()
+        )
+        ip_by_tag = _row_dicts(
+            conn.execute(
+                """
+                SELECT
+                    tag,
+                    label,
+                    ip_address,
+                    COUNT(*) AS total_clicks,
+                    MIN(clicked_at) AS first_click,
+                    MAX(clicked_at) AS last_click
+                FROM ad_clicks
+                GROUP BY tag, label, ip_address
+                ORDER BY tag, total_clicks DESC, last_click DESC
+                """
+            ).fetchall()
+        )
+        recent_clicks = _row_dicts(
+            conn.execute(
+                """
+                SELECT
+                    clicked_at,
+                    tag,
+                    label,
+                    ip_address,
+                    user_agent,
+                    referrer
+                FROM ad_clicks
+                ORDER BY clicked_at DESC
+                LIMIT 100
+                """
+            ).fetchall()
+        )
+
+    return {
+        "tag_totals": tag_totals,
+        "daily_totals": daily_totals,
+        "ip_totals": ip_totals,
+        "ip_by_tag": ip_by_tag,
+        "recent_clicks": recent_clicks,
+    }
 
 
 def _init_auto_reply_store() -> None:
@@ -255,10 +525,12 @@ def _queue_contact_submission(payload: dict, meta: dict) -> None:
 
 @app.get("/")
 def index():
+    _record_inbound_page_visit()
     return render_template("index.html", initial_section="home")
 
 
 def render_home_section(section: str):
+    _record_inbound_page_visit()
     section_name = section if section in HOME_SECTIONS else "home"
     return render_template("index.html", initial_section=section_name)
 
@@ -278,23 +550,49 @@ def contact_section():
     return render_home_section("contact")
 
 
+@app.get("/<tag>")
+def ad_tracking_redirect(tag):
+    tag = tag.lower()
+    config = AD_TRACKING_TAGS.get(tag)
+    if config is None:
+        abort(404)
+
+    _record_ad_click(tag, config)
+    response = redirect(config["destination"], code=302)
+    response.headers["Cache-Control"] = "no-store, max-age=0"
+    return response
+
+
+@app.get("/ad-clicks")
+def ad_clicks_dashboard():
+    return render_template(
+        "ad-clicks.html",
+        report=_get_ad_click_report(),
+        tracking_tags=AD_TRACKING_TAGS,
+    )
+
+
 @app.get("/why-clarity")
 def why_clarity():
+    _record_inbound_page_visit()
     return render_template("why-clarity.html")
 
 
 @app.get("/articles/diy-software")
 def article_diy_software():
+    _record_inbound_page_visit()
     return render_template("article-diy-software.html")
 
 
 @app.get("/articles/custom-vs-ready")
 def article_custom_vs_ready():
+    _record_inbound_page_visit()
     return render_template("article-custom-vs-ready.html")
 
 
 @app.get("/articles/5-mistakes")
 def article_5_mistakes():
+    _record_inbound_page_visit()
     return render_template("article-5-mistakes.html")
 
 
@@ -347,6 +645,7 @@ def contact_submit():
 
 
 _ensure_auto_reply_scheduler()
+_init_ad_tracking_store()
 
 
 if __name__ == "__main__":

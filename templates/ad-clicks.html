@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="trackingPage" aria-label="Ad click tracking">
+  <div class="trackingInner">
+    <div class="trackingHeader">
+      <div>
+        <p class="trackingEyebrow">Ad tracking</p>
+        <h1>Click report</h1>
+        <p class="trackingNote">Timestamps are recorded in UTC. Links use temporary redirects and keep a server-side click log.</p>
+      </div>
+      <div class="trackingLinks" aria-label="Tracking links">
+        {% for tag, config in tracking_tags.items() %}
+          <a href="/{{ tag }}" target="_blank" rel="noopener noreferrer">/{{ tag }} - {{ config.label }}</a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="trackingStats">
+      {% for row in report.tag_totals %}
+        <article class="trackingStat">
+          <div class="trackingStatLabel">
+            {% if row.tag in tracking_tags %}/{{ row.tag }} - {% endif %}{{ row.label }}
+          </div>
+          <div class="trackingStatNumber">{{ row.unique_ips }}</div>
+          <div class="trackingStatMeta">{{ row.total_clicks }} click{% if row.total_clicks != 1 %}s{% endif %}</div>
+        </article>
+      {% endfor %}
+    </div>
+
+    <section class="trackingPanel">
+      <h2>Clicks By Date</h2>
+      <div class="trackingTableWrap">
+        <table class="trackingTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Source</th>
+              <th>Clicks</th>
+              <th>Unique IPs</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in report.daily_totals %}
+              <tr>
+                <td>{{ row.click_date }}</td>
+                <td>{% if row.tag in tracking_tags %}/{{ row.tag }} - {% endif %}{{ row.label }}</td>
+                <td>{{ row.total_clicks }}</td>
+                <td>{{ row.unique_ips }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="4">No clicks recorded yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="trackingPanel">
+      <h2>IP Breakdown</h2>
+      <div class="trackingTableWrap">
+        <table class="trackingTable">
+          <thead>
+            <tr>
+              <th>IP Address</th>
+              <th>Clicks</th>
+              <th>Sources</th>
+              <th>First Click</th>
+              <th>Last Click</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in report.ip_totals %}
+              <tr>
+                <td>{{ row.ip_address }}</td>
+                <td>{{ row.total_clicks }}</td>
+                <td>{{ row.sources }}</td>
+                <td>{{ row.first_click }}</td>
+                <td>{{ row.last_click }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="5">No IP activity recorded yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="trackingPanel">
+      <h2>IP By Source</h2>
+      <div class="trackingTableWrap">
+        <table class="trackingTable">
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>IP Address</th>
+              <th>Clicks</th>
+              <th>First Click</th>
+              <th>Last Click</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in report.ip_by_tag %}
+              <tr>
+                <td>{% if row.tag in tracking_tags %}/{{ row.tag }} - {% endif %}{{ row.label }}</td>
+                <td>{{ row.ip_address }}</td>
+                <td>{{ row.total_clicks }}</td>
+                <td>{{ row.first_click }}</td>
+                <td>{{ row.last_click }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="5">No source/IP activity recorded yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="trackingPanel">
+      <h2>Recent Clicks</h2>
+      <div class="trackingTableWrap">
+        <table class="trackingTable">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Source</th>
+              <th>IP Address</th>
+              <th>User Agent</th>
+              <th>Referrer</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in report.recent_clicks %}
+              <tr>
+                <td>{{ row.clicked_at }}</td>
+                <td>{% if row.tag in tracking_tags %}/{{ row.tag }} - {% endif %}{{ row.label }}</td>
+                <td>{{ row.ip_address }}</td>
+                <td class="trackingLongText">{{ row.user_agent }}</td>
+                <td class="trackingLongText">{{ row.referrer or "-" }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="5">No clicks recorded yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</section>
+
+{% endblock %}

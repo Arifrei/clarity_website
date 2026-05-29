@@ -494,6 +494,149 @@ body.js-ready .testimonialsSection {
   transition: opacity 0.3s ease;
 }
 
+/* Ad click tracking dashboard */
+.trackingPage {
+  min-height: calc(100vh - var(--navH));
+  padding: clamp(32px, 6vw, 72px) var(--container-padding);
+  background: #f6f7f9;
+  color: #111111;
+}
+
+.trackingInner {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.trackingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.trackingEyebrow {
+  margin: 0 0 8px;
+  color: #8a6b00;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.trackingHeader h1 {
+  margin: 0;
+  font-size: clamp(34px, 6vw, 56px);
+  line-height: 1;
+  font-family: "DM Serif Display", "Bookman Old Style", "Bookman", "Serpentine", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+}
+
+.trackingNote {
+  max-width: 680px;
+  margin: 12px 0 0;
+  color: #4f5967;
+  line-height: 1.6;
+}
+
+.trackingLinks {
+  display: grid;
+  gap: 8px;
+  min-width: min(320px, 100%);
+}
+
+.trackingLinks a {
+  display: block;
+  padding: 12px 14px;
+  border: 1px solid #d8dde6;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111111;
+  font-weight: 800;
+}
+
+.trackingStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.trackingStat,
+.trackingPanel {
+  border: 1px solid #d8dde6;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 14px 36px rgba(17,24,39,.08);
+}
+
+.trackingStat {
+  padding: 20px;
+}
+
+.trackingStatLabel {
+  color: #4f5967;
+  font-weight: 800;
+}
+
+.trackingStatNumber {
+  margin-top: 10px;
+  color: #8a6b00;
+  font-size: clamp(34px, 6vw, 48px);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.trackingStatMeta {
+  margin-top: 8px;
+  color: #657185;
+}
+
+.trackingPanel {
+  margin-top: 18px;
+  padding: 18px;
+}
+
+.trackingPanel h2 {
+  margin: 0 0 14px;
+  font-size: 18px;
+}
+
+.trackingTableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.trackingTable {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+}
+
+.trackingTable th,
+.trackingTable td {
+  padding: 11px 10px;
+  border-bottom: 1px solid #e6e9ef;
+  color: #303846;
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: left;
+  vertical-align: top;
+}
+
+.trackingTable th {
+  color: #111111;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.trackingLongText {
+  max-width: 360px;
+  overflow-wrap: anywhere;
+}
+
 /* Touch-friendly active states for mobile */
 @media (hover: none) and (pointer: coarse) {
   .btn:active {

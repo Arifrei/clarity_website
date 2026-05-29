@@ -1,3 +1,4 @@
 .env
 venv
 auto_reply_jobs.sqlite3
+ad_clicks.sqlite3
