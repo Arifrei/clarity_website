@@ -1968,6 +1968,195 @@ body.js-ready .testimonialsSection {
   transform: translateY(0);
 }
 
+/* ========================================
+   CONTACT V2 — Two-column redesign
+   ======================================== */
+
+.contactSection.contactV2 {
+  padding: clamp(60px, 8vw, 120px) var(--container-padding) clamp(60px, 8vw, 120px);
+  background: #0b0f19;
+  position: relative;
+}
+
+.contactSection.contactV2::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+}
+
+.cv2-inner {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.cv2-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 5vw, 80px);
+  align-items: start;
+}
+
+/* Left column — info */
+.cv2-eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mustard);
+  margin-bottom: 12px;
+}
+
+.cv2-title {
+  margin: 0 0 16px;
+  font-size: clamp(28px, 5vw, 46px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
+  color: var(--offwhite);
+}
+
+.cv2-desc {
+  font-size: clamp(15px, 1.5vw, 18px);
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 32px;
+  max-width: 480px;
+}
+
+/* Contact method cards */
+.cv2-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.cv2-method {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(31,58,95,.14);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.25s ease;
+}
+
+.cv2-method:hover {
+  border-color: var(--mustard);
+  background: rgba(199,160,8,.08);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+}
+
+.cv2-method-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(199,160,8,.1);
+  color: var(--mustard);
+  flex-shrink: 0;
+}
+
+.cv2-method-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted2);
+}
+
+.cv2-method-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--offwhite);
+}
+
+.cv2-note {
+  font-size: 14px;
+  color: var(--muted2);
+  font-style: italic;
+}
+
+/* Right column — form card */
+.cv2-form-wrap {
+  background: rgba(31,58,95,.12);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: clamp(24px, 3vw, 40px);
+}
+
+.cv2-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cv2-req {
+  color: var(--mustard);
+  font-weight: 600;
+}
+
+.cv2-opt {
+  font-weight: 400;
+  opacity: 0.5;
+}
+
+/* Submit button */
+.cv2-submit {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 10px;
+  background: var(--mustard);
+  color: var(--ink);
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.cv2-submit:hover {
+  background: #d9ad1a;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(199,160,8,.3);
+}
+
+/* Responsive — contact V2 */
+@media (max-width: 900px) {
+  .cv2-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .cv2-form-wrap {
+    padding: clamp(20px, 4vw, 32px);
+  }
+
+  .contactSection.contactV2 .formRow {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .cv2-submit {
+    padding: 16px 20px;
+  }
+}
+
+/* ======================================== */
+
 @media (prefers-reduced-motion: reduce) {
   .connector,
   .workflowCard {
