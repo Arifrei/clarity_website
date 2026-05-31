@@ -93,6 +93,7 @@ KNOWN_AD_UTM_CONTENT = {
     "mommys-status",
     "suchis-contacts",
 }
+IGNORED_REFERRER_HOSTS = {"51.81.32.252:80"}
 
 
 def sanitize(value: str, max_len: int) -> str:
@@ -242,6 +243,9 @@ def _record_inbound_page_visit() -> None:
         return
 
     tag, label = _identify_inbound_source()
+    if tag.startswith("ref-") and _get_external_referrer_host() in IGNORED_REFERRER_HOSTS:
+        return
+
     _init_ad_tracking_store()
     with _get_ad_tracking_conn() as conn:
         conn.execute(
