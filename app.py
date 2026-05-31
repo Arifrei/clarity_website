@@ -63,8 +63,36 @@ AD_TRACKING_TAGS = {
         "label": "Jewish Networking Group",
         "destination": "/?utm_source=whatsapp&utm_medium=group&utm_campaign=ads&utm_content=jewish-networking-group",
     },
+    "c": {
+        "label": "My Status",
+        "destination": "/?utm_source=whatsapp&utm_medium=status&utm_campaign=ads&utm_content=my-status",
+    },
+    "d": {
+        "label": "Totty's Status",
+        "destination": "/?utm_source=whatsapp&utm_medium=status&utm_campaign=ads&utm_content=tottys-status",
+    },
+    "e": {
+        "label": "Yitzchuk's Status",
+        "destination": "/?utm_source=whatsapp&utm_medium=status&utm_campaign=ads&utm_content=yitzchuks-status",
+    },
+    "f": {
+        "label": "Mommy's Status",
+        "destination": "/?utm_source=whatsapp&utm_medium=status&utm_campaign=ads&utm_content=mommys-status",
+    },
+    "g": {
+        "label": "Suchi's Contacts",
+        "destination": "/?utm_source=whatsapp&utm_medium=contacts&utm_campaign=ads&utm_content=suchis-contacts",
+    },
 }
-KNOWN_AD_UTM_CONTENT = {"omi-status", "jewish-networking-group"}
+KNOWN_AD_UTM_CONTENT = {
+    "omi-status",
+    "jewish-networking-group",
+    "my-status",
+    "tottys-status",
+    "yitzchuks-status",
+    "mommys-status",
+    "suchis-contacts",
+}
 
 
 def sanitize(value: str, max_len: int) -> str:
