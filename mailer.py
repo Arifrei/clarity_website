@@ -106,6 +106,8 @@ def _spam_disposition(spam_check: Dict[str, Any]) -> str:
         return ""
     if spam_check.get("is_spam"):
         return "Spam - Teamwork skipped; auto-reply not sent."
+    if spam_check.get("is_solicitation"):
+        return "Solicitation - Teamwork skipped; auto-reply not sent."
     if spam_check.get("checked"):
         return ""
     return "Not checked - normal workflow continued."
@@ -186,6 +188,8 @@ def _build_notification_email(
     msg = EmailMessage()
     if spam_check.get("is_spam"):
         msg["Subject"] = f"Possible Spam Form Submission - {client_name}"
+    elif spam_check.get("is_solicitation"):
+        msg["Subject"] = f"Solicitation Form Submission - {client_name}"
     else:
         msg["Subject"] = f"New Form Submission - {client_name}"
     msg["From"] = _format_from_header(config)

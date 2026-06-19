@@ -18,6 +18,7 @@
   - `AI_SPAM_THRESHOLD` - defaults to `0.72`
   - `AI_SPAM_CONFIDENCE_THRESHOLD` - defaults to `0.60`
 - If AI flags a submission as spam, the internal notification email is still sent, Teamwork task creation is skipped, and no auto-reply is sent or queued.
+- If AI flags a submission as solicitation/vendor outreach, the internal notification email is still sent every time, but Teamwork task creation, lead research, and the auto-reply are skipped.
 - AI-flagged spam is logged in `spam_submissions.jsonl`. If a later spam submission matches a previous spammer by exact email, exact phone, name plus company, name plus business email domain, company plus business email domain, or exact long-message fingerprint, the app logs the repeat and does not send another internal notification email.
 - If AI sees company or project context on a non-spam submission, it creates the normal Teamwork task and queues the normal auto-reply first, then runs web research in the background.
 - If lead research succeeds, the app adds the qualification notes to the Teamwork task and sends a follow-up email with the same findings.

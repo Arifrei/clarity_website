@@ -800,6 +800,18 @@ def _process_contact_submission(payload: dict, meta: dict) -> None:
         app.logger.info("Skipping auto-reply for AI-flagged spam submission.")
         return
 
+    if spam_verdict.get("is_solicitation"):
+        try:
+            send_contact_notification_email(payload, notification_meta)
+        except EmailConfigError as exc:
+            app.logger.warning("Email configuration issue after solicitation form capture: %s", exc)
+        except Exception as exc:  # pragma: no cover - simple logging
+            app.logger.warning("Failed to send solicitation contact email after form capture: %s", exc, exc_info=True)
+
+        app.logger.info("Skipping Teamwork for AI-flagged solicitation: %s", spam_verdict.get("reason"))
+        app.logger.info("Skipping auto-reply for AI-flagged solicitation.")
+        return
+
     try:
         send_contact_notification_email(payload, notification_meta)
     except EmailConfigError as exc:

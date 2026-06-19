@@ -22,7 +22,11 @@ SPAM_CHECK_INSTRUCTIONS = """You classify website contact form submissions for C
 
 Clarity Solutions helps businesses improve workflows, software, automation, CRM, forms, operations, and similar business systems.
 
-Mark as spam when a submission is likely an unsolicited sales pitch, SEO/link-building outreach, crypto/investment/gambling/adult content, irrelevant service promotion, bot gibberish, exploit/probing text, or unrelated bulk outreach.
+Use classification "not_spam" only when the sender appears to be a potential client asking about, or plausibly interested in, Clarity Solutions services.
+
+Use classification "solicitation" when the sender is pitching or selling something to Clarity Solutions instead of asking to buy Clarity's services. Examples: SEO/link-building, marketing, ads, staffing, outsourcing, software/vendor pitches, partnership pitches, lead generation, app/dev services, or other business development outreach.
+
+Use classification "spam" for scammy, malicious, irrelevant, adult/gambling/crypto, bot gibberish, exploit/probing text, or obvious bulk junk.
 
 Do not mark as spam only because the note is short, uses a free email provider, asks for pricing, asks for a quote, asks about software, automation, forms, websites, apps, CRM, integrations, operations, or sounds informal.
 
@@ -44,7 +48,7 @@ SPAM_VERDICT_SCHEMA = {
     "type": "object",
     "additionalProperties": False,
     "properties": {
-        "classification": {"type": "string", "enum": ["spam", "not_spam"]},
+        "classification": {"type": "string", "enum": ["spam", "solicitation", "not_spam"]},
         "spam_score": {"type": "number"},
         "confidence": {"type": "number"},
         "reason": {"type": "string"},
@@ -380,13 +384,22 @@ def check_contact_submission_spam(payload: Dict[str, Any], meta: Dict[str, Any] 
         and spam_score >= config["spam_threshold"]
         and confidence >= config["confidence_threshold"]
     )
+    is_solicitation = (
+        classification == "solicitation"
+        and confidence >= config["confidence_threshold"]
+    )
 
     return {
         "checked": True,
         "provider": "openai",
         "model": config["spam_model"],
-        "classification": classification if classification in {"spam", "not_spam"} else "not_spam",
+        "classification": (
+            classification
+            if classification in {"spam", "solicitation", "not_spam"}
+            else "not_spam"
+        ),
         "is_spam": is_spam,
+        "is_solicitation": is_solicitation,
         "spam_score": spam_score,
         "confidence": confidence,
         "reason": _normalize_reason(parsed.get("reason")),
