@@ -1142,7 +1142,6 @@
     const normalized = (hash || "").replace(/^#/, "").trim().toLowerCase();
     return sectionToPath[normalized] ? normalized : null;
   };
-  const isMobileViewport = () => window.innerWidth <= 900;
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
@@ -1156,13 +1155,6 @@
     // Special-case workflow: jump to end of its pinned animation/hold
     let targetY =
       el.getBoundingClientRect().top + window.scrollY - navHeight - 10;
-    if (id === "contact" && !isMobileViewport()) {
-      const docHeight = Math.max(
-        document.body.scrollHeight,
-        document.documentElement.scrollHeight
-      );
-      targetY = Math.max(0, docHeight - window.innerHeight);
-    }
     if (id === "workflow" && typeof window !== "undefined") {
       const stored = window.__workflowScrollTarget;
       if (typeof stored === "number" && !Number.isNaN(stored)) {

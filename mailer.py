@@ -6,6 +6,8 @@ from email.message import EmailMessage
 from email.utils import formataddr
 from typing import Any, Dict
 
+from lead_formatting import format_lead_qualification_text
+
 
 class EmailConfigError(Exception):
     pass
@@ -85,16 +87,107 @@ def _send_messages(config: Dict[str, Any], messages: list[EmailMessage]) -> None
             server.send_message(msg)
 
 
-def _build_notification_email(config: Dict[str, Any], payload: Dict[str, Any]) -> EmailMessage:
+def _format_score(value: Any) -> str:
+    try:
+        return f"{float(value):.2f}"
+    except (TypeError, ValueError):
+        return "N/A"
+
+
+def _get_spam_check(meta: Dict[str, Any] | None) -> Dict[str, Any]:
+    if not meta:
+        return {}
+    spam_check = meta.get("spam_check")
+    return spam_check if isinstance(spam_check, dict) else {}
+
+
+def _spam_disposition(spam_check: Dict[str, Any]) -> str:
+    if not spam_check:
+        return ""
+    if spam_check.get("is_spam"):
+        return "Spam - Teamwork skipped; auto-reply not sent."
+    if spam_check.get("checked"):
+        return ""
+    return "Not checked - normal workflow continued."
+
+
+def _build_spam_check_text(spam_check: Dict[str, Any]) -> str:
+    disposition = _spam_disposition(spam_check)
+    if not disposition:
+        return ""
+
+    lines = [f"Disposition: {disposition}"]
+    if spam_check.get("checked"):
+        lines.extend(
+            [
+                f"Classification: {spam_check.get('classification') or 'N/A'}",
+                f"Spam Score: {_format_score(spam_check.get('spam_score'))}",
+                f"Confidence: {_format_score(spam_check.get('confidence'))}",
+            ]
+        )
+        if spam_check.get("model"):
+            lines.append(f"Model: {spam_check['model']}")
+    if spam_check.get("reason"):
+        lines.append(f"Reason: {spam_check['reason']}")
+    return "\n".join(lines)
+
+
+def _build_spam_check_html(spam_check: Dict[str, Any]) -> str:
+    disposition = _spam_disposition(spam_check)
+    if not disposition:
+        return ""
+
+    details = [
+        ("Disposition", disposition),
+    ]
+    if spam_check.get("checked"):
+        details.extend(
+            [
+                ("Classification", spam_check.get("classification") or "N/A"),
+                ("Spam Score", _format_score(spam_check.get("spam_score"))),
+                ("Confidence", _format_score(spam_check.get("confidence"))),
+            ]
+        )
+        if spam_check.get("model"):
+            details.append(("Model", spam_check["model"]))
+    if spam_check.get("reason"):
+        details.append(("Reason", spam_check["reason"]))
+
+    fields = "\n".join(
+        f"""
+                <div class="field">
+                    <span class="label">{html.escape(label)}</span>
+                    <span class="value">{html.escape(str(value))}</span>
+                </div>
+        """
+        for label, value in details
+    )
+    return f"""
+                <div class="header">AI Spam Check</div>
+{fields}
+    """
+
+
+def _build_notification_email(
+    config: Dict[str, Any],
+    payload: Dict[str, Any],
+    meta: Dict[str, Any] | None = None,
+) -> EmailMessage:
     client_name = " ".join((payload.get("name") or "").split()) or "Unknown Client"
     name = payload.get("name") or "N/A"
     email_value = payload.get("email") or "N/A"
     phone = payload.get("phone") or "N/A"
     company = payload.get("company") or "N/A"
     message_value = payload.get("message") or ""
+    spam_check = _get_spam_check(meta)
+    spam_check_text = _build_spam_check_text(spam_check)
+    spam_check_html = _build_spam_check_html(spam_check)
 
     msg = EmailMessage()
-    msg["Subject"] = f"New Form Submission - {client_name}"
+    if spam_check.get("is_spam"):
+        msg["Subject"] = f"Possible Spam Form Submission - {client_name}"
+    else:
+        msg["Subject"] = f"New Form Submission - {client_name}"
     msg["From"] = _format_from_header(config)
     msg["To"] = config["to_email"]
     if config["bcc_email"]:
@@ -111,6 +204,11 @@ Company: {company}
 
 Message:
 {message_value}
+"""
+    if spam_check_text:
+        text_body += f"""
+AI Spam Check:
+{spam_check_text}
 """
 
     html_body = f"""
@@ -194,6 +292,8 @@ Message:
                     <span class="label">Message</span>
                     <div class="message-box">{html.escape(message_value)}</div>
                 </div>
+
+{spam_check_html}
             </div>
         </body>
     </html>
@@ -249,10 +349,66 @@ https://claritysolutionsco.com
     return msg
 
 
+def _build_lead_qualification_email(
+    config: Dict[str, Any],
+    payload: Dict[str, Any],
+    lead_qualification: Dict[str, Any],
+    teamwork_note: str | None = None,
+) -> EmailMessage | None:
+    qualification_text = format_lead_qualification_text(lead_qualification)
+    if not qualification_text:
+        return None
+
+    client_name = " ".join((payload.get("name") or "").split()) or "Unknown Client"
+    msg = EmailMessage()
+    msg["Subject"] = f"Lead Research - {client_name}"
+    msg["From"] = _format_from_header(config)
+    msg["To"] = config["to_email"]
+    if config["bcc_email"]:
+        msg["Bcc"] = config["bcc_email"]
+
+    teamwork_note_text = ""
+    if teamwork_note:
+        teamwork_note_text = f"\nTeamwork note: {teamwork_note}\n"
+
+    text_body = f"""Lead research follow-up.
+
+Name: {payload.get('name') or 'N/A'}
+Email: {payload.get('email') or 'N/A'}
+Company: {payload.get('company') or 'N/A'}
+{teamwork_note_text}
+{qualification_text}
+"""
+
+    escaped_body = html.escape(text_body).replace("\n", "<br>")
+    html_body = f"""
+    <html>
+        <body>
+            <p>{escaped_body}</p>
+        </body>
+    </html>
+    """
+
+    msg.set_content(text_body)
+    msg.add_alternative(html_body, subtype="html")
+    return msg
+
+
 def send_contact_notification_email(payload: Dict[str, Any], meta: Dict[str, Any]) -> None:
-    _ = meta
     config = _get_mail_config()
-    _send_messages(config, [_build_notification_email(config, payload)])
+    _send_messages(config, [_build_notification_email(config, payload, meta)])
+
+
+def send_lead_qualification_followup_email(
+    payload: Dict[str, Any],
+    lead_qualification: Dict[str, Any],
+    teamwork_note: str | None = None,
+) -> None:
+    config = _get_mail_config()
+    message = _build_lead_qualification_email(config, payload, lead_qualification, teamwork_note)
+    if message is None:
+        return
+    _send_messages(config, [message])
 
 
 def send_contact_auto_reply_email(payload: Dict[str, Any]) -> None:

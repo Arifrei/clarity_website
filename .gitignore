@@ -2,3 +2,4 @@
 venv
 auto_reply_jobs.sqlite3
 ad_clicks.sqlite3
+spam_submissions.jsonl

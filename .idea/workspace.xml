@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c562b8fa-0372-49e4-994e-19ecc588f56b" name="Changes" comment="" />
+    <list default="true" id="c562b8fa-0372-49e4-994e-19ecc588f56b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/css/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/article-5-mistakes.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/article-5-mistakes.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/article-custom-vs-ready.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/article-custom-vs-ready.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/article-diy-software.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/article-diy-software.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/why-clarity.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/why-clarity.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

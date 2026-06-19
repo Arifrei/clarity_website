@@ -6,6 +6,8 @@ from typing import Any, Dict
 from urllib import error, request
 from zoneinfo import ZoneInfo
 
+from lead_formatting import format_lead_qualification_text
+
 
 class TeamworkConfigError(Exception):
     pass
@@ -129,6 +131,9 @@ def _build_task_description(payload: Dict[str, Any]) -> str:
         "",
         f"Submitted At: {_format_submitted_at(payload.get('timestamp') or '')}",
     ]
+    lead_qualification = format_lead_qualification_text(payload.get("lead_qualification"))
+    if lead_qualification:
+        parts.extend(["", lead_qualification])
     return "\n".join(parts)
 
 
@@ -164,6 +169,19 @@ def _assign_task(config: Dict[str, Any], task_id: int) -> None:
     )
 
 
+def _update_task_description(config: Dict[str, Any], task_id: int, description: str) -> None:
+    _request_json(
+        "PUT",
+        f"{config['site']}/tasks/{task_id}.json",
+        config["api_key"],
+        {
+            "todo-item": {
+                "description": description,
+            }
+        },
+    )
+
+
 def _create_custom_field_value(config: Dict[str, Any], task_id: int, custom_field_id: int, value: str) -> None:
     if not value:
         return
@@ -187,3 +205,10 @@ def create_lead_task(payload: Dict[str, Any]) -> Dict[str, Any]:
     _create_custom_field_value(config, task_id, config["email_field_id"], payload.get("email", ""))
     _create_custom_field_value(config, task_id, config["phone_field_id"], payload.get("phone", ""))
     return {"task_id": task_id, "task_url": f"{config['site']}/app/tasks/{task_id}"}
+
+
+def update_lead_task_description(payload: Dict[str, Any], task_id: int, lead_qualification: Dict[str, Any]) -> None:
+    config = _get_config()
+    updated_payload = dict(payload)
+    updated_payload["lead_qualification"] = lead_qualification
+    _update_task_description(config, task_id, _build_task_description(updated_payload))

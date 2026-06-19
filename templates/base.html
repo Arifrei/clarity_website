@@ -93,6 +93,36 @@
     {% block content %}{% endblock %}
   </main>
 
+  <footer class="siteFooter">
+    <div class="siteFooterInner">
+      <div class="siteFooterBrand">
+        <a class="siteFooterLogo" href="/" aria-label="Clarity Solutions Home">
+          <img src="{{ url_for('static', filename='logo3.png') }}" alt="Clarity Logo">
+          <span>
+            <span class="siteFooterName">Clarity Solutions</span>
+            <span class="siteFooterSlogan">Helping businesses run smarter</span>
+          </span>
+        </a>
+        <p class="siteFooterText">Business operations, software systems, and digital workflow consulting for teams that need clearer ways to work.</p>
+      </div>
+
+      <div class="siteFooterLinks" aria-label="Footer navigation">
+        <a href="/">Home</a>
+        <a href="/workflow">Our Process</a>
+        <a href="/why-clarity">Why Clarity</a>
+        <a href="/contact">Contact</a>
+      </div>
+
+      <div class="siteFooterContact">
+        <a href="tel:+18452620229">845-262-0229</a>
+        <a href="https://wa.me/18454222502" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+      </div>
+    </div>
+    <div class="siteFooterBottom">
+      <span>&copy; 2026 Clarity Solutions. All rights reserved.</span>
+    </div>
+  </footer>
+
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
