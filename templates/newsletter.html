@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block title %}INTEGRATED: Business Systems &amp; AI Newsletter | Clarity Solutions{% endblock %}
-{% block meta_description %}Subscribe to INTEGRATED, Clarity Solutions' weekly newsletter with practical ideas on business systems, software, automation, and AI&mdash;without the hype.{% endblock %}
+{% block meta_description %}Subscribe to INTEGRATED, Clarity Solutions' monthly newsletter with practical ideas on business systems, software, automation, and AI, without the hype.{% endblock %}
 {% block og_title %}INTEGRATED | Practical Business Systems, Automation &amp; AI{% endblock %}
-{% block og_description %}A weekly newsletter with useful ideas for building better business systems, choosing smarter software, and applying automation and AI where they help.{% endblock %}
+{% block og_description %}A monthly newsletter with useful ideas for building better business systems, choosing smarter software, and applying automation and AI where they help.{% endblock %}
 {% block og_image_alt %}Two business professionals reviewing software in a modern office{% endblock %}
 {% block twitter_title %}INTEGRATED | Practical Business Systems, Automation &amp; AI{% endblock %}
-{% block twitter_description %}Useful weekly ideas about business systems, software, automation, and practical AI&mdash;without the hype.{% endblock %}
+{% block twitter_description %}Useful monthly ideas about business systems, software, automation, and practical AI, without the hype.{% endblock %}
 
 {% block structured_data %}
   <script type="application/ld+json">
@@ -18,7 +18,7 @@
           "@id": "{{ canonical_origin }}/newsletter#webpage",
           "url": "{{ canonical_origin }}/newsletter",
           "name": "INTEGRATED: Business Systems and AI Newsletter",
-          "description": "A weekly newsletter from Clarity Solutions with practical ideas on business systems, software, automation, and AI.",
+          "description": "A monthly newsletter from Clarity Solutions with practical ideas on business systems, software, automation, and AI.",
           "isPartOf": {"@id": "{{ canonical_origin }}/#website"},
           "about": {"@id": "{{ canonical_origin }}/newsletter#publication"},
           "publisher": {"@id": "{{ canonical_origin }}/#organization"},
@@ -36,7 +36,7 @@
           "name": "INTEGRATED",
           "alternateName": "INTEGRATED Newsletter",
           "url": "{{ canonical_origin }}/newsletter",
-          "description": "Practical weekly ideas about business systems, software, automation, and artificial intelligence for business owners and operators.",
+          "description": "Practical monthly ideas for anyone interested in better workflows, useful automation, and applying AI to work and everyday life.",
           "publisher": {"@id": "{{ canonical_origin }}/#organization"},
           "keywords": [
             "business systems",
@@ -57,18 +57,17 @@
   <div class="newsletterLandingGlow" aria-hidden="true"></div>
   <div class="newsletterLandingInner">
     <div class="newsletterLandingCopy">
-      <p class="newsletterEyebrow">A weekly newsletter from Clarity Solutions</p>
       <h1 id="newsletterLandingTitle">
         <span class="newsletterTitleBrand">INTEGRATED</span>
         <span>Practical systems and smarter technology for a better-run business.</span>
       </h1>
       <div class="newsletterLandingBody">
-        <p>INTEGRATED is a short weekly newsletter about practical business systems, software, automation, and AI.</p>
-        <p>No tech hype. Just useful ideas, real examples, and better ways to run your business.</p>
+        <p>A short monthly newsletter about practical business systems, software, automation, and AI, without the tech hype.</p>
       </div>
     </div>
 
     <div class="newsletterSignupPanel" id="newsletter-signup" aria-label="Subscribe to INTEGRATED">
+      <h2 class="newsletterSignupHeading">Subscribe to INTEGRATED</h2>
       <div class="newsletterSignupEmbed">
         <script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="45839228-a04c-4eaf-9348-9cbab49d391c"></script>
       </div>
@@ -84,23 +83,22 @@
     <div class="newsletterSectionHeading">
       <p class="newsletterEyebrow">What you'll get</p>
       <h2 id="newsletterBenefitsTitle">Useful ideas for the systems behind your business.</h2>
-      <p>Each edition connects business operations with technology in plain language, so you can make better decisions without chasing every new tool.</p>
     </div>
     <div class="newsletterBenefitGrid">
       <article class="newsletterBenefitCard">
         <span class="newsletterBenefitNumber" aria-hidden="true">01</span>
         <h3>Business systems</h3>
-        <p>Clearer ways to organize workflows, responsibilities, information, and the work that keeps a business moving.</p>
+        <p>Clearer workflows, responsibilities, and information.</p>
       </article>
       <article class="newsletterBenefitCard">
         <span class="newsletterBenefitNumber" aria-hidden="true">02</span>
         <h3>Software that fits</h3>
-        <p>Practical guidance for choosing, connecting, and using software around the way your team actually works.</p>
+        <p>Better ways to choose, connect, and use software.</p>
       </article>
       <article class="newsletterBenefitCard">
         <span class="newsletterBenefitNumber" aria-hidden="true">03</span>
         <h3>Automation and practical AI</h3>
-        <p>Realistic ways to save time and improve decisions with automation and AI&mdash;only where they genuinely help.</p>
+        <p>Useful automation and AI, only where they genuinely help.</p>
       </article>
     </div>
   </div>
@@ -110,19 +108,13 @@
   <div class="newsletterAudienceInner">
     <div class="newsletterAudienceCopy">
       <p class="newsletterEyebrow">Who it's for</p>
-      <h2 id="newsletterAudienceTitle">For owners and operators who want the business to run more clearly.</h2>
-      <p>INTEGRATED is written for people responsible for improving how work gets done&mdash;whether the business is still held together by spreadsheets or already has software that is not living up to its potential.</p>
-      <ul>
-        <li>Build processes the team can actually follow.</li>
-        <li>Make confident software and automation decisions.</li>
-        <li>Use AI as a practical business tool, not a buzzword.</li>
-      </ul>
+      <h2 id="newsletterAudienceTitle">For curious people who want work and everyday life to run better.</h2>
+      <p>Whether you own a business, manage a team, or simply want to understand better workflows, practical automation, and useful AI, INTEGRATED is for you.</p>
     </div>
     <aside class="newsletterPublisher">
       <p class="newsletterEyebrow">Published by Clarity Solutions</p>
-      <h2>Ideas grounded in real operations work.</h2>
-      <p>Clarity Solutions helps businesses clarify processes, choose and implement the right software, and build connected workflows their teams can use with confidence.</p>
-      <a href="/why-clarity">Learn how Clarity approaches business systems <span aria-hidden="true">&rarr;</span></a>
+      <p>Grounded in practical work helping businesses build clearer processes and better systems.</p>
+      <a href="/why-clarity">About Clarity <span aria-hidden="true">&rarr;</span></a>
     </aside>
   </div>
 </section>
@@ -154,38 +146,6 @@
   </div>
 </section>
 {% endif %}
-
-<section class="newsletterAbout" aria-labelledby="newsletterAboutTitle">
-  <div class="newsletterContentInner">
-    <div class="newsletterSectionHeading">
-      <p class="newsletterEyebrow">About the newsletter</p>
-      <h2 id="newsletterAboutTitle">A focused weekly read about running a modern business.</h2>
-    </div>
-    <div class="newsletterAboutGrid">
-      <article>
-        <h3>What does INTEGRATED cover?</h3>
-        <p>Business processes, software decisions, connected workflows, useful automations, and practical applications of AI.</p>
-      </article>
-      <article>
-        <h3>How often is it published?</h3>
-        <p>INTEGRATED is a short weekly newsletter designed to be useful without becoming another overwhelming inbox commitment.</p>
-      </article>
-      <article>
-        <h3>Who should subscribe?</h3>
-        <p>Business owners, managers, and operations-minded professionals who want technology to support a clearer way of working.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="newsletterFinalCTA" aria-labelledby="newsletterFinalCTATitle">
-  <div class="newsletterFinalCTAInner">
-    <p class="newsletterEyebrow">INTEGRATED</p>
-    <h2 id="newsletterFinalCTATitle">Build a business that runs with more clarity.</h2>
-    <p>Get the next practical idea delivered to your inbox.</p>
-    <a class="btn primary" href="#newsletter-signup">Subscribe to INTEGRATED</a>
-  </div>
-</section>
 {% endblock %}
 
 {% block beehiiv_popup_script %}{% endblock %}
