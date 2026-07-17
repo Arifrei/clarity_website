@@ -2,31 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Clarity Solutions</title>
+  <title>{% block title %}Clarity Solutions{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Clarity Solutions provides business operations, software systems, and digital workflow consulting to help organizations run with clarity and control." />
+  <meta name="description" content="{% block meta_description %}Clarity Solutions provides business operations, software systems, and digital workflow consulting to help organizations run with clarity and control.{% endblock %}" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta name="theme-color" content="#111111" />
+  <link rel="canonical" href="{% block canonical_url %}{{ canonical_origin }}{{ request.path }}{% endblock %}" />
 
-  <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "ProfessionalService",
-      "name": "Clarity Solutions",
-      "url": "https://claritysolutionsco.com",
-      "description": "Clarity Solutions provides business operations, software systems, and digital workflow consulting to help organizations replace scattered processes with clear, usable systems.",
-      "serviceType": [
-        "Business operations consulting",
-        "Software systems consulting",
-        "Digital workflow consulting",
-        "Software selection and implementation"
-      ],
-      "areaServed": {
-        "@type": "Place",
-        "name": "United States"
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+  <meta property="og:site_name" content="Clarity Solutions" />
+  <meta property="og:title" content="{% block og_title %}Clarity Solutions | Business Systems and Software Consulting{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}Clearer business operations, better-fit software, and practical digital workflows.{% endblock %}" />
+  <meta property="og:url" content="{{ canonical_origin }}{{ request.path }}" />
+  <meta property="og:image" content="{% block og_image %}{{ canonical_origin }}{{ url_for('static', filename='image0.png') }}{% endblock %}" />
+  <meta property="og:image:width" content="1536" />
+  <meta property="og:image:height" content="1024" />
+  <meta property="og:image:alt" content="{% block og_image_alt %}Business professionals reviewing a digital operations system{% endblock %}" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{% block twitter_title %}Clarity Solutions | Business Systems and Software Consulting{% endblock %}" />
+  <meta name="twitter:description" content="{% block twitter_description %}Clearer business operations, better-fit software, and practical digital workflows.{% endblock %}" />
+  <meta name="twitter:image" content="{{ canonical_origin }}{{ url_for('static', filename='image0.png') }}" />
+
+  {% if request.path == '/' or request.path == '/home' %}
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": ["ProfessionalService", "Organization"],
+            "@id": "{{ canonical_origin }}/#organization",
+            "name": "Clarity Solutions",
+            "url": "{{ canonical_origin }}/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "{{ canonical_origin }}{{ url_for('static', filename='logo3.png') }}"
+            },
+            "description": "Clarity Solutions helps businesses improve operations, select and implement software, and build clear digital workflows.",
+            "telephone": "+1-845-262-0229",
+            "serviceType": [
+              "Business operations consulting",
+              "Software systems consulting",
+              "Digital workflow consulting",
+              "Software selection and implementation"
+            ],
+            "areaServed": {
+              "@type": "Country",
+              "name": "United States"
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "{{ canonical_origin }}/#website",
+            "url": "{{ canonical_origin }}/",
+            "name": "Clarity Solutions",
+            "publisher": {"@id": "{{ canonical_origin }}/#organization"},
+            "inLanguage": "en-US"
+          }
+        ]
       }
-    }
-  </script>
+    </script>
+  {% endif %}
+  {% block structured_data %}{% endblock %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://subscribe-forms.beehiiv.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
@@ -58,6 +98,7 @@
   {% set is_workflow = (path == '/workflow') %}
   {% set is_contact = (path == '/contact') %}
   {% set is_insights = path.startswith('/why-clarity') or path.startswith('/article-') or path.startswith('/articles/') %}
+  {% set is_newsletter = path.startswith('/newsletter') %}
 
   <header class="navWrap" id="navWrap">
     <div class="nav">
@@ -79,6 +120,7 @@
         <a href="/" class="navBtn{% if is_home %} active{% endif %}" data-target="home">Home</a>
         <a href="/workflow" class="navBtn{% if is_workflow %} active{% endif %}" data-target="workflow">Our Process</a>
         <a href="/contact" class="navBtn{% if is_contact %} active{% endif %}" data-target="contact">Contact</a>
+        <a href="/newsletter" class="navBtn{% if is_newsletter %} active{% endif %}">Newsletter</a>
         <a href="/why-clarity" class="navBtn secondary{% if is_insights %} active{% endif %}">Why Clarity</a>
       </div>
 
@@ -110,6 +152,7 @@
         <a href="/">Home</a>
         <a href="/workflow">Our Process</a>
         <a href="/why-clarity">Why Clarity</a>
+        <a href="/newsletter">INTEGRATED Newsletter</a>
         <a href="/contact">Contact</a>
       </div>
 
@@ -123,6 +166,9 @@
     </div>
   </footer>
 
+  {% block beehiiv_popup_script %}<script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="bdeaa6eb-aa68-4389-898f-bf2b8d65d48e"></script>{% endblock %}
+  <script type="text/javascript" async src="https://subscribe-forms.beehiiv.com/attribution.js"></script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

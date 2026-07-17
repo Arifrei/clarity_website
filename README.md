@@ -1,5 +1,16 @@
 # Clarity Solutions site
 
+## INTEGRATED newsletter configuration
+- Generate the publication's RSS URL in beehiiv under **Settings > RSS**.
+- Set `BEEHIIV_RSS_URL` to that complete `.xml` URL in the deployment environment or local `.env` file.
+- `CANONICAL_ORIGIN` optionally overrides the public site origin used in canonical, Open Graph, and structured-data URLs; it defaults to `https://claritysolutionsco.com`.
+- `/newsletter` is the external signup landing page.
+- `/newsletter/archive` renders cached RSS metadata and links each card to the full edition on beehiiv.
+- `/robots.txt` and `/sitemap.xml` serve the crawler files from the site root.
+- RSS responses are cached in-process for 10 minutes. If a refresh fails, the last successful response remains available until the process restarts.
+- The automatic homepage signup appears after 10 seconds, then waits 7 days before appearing again in the same browser. beehiiv handles only the embedded email form.
+- The click-triggered beehiiv popup listens for `.newsletter-subscribe-trigger`.
+
 ## Contact email configuration
 - Set these environment variables before running the app:
   - `SMTP_HOST` – your SMTP server hostname

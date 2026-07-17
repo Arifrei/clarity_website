@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Previous Editions of INTEGRATED | Clarity Solutions{% endblock %}
+{% block meta_description %}Browse previous editions of INTEGRATED from Clarity Solutions, covering practical business systems, software, automation, and AI.{% endblock %}
+{% block og_title %}Previous Editions of INTEGRATED{% endblock %}
+{% block og_description %}Browse practical ideas about business systems, software, workflow automation, and AI from the INTEGRATED newsletter.{% endblock %}
+{% block twitter_title %}Previous Editions of INTEGRATED{% endblock %}
+{% block twitter_description %}Practical business systems, software, automation, and AI insights from Clarity Solutions.{% endblock %}
+
+{% block structured_data %}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "@id": "{{ canonical_origin }}/newsletter/archive#webpage",
+      "url": "{{ canonical_origin }}/newsletter/archive",
+      "name": "Previous Editions of INTEGRATED",
+      "description": "An archive of INTEGRATED newsletter editions about business systems, software, automation, and AI.",
+      "isPartOf": {"@id": "{{ canonical_origin }}/#website"},
+      "publisher": {"@id": "{{ canonical_origin }}/#organization"},
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": [
+          {% for edition in newsletter_feed.editions %}
+            {
+              "@type": "ListItem",
+              "position": {{ loop.index }},
+              "url": {{ edition.url|tojson }},
+              "name": {{ edition.title|tojson }}
+            }{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ]
+      },
+      "inLanguage": "en-US"
+    }
+  </script>
+{% endblock %}
+
+{% block content %}
+<section class="newsletterArchiveHero" aria-labelledby="newsletterArchiveTitle">
+  <div class="newsletterArchiveHeroInner">
+    <p class="newsletterEyebrow">INTEGRATED</p>
+    <h1 id="newsletterArchiveTitle">Previous editions of INTEGRATED</h1>
+    <p>Practical ideas for building better systems, choosing smarter technology, and running a stronger business.</p>
+    <div class="newsletterArchiveActions">
+      <button type="button" class="btn primary newsletter-subscribe-trigger">Subscribe to INTEGRATED</button>
+      <a class="newsletterTextLink" href="/newsletter">About the INTEGRATED newsletter <span aria-hidden="true">&rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="newsletterArchiveSection" aria-label="Newsletter editions">
+  <div class="newsletterArchiveInner">
+    {% if newsletter_feed.editions %}
+      <div class="newsletterEditionGrid">
+        {% for edition in newsletter_feed.editions %}
+          <article class="newsletterEditionCard">
+            <a class="newsletterEditionCardLink" href="{{ edition.url }}" aria-label="Read {{ edition.title }}">
+              {% if edition.image_url %}
+                <div class="newsletterEditionImage">
+                  <img src="{{ edition.image_url }}" alt="" loading="lazy" decoding="async">
+                </div>
+              {% else %}
+                <div class="newsletterEditionImage newsletterEditionImageFallback" aria-hidden="true">
+                  <span>INTEGRATED</span>
+                </div>
+              {% endif %}
+              <div class="newsletterEditionContent">
+                {% if edition.published_label %}
+                  <time datetime="{{ edition.published_at.date().isoformat() }}">{{ edition.published_label }}</time>
+                {% endif %}
+                <h2>{{ edition.title }}</h2>
+                {% if edition.excerpt %}<p>{{ edition.excerpt }}</p>{% endif %}
+                <span class="newsletterEditionRead">Read this edition <span aria-hidden="true">&rarr;</span></span>
+              </div>
+            </a>
+          </article>
+        {% endfor %}
+      </div>
+      {% if newsletter_feed.stale %}
+        <p class="newsletterArchiveNotice">Showing the most recently available editions.</p>
+      {% endif %}
+    {% elif newsletter_feed.configured %}
+      <div class="newsletterArchiveEmpty">
+        <h2>The archive is temporarily unavailable.</h2>
+        <p>Please check back shortly, or subscribe to receive the next edition.</p>
+        <button type="button" class="btn primary newsletter-subscribe-trigger">Subscribe</button>
+      </div>
+    {% else %}
+      <div class="newsletterArchiveEmpty">
+        <h2>Previous editions are coming soon.</h2>
+        <p>Subscribe now and the next edition will arrive in your inbox.</p>
+        <button type="button" class="btn primary newsletter-subscribe-trigger">Subscribe</button>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

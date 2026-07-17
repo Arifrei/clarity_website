@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://claritysolutionsco.com/static/sitemap.xml
+Sitemap: https://claritysolutionsco.com/sitemap.xml

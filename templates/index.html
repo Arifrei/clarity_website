@@ -272,4 +272,35 @@
   </div>
 </section>
 
+{% if initial_section|default('', true) == 'home' %}
+<div class="newsletterModal" id="newsletterModal" aria-hidden="true" data-show-delay="10000" data-cooldown-days="7">
+  <div class="newsletterModalBackdrop" data-newsletter-modal-close></div>
+  <section
+    class="newsletterModalDialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="newsletterModalTitle"
+    aria-describedby="newsletterModalDescription"
+    tabindex="-1"
+  >
+    <button class="newsletterModalClose" type="button" aria-label="Close newsletter signup" data-newsletter-modal-close>
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <p class="newsletterModalBrand" id="newsletterModalTitle">INTEGRATED</p>
+    <p class="newsletterModalSubtitle">Where Business Meets Tech</p>
+    <p class="newsletterModalDescription" id="newsletterModalDescription">Sign up for practical ideas on business systems, software, automation, and AI - focused on what actually helps businesses run better.</p>
+    <div class="newsletterModalForm" aria-label="Subscribe to INTEGRATED">
+      <script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="45839228-a04c-4eaf-9348-9cbab49d391c"></script>
+    </div>
+    <a class="newsletterModalArchiveLink" href="/newsletter/archive">View previous editions <span aria-hidden="true">&rarr;</span></a>
+  </section>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{% if initial_section|default('', true) == 'home' %}
+  <script src="{{ url_for('static', filename='js/newsletter-popup.js') }}"></script>
+{% endif %}
 {% endblock %}

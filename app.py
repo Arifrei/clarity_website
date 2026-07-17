@@ -52,9 +52,12 @@ from teamwork import (  # noqa: E402
     create_lead_task,
     update_lead_task_description,
 )
+from newsletter_feed import get_newsletter_feed  # noqa: E402
 
 app = Flask(__name__)
 
+CANONICAL_ORIGIN = os.getenv("CANONICAL_ORIGIN", "https://claritysolutionsco.com").rstrip("/")
+CANONICAL_HOST = (urlparse(CANONICAL_ORIGIN).hostname or "claritysolutionsco.com").lower()
 EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 AUTO_REPLY_DELAY_SECONDS = 5 * 60
 AUTO_REPLY_POLL_INTERVAL_SECONDS = 15
@@ -122,6 +125,29 @@ COMMON_EMAIL_DOMAINS = {
     "protonmail.com",
     "yahoo.com",
 }
+
+
+@app.context_processor
+def inject_site_metadata() -> dict:
+    return {"canonical_origin": CANONICAL_ORIGIN}
+
+
+@app.before_request
+def redirect_to_canonical_host():
+    """Consolidate the public www hostname without affecting local development."""
+    request_host = (request.host or "").split(":", 1)[0].lower()
+    alternate_host = (
+        CANONICAL_HOST.removeprefix("www.")
+        if CANONICAL_HOST.startswith("www.")
+        else f"www.{CANONICAL_HOST}"
+    )
+    if request_host != alternate_host:
+        return None
+
+    path_and_query = request.full_path
+    if path_and_query.endswith("?"):
+        path_and_query = path_and_query[:-1]
+    return redirect(f"{CANONICAL_ORIGIN}{path_and_query}", code=308)
 
 
 def sanitize(value: str, max_len: int) -> str:
@@ -869,6 +895,41 @@ def workflow_section():
 @app.get("/contact")
 def contact_section():
     return render_home_section("contact")
+
+
+@app.get("/newsletter")
+def newsletter_landing():
+    _record_inbound_page_visit()
+    feed = get_newsletter_feed(
+        os.getenv("BEEHIIV_RSS_URL"),
+        timeout_seconds=3,
+    )
+    if feed.error:
+        app.logger.warning("Unable to refresh beehiiv RSS feed for landing page: %s", feed.error)
+    return render_template("newsletter.html", newsletter_feed=feed)
+
+
+@app.get("/newsletter/archive")
+def newsletter_archive():
+    _record_inbound_page_visit()
+    feed = get_newsletter_feed(os.getenv("BEEHIIV_RSS_URL"))
+    if feed.error:
+        app.logger.warning("Unable to refresh beehiiv RSS feed: %s", feed.error)
+    return render_template("newsletter-archive.html", newsletter_feed=feed)
+
+
+@app.get("/sitemap.xml")
+def sitemap():
+    response = app.send_static_file("sitemap.xml")
+    response.mimetype = "application/xml"
+    return response
+
+
+@app.get("/robots.txt")
+def robots():
+    response = app.send_static_file("robots.txt")
+    response.mimetype = "text/plain"
+    return response
 
 
 @app.get("/<tag>")
