@@ -53,99 +53,70 @@
 {% endblock %}
 
 {% block content %}
-<section class="newsletterLanding" aria-labelledby="newsletterLandingTitle">
-  <div class="newsletterLandingGlow" aria-hidden="true"></div>
-  <div class="newsletterLandingInner">
-    <div class="newsletterLandingCopy">
-      <h1 id="newsletterLandingTitle">
-        <span class="newsletterTitleBrand">INTEGRATED</span>
-        <span>Practical systems and smarter technology for a better-run business.</span>
-      </h1>
-      <div class="newsletterLandingBody">
-        <p>A short monthly newsletter about practical business systems, software, automation, and AI, without the tech hype.</p>
-      </div>
-    </div>
+<section class="newsletterPage" aria-labelledby="newsletterLandingTitle">
+  <header class="newsletterHero">
+    <p class="newsletterKicker">A Clarity Solutions monthly</p>
+    <h1 id="newsletterLandingTitle">
+      <span class="newsletterTitleBrand">INTEGRATED
+        <svg class="newsletterBrandStroke" viewBox="0 0 240 12" aria-hidden="true" focusable="false">
+          <path d="M4 8.5C60 2.5 180 2 236 6.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="newsletterTitleSub">Practical systems and smarter technology for a better-run business.</span>
+    </h1>
+  </header>
 
-    <div class="newsletterSignupPanel" id="newsletter-signup" aria-label="Subscribe to INTEGRATED">
-      <h2 class="newsletterSignupHeading">Subscribe to INTEGRATED</h2>
-      <div class="newsletterSignupEmbed">
-        <script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="45839228-a04c-4eaf-9348-9cbab49d391c"></script>
-      </div>
-      <a class="newsletterArchiveLink" href="/newsletter/archive">
-        Want to see what you're signing up for? <span>View previous editions &rarr;</span>
-      </a>
+  <div class="newsletterSubscribe" id="newsletter-signup" aria-label="Subscribe to INTEGRATED">
+    <p class="newsletterTagline">One short, useful email a month. No hype.</p>
+    <div class="newsletterSignupEmbed">
+      <script async src="https://subscribe-forms.beehiiv.com/v3/loader.js" data-beehiiv-form="45839228-a04c-4eaf-9348-9cbab49d391c"></script>
     </div>
+    <a class="newsletterTextLink" href="/newsletter/archive">View previous editions <span aria-hidden="true">&rarr;</span></a>
   </div>
-</section>
 
-<section class="newsletterBenefits" aria-labelledby="newsletterBenefitsTitle">
-  <div class="newsletterContentInner">
-    <div class="newsletterSectionHeading">
-      <p class="newsletterEyebrow">What you'll get</p>
-      <h2 id="newsletterBenefitsTitle">Useful ideas for the systems behind your business.</h2>
-    </div>
-    <div class="newsletterBenefitGrid">
-      <article class="newsletterBenefitCard">
-        <span class="newsletterBenefitNumber" aria-hidden="true">01</span>
+  <div class="newsletterGetBlock" aria-labelledby="newsletterGetTitle">
+    <h2 id="newsletterGetTitle" class="newsletterSectionTitle">What you'll get</h2>
+    <div class="newsletterGetGrid">
+      <div>
         <h3>Business systems</h3>
         <p>Clearer workflows, responsibilities, and information.</p>
-      </article>
-      <article class="newsletterBenefitCard">
-        <span class="newsletterBenefitNumber" aria-hidden="true">02</span>
-        <h3>Software that fits</h3>
-        <p>Better ways to choose, connect, and use software.</p>
-      </article>
-      <article class="newsletterBenefitCard">
-        <span class="newsletterBenefitNumber" aria-hidden="true">03</span>
-        <h3>Automation and practical AI</h3>
-        <p>Useful automation and AI, only where they genuinely help.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="newsletterAudience" aria-labelledby="newsletterAudienceTitle">
-  <div class="newsletterAudienceInner">
-    <div class="newsletterAudienceCopy">
-      <p class="newsletterEyebrow">Who it's for</p>
-      <h2 id="newsletterAudienceTitle">For curious people who want work and everyday life to run better.</h2>
-      <p>Whether you own a business, manage a team, or simply want to understand better workflows, practical automation, and useful AI, INTEGRATED is for you.</p>
-    </div>
-    <aside class="newsletterPublisher">
-      <p class="newsletterEyebrow">Published by Clarity Solutions</p>
-      <p>Grounded in practical work helping businesses build clearer processes and better systems.</p>
-      <a href="/why-clarity">About Clarity <span aria-hidden="true">&rarr;</span></a>
-    </aside>
-  </div>
-</section>
-
-{% if newsletter_feed.editions %}
-<section class="newsletterLatest" aria-labelledby="newsletterLatestTitle">
-  <div class="newsletterContentInner">
-    <div class="newsletterSectionHeading newsletterSectionHeadingRow">
-      <div>
-        <p class="newsletterEyebrow">From the archive</p>
-        <h2 id="newsletterLatestTitle">Explore recent editions of INTEGRATED.</h2>
       </div>
-      <a class="newsletterTextLink" href="/newsletter/archive">View all previous editions <span aria-hidden="true">&rarr;</span></a>
+      <div>
+        <h3>Software that fits</h3>
+        <p>How to choose, connect, and actually use your tools.</p>
+      </div>
+      <div>
+        <h3>Automation &amp; practical AI</h3>
+        <p>Workflow automation and AI, only where they genuinely help.</p>
+      </div>
     </div>
-    <div class="newsletterLatestGrid">
+  </div>
+
+  <p class="newsletterAudienceNote">Written for owners, managers, and curious people who want work and everyday life to run better.</p>
+
+  {% if newsletter_feed.editions %}
+  <div class="newsletterRecentBlock" aria-labelledby="newsletterLatestTitle">
+    <h2 id="newsletterLatestTitle" class="newsletterSectionTitle">Recent editions</h2>
+    <ul class="newsletterRecentList">
       {% for edition in newsletter_feed.editions[:3] %}
-        <article class="newsletterLatestCard">
-          <a href="{{ edition.url }}" aria-label="Read {{ edition.title }}">
+        <li>
+          <a href="{{ edition.url }}">
             {% if edition.published_label %}
               <time datetime="{{ edition.published_at.date().isoformat() }}">{{ edition.published_label }}</time>
             {% endif %}
-            <h3>{{ edition.title }}</h3>
-            {% if edition.excerpt %}<p>{{ edition.excerpt }}</p>{% endif %}
-            <span>Read this edition <span aria-hidden="true">&rarr;</span></span>
+            <span class="newsletterTocTitle">{{ edition.title }}</span>
           </a>
-        </article>
+        </li>
       {% endfor %}
-    </div>
+    </ul>
+    <a class="newsletterTextLink" href="/newsletter/archive">View all editions <span aria-hidden="true">&rarr;</span></a>
   </div>
+  {% endif %}
+
+  <footer class="newsletterColophon">
+    <p>Published by <a href="/why-clarity">Clarity Solutions</a>.</p>
+  </footer>
 </section>
-{% endif %}
 {% endblock %}
 
 {% block beehiiv_popup_script %}{% endblock %}

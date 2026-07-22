@@ -4,7 +4,14 @@
       "Bash(cat:*)",
       "Bash(git -C \"/c/Users/Aron/Clarity Projects/calrity_new2\" log --oneline -10)",
       "Bash(tree:*)",
-      "Bash(cd C:\\\\Users\\\\Aron\\\\clarity projects\\\\calrity_new2:*)"
+      "Bash(cd C:\\\\Users\\\\Aron\\\\clarity projects\\\\calrity_new2:*)",
+      "PowerShell(python -m pytest tests/test_newsletter_routes.py tests/test_newsletter_feed.py -q)",
+      "PowerShell(python app.py)",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:5001/newsletter\" -UseBasicParsing; $r.StatusCode; \\($r.Content -match 'newsletterPage'\\); \\($r.Content -match 'CreativeWorkSeries'\\))",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:5001/newsletter\" -UseBasicParsing; $r.StatusCode; \\($r.Content -match 'newsletterMasthead'\\); \\($r.Content -match 'newsletterColophon'\\))",
+      "PowerShell(python -m pytest tests/test_newsletter_routes.py tests/test_newsletter_feed.py -q; $r = Invoke-WebRequest -Uri \"http://localhost:5001/newsletter\" -UseBasicParsing; $r.StatusCode; \\($r.Content -match 'newsletterBrandStroke'\\))",
+      "PowerShell(python -m pytest tests/test_newsletter_routes.py tests/test_newsletter_feed.py -q; $r = Invoke-WebRequest -Uri \"http://localhost:5001/newsletter\" -UseBasicParsing; $r.StatusCode; \\($r.Content -match 'newsletterTopics'\\); \\($r.Content -match 'newsletterSubscribe'\\))",
+      "PowerShell(python -m pytest tests/test_newsletter_routes.py tests/test_newsletter_feed.py -q; $r = Invoke-WebRequest -Uri \"http://localhost:5001/newsletter\" -UseBasicParsing; $r.StatusCode; \\($r.Content -match 'newsletterGetGrid'\\); \\($r.Content -match 'newsletterAudienceNote'\\))"
     ]
   }
 }

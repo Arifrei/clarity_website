@@ -49,8 +49,9 @@ class NewsletterRouteTests(unittest.TestCase):
 
         body = self.client.get("/newsletter").get_data(as_text=True)
 
-        self.assertIn("Explore recent editions of INTEGRATED.", body)
+        self.assertIn("Recent editions", body)
         self.assertIn("A Better Workflow", body)
+        self.assertIn('datetime="2026-07-15"', body)
         self.assertIn("https://example.beehiiv.com/p/better-workflow", body)
 
     @patch("app.get_newsletter_feed")
