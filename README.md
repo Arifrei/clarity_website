@@ -35,6 +35,16 @@
 - If lead research succeeds, the app adds the qualification notes to the Teamwork task and sends a follow-up email with the same findings.
 - If the AI check cannot run, the app logs the issue and continues the normal lead workflow.
 
+## Contact form bot protection
+- Create a Cloudflare Turnstile widget in Managed mode for `claritysolutionsco.com`.
+- Set `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in the deployment environment. The site key is public; the secret key must never be committed or sent to the browser.
+- `TURNSTILE_EXPECTED_HOSTNAME` optionally overrides the hostname checked in Cloudflare's Siteverify response; it defaults to the hostname in `CANONICAL_ORIGIN`.
+- Turnstile is validated server-side before email, Teamwork, or AI processing. Missing, expired, reused, wrong-action, and wrong-hostname tokens are rejected.
+- Contact limits are stored in `contact_security.sqlite3`, so they survive restarts and work across multiple app workers. Defaults are 5 submissions per IP per 15 minutes, 25 per IP per day, 8 per normalized name per hour, and 3 per email per hour.
+- Override those defaults with `CONTACT_RATE_IP_MAX`, `CONTACT_RATE_IP_DAY_MAX`, `CONTACT_RATE_NAME_MAX`, and `CONTACT_RATE_EMAIL_MAX`.
+- When proxied through Cloudflare, the app uses `CF-Connecting-IP`. Restrict origin traffic to Cloudflare so clients cannot forge this header. For another trusted reverse proxy, set `TRUST_X_FORWARDED_FOR=true`; never enable it when clients can reach the app directly.
+- The existing honeypot remains enabled, explicit cross-origin browser submissions are rejected, and contact request bodies are limited to 32 KB.
+
 To inspect suppressed spam repeats:
 `python -c "import json; print([{'received_at': e.get('received_at'), 'name': e.get('name'), 'email': e.get('email'), 'company': e.get('company'), 'previous_event_count': e.get('previous_event_count'), 'matched_identity_key': e.get('matched_identity_key')} for e in (json.loads(line) for line in open('spam_submissions.jsonl', encoding='utf-8')) if e.get('action') == 'suppressed_repeat'])"`
 

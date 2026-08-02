@@ -1,5 +1,8 @@
 .env
 venv
+__pycache__/
+*.pyc
 auto_reply_jobs.sqlite3
 ad_clicks.sqlite3
+contact_security.sqlite3
 spam_submissions.jsonl

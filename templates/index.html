@@ -263,6 +263,19 @@
             <textarea id="message" name="message" required rows="4" maxlength="3000" placeholder="What’s happening in your operations?"></textarea>
           </div>
 
+          {% if turnstile_site_key %}
+          <div
+            id="contactTurnstile"
+            class="cf-turnstile contactTurnstile"
+            data-sitekey="{{ turnstile_site_key }}"
+            data-action="contact"
+            data-appearance="interaction-only"
+            data-theme="dark"
+            data-size="flexible"
+            data-error-callback="onContactTurnstileError"
+          ></div>
+          {% endif %}
+
           <button type="submit" class="btn primary cv2-submit">Start the conversation</button>
           <div id="contactStatus" class="contactStatus" aria-live="polite"></div>
         </form>
@@ -300,6 +313,9 @@
 {% endblock %}
 
 {% block scripts %}
+{% if turnstile_site_key %}
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+{% endif %}
 {% if initial_section|default('', true) == 'home' %}
   <script src="{{ url_for('static', filename='js/newsletter-popup.js') }}"></script>
 {% endif %}

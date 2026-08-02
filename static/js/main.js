@@ -1426,6 +1426,11 @@
     if (type) statusEl.classList.add(type);
   };
 
+  window.onContactTurnstileError = () => {
+    setStatus("Verification could not load. Please refresh and try again.", "error");
+    return true;
+  };
+
   const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
   if (form) {
@@ -1439,6 +1444,8 @@
         phone: (formData.get("phone") || "").trim(),
         message: (formData.get("message") || "").trim(),
         website: (formData.get("website") || "").trim(),
+        "cf-turnstile-response":
+          (formData.get("cf-turnstile-response") || "").trim(),
       };
 
       if (!payload.name || !payload.email || !payload.message) {
@@ -1448,6 +1455,11 @@
 
       if (!isValidEmail(payload.email)) {
         setStatus("Add a valid email so we can reach you.", "error");
+        return;
+      }
+
+      if (!payload["cf-turnstile-response"]) {
+        setStatus("Please complete the verification and try again.", "error");
         return;
       }
 
@@ -1476,6 +1488,9 @@
       } catch (err) {
         setStatus(err.message || "Could not submit your message right now.", "error");
       } finally {
+        if (window.turnstile) {
+          window.turnstile.reset("#contactTurnstile");
+        }
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.textContent =

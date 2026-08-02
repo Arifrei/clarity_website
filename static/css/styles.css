@@ -2089,6 +2089,11 @@ body.js-ready .testimonialsSection {
 .contactStatus.error{ color: #ff9b9b; }
 .contactStatus.success{ color: #d4e28a; }
 
+.contactTurnstile{
+  width: 100%;
+  min-height: 65px;
+}
+
 .honeypot{
   position: absolute;
   left: -9999px;

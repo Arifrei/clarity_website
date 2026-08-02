@@ -5,8 +5,11 @@ import threading
 import time
 import json
 import hashlib
+from contextlib import closing
 from datetime import datetime, timedelta, timezone
-from urllib.parse import urlparse
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode, urlparse
+from urllib.request import Request as UrlRequest, urlopen
 
 from flask import Flask, abort, jsonify, redirect, render_template, request
 
@@ -55,6 +58,7 @@ from teamwork import (  # noqa: E402
 from newsletter_feed import get_newsletter_feed  # noqa: E402
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 32 * 1024
 
 CANONICAL_ORIGIN = os.getenv("CANONICAL_ORIGIN", "https://claritysolutionsco.com").rstrip("/")
 CANONICAL_HOST = (urlparse(CANONICAL_ORIGIN).hostname or "claritysolutionsco.com").lower()
@@ -62,15 +66,16 @@ EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 AUTO_REPLY_DELAY_SECONDS = 5 * 60
 AUTO_REPLY_POLL_INTERVAL_SECONDS = 15
 AUTO_REPLY_RETRY_DELAY_SECONDS = 5 * 60
-RATE_LIMIT_WINDOW = 15 * 60  # 15 minutes
-RATE_LIMIT_MAX = 5
 AUTO_REPLY_DB_PATH = os.path.join(app.root_path, "auto_reply_jobs.sqlite3")
 AD_TRACKING_DB_PATH = os.path.join(app.root_path, "ad_clicks.sqlite3")
+CONTACT_SECURITY_DB_PATH = os.getenv(
+    "CONTACT_SECURITY_DB_PATH",
+    os.path.join(app.root_path, "contact_security.sqlite3"),
+)
 SPAM_LOG_PATH = os.path.join(app.root_path, "spam_submissions.jsonl")
 auto_reply_scheduler_lock = threading.Lock()
 auto_reply_scheduler_started = False
 spam_log_lock = threading.Lock()
-rate_memory = {}
 HOME_SECTIONS = {"home", "workflow", "contact"}
 AD_TRACKING_TAGS = {
     "a": {
@@ -129,7 +134,10 @@ COMMON_EMAIL_DOMAINS = {
 
 @app.context_processor
 def inject_site_metadata() -> dict:
-    return {"canonical_origin": CANONICAL_ORIGIN}
+    return {
+        "canonical_origin": CANONICAL_ORIGIN,
+        "turnstile_site_key": os.getenv("TURNSTILE_SITE_KEY", ""),
+    }
 
 
 @app.before_request
@@ -161,9 +169,18 @@ def is_valid_email(value: str) -> bool:
 
 
 def get_client_ip() -> str:
-    forwarded = request.headers.get("X-Forwarded-For")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
+    # Cloudflare sets this to the original visitor IP. The origin should be
+    # firewalled so public traffic cannot bypass Cloudflare and forge it.
+    cloudflare_ip = request.headers.get("CF-Connecting-IP")
+    if cloudflare_ip:
+        return sanitize(cloudflare_ip, 64)
+
+    # X-Forwarded-For is intentionally not trusted by default because clients
+    # can send it themselves. Enable only behind a trusted non-Cloudflare proxy.
+    if os.getenv("TRUST_X_FORWARDED_FOR", "").lower() in {"1", "true", "yes"}:
+        forwarded = request.headers.get("X-Forwarded-For")
+        if forwarded:
+            return sanitize(forwarded.split(",")[0], 64)
     return request.remote_addr or "unknown"
 
 
@@ -210,16 +227,167 @@ def _is_known_ad_redirect_followup() -> bool:
     )
 
 
-def within_rate_limit(ip: str) -> bool:
-    now = time.time()
-    window = rate_memory.get(ip, [])
-    window = [ts for ts in window if now - ts < RATE_LIMIT_WINDOW]
-    if len(window) >= RATE_LIMIT_MAX:
-        rate_memory[ip] = window
-        return False
-    window.append(now)
-    rate_memory[ip] = window
-    return True
+def _env_positive_int(name: str, default: int) -> int:
+    try:
+        value = int(os.getenv(name, str(default)))
+    except (TypeError, ValueError):
+        return default
+    return value if value > 0 else default
+
+
+def _contact_security_conn() -> sqlite3.Connection:
+    conn = sqlite3.connect(CONTACT_SECURITY_DB_PATH, timeout=10)
+    conn.execute("PRAGMA busy_timeout = 10000")
+    return conn
+
+
+def _init_contact_security_store(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS contact_rate_events (
+            bucket TEXT NOT NULL,
+            created_at INTEGER NOT NULL
+        )
+        """
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_contact_rate_bucket_time "
+        "ON contact_rate_events (bucket, created_at)"
+    )
+
+
+def _rate_bucket(kind: str, value: str) -> str:
+    normalized = re.sub(r"\s+", " ", (value or "").strip().casefold())
+    digest = hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+    return f"{kind}:{digest}"
+
+
+def _within_contact_rate_policies(
+    policies: tuple[tuple[str, int, int, str], ...],
+) -> tuple[bool, str]:
+    """Atomically enforce rate policies without storing raw visitor identifiers."""
+    now = int(time.time())
+
+    with closing(_contact_security_conn()) as conn:
+        _init_contact_security_store(conn)
+        conn.commit()
+        conn.execute("BEGIN IMMEDIATE")
+        conn.execute(
+            "DELETE FROM contact_rate_events WHERE created_at < ?",
+            (now - 24 * 60 * 60,),
+        )
+
+        for bucket, maximum, window_seconds, label in policies:
+            count = conn.execute(
+                """
+                SELECT COUNT(*)
+                FROM contact_rate_events
+                WHERE bucket = ? AND created_at >= ?
+                """,
+                (bucket, now - window_seconds),
+            ).fetchone()[0]
+            if count >= maximum:
+                conn.rollback()
+                return False, label
+
+        conn.executemany(
+            "INSERT INTO contact_rate_events (bucket, created_at) VALUES (?, ?)",
+            ((bucket, now) for bucket, _, _, _ in policies),
+        )
+        conn.commit()
+
+    return True, ""
+
+
+def within_contact_ip_limits(ip: str) -> tuple[bool, str]:
+    """Limit every shaped submission attempt before making an outbound API call."""
+    policies = (
+        (
+            _rate_bucket("ip-15m", ip),
+            _env_positive_int("CONTACT_RATE_IP_MAX", 5),
+            15 * 60,
+            "ip-15m",
+        ),
+        (
+            _rate_bucket("ip-day", ip),
+            _env_positive_int("CONTACT_RATE_IP_DAY_MAX", 25),
+            24 * 60 * 60,
+            "ip-day",
+        ),
+    )
+    return _within_contact_rate_policies(policies)
+
+
+def within_contact_identity_limits(name: str, email: str) -> tuple[bool, str]:
+    """Limit verified submissions that rotate IPs but reuse contact identities."""
+    policies = (
+        (
+            _rate_bucket("name-hour", name),
+            _env_positive_int("CONTACT_RATE_NAME_MAX", 8),
+            60 * 60,
+            "name-hour",
+        ),
+        (
+            _rate_bucket("email-hour", email),
+            _env_positive_int("CONTACT_RATE_EMAIL_MAX", 3),
+            60 * 60,
+            "email-hour",
+        ),
+    )
+    return _within_contact_rate_policies(policies)
+
+
+def _contact_origin_is_allowed() -> bool:
+    """Reject explicit cross-site browser posts while allowing non-browser clients."""
+    origin = request.headers.get("Origin")
+    if not origin:
+        return True
+    origin_host = (urlparse(origin).hostname or "").lower()
+    request_host = (request.host or "").split(":", 1)[0].lower()
+    return bool(origin_host and origin_host in {request_host, CANONICAL_HOST})
+
+
+def verify_turnstile(token: str, remote_ip: str) -> tuple[bool, str]:
+    """Validate a single-use Turnstile token and its form/hostname binding."""
+    secret = os.getenv("TURNSTILE_SECRET_KEY", "").strip()
+    if not secret:
+        app.logger.error("TURNSTILE_SECRET_KEY is not configured.")
+        return False, "not-configured"
+    if not token or len(token) > 2048:
+        return False, "missing-or-invalid-token"
+
+    body = urlencode(
+        {
+            "secret": secret,
+            "response": token,
+            "remoteip": remote_ip,
+        }
+    ).encode("utf-8")
+    siteverify_request = UrlRequest(
+        "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+        data=body,
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        method="POST",
+    )
+
+    try:
+        with urlopen(siteverify_request, timeout=5) as response:
+            result = json.loads(response.read().decode("utf-8"))
+    except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, OSError) as exc:
+        app.logger.warning("Turnstile Siteverify request failed: %s", type(exc).__name__)
+        return False, "verification-unavailable"
+
+    if not result.get("success"):
+        error_codes = result.get("error-codes") or []
+        return False, ",".join(str(code) for code in error_codes) or "rejected"
+    if result.get("action") != "contact":
+        return False, "action-mismatch"
+
+    expected_hostname = os.getenv("TURNSTILE_EXPECTED_HOSTNAME", CANONICAL_HOST).strip().lower()
+    if expected_hostname and (result.get("hostname") or "").lower() != expected_hostname:
+        return False, "hostname-mismatch"
+
+    return True, ""
 
 
 def _get_auto_reply_conn() -> sqlite3.Connection:
@@ -982,6 +1150,10 @@ def article_5_mistakes():
 def contact_submit():
     _load_env_from_file()
     _ensure_auto_reply_scheduler()
+
+    if not _contact_origin_is_allowed():
+        return jsonify(success=False, message="Invalid submission origin."), 403
+
     data = request.get_json(silent=True) or request.form
 
     honeypot = sanitize(data.get("website"), 120)
@@ -1004,7 +1176,28 @@ def contact_submit():
         return jsonify(success=False, message="Tell us a bit more so we can help."), 400
 
     ip = get_client_ip()
-    if not within_rate_limit(ip):
+    within_limit, limit_name = within_contact_ip_limits(ip)
+    if not within_limit:
+        app.logger.info("Contact rate limit rejected bucket %s.", limit_name)
+        return jsonify(success=False, message="Too many submissions. Please try again shortly."), 429
+
+    turnstile_token = sanitize(data.get("cf-turnstile-response"), 2048)
+    turnstile_valid, turnstile_reason = verify_turnstile(turnstile_token, ip)
+    if not turnstile_valid:
+        app.logger.info("Turnstile rejected contact submission: %s", turnstile_reason)
+        status_code = (
+            503
+            if turnstile_reason in {"not-configured", "verification-unavailable"}
+            else 400
+        )
+        return jsonify(
+            success=False,
+            message="We could not verify the submission. Please refresh and try again.",
+        ), status_code
+
+    within_limit, limit_name = within_contact_identity_limits(name, email)
+    if not within_limit:
+        app.logger.info("Contact rate limit rejected bucket %s.", limit_name)
         return jsonify(success=False, message="Too many submissions. Please try again shortly."), 429
 
     payload = {
